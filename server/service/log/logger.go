@@ -10,12 +10,13 @@ import (
 )
 
 type Config struct {
-	Level      string `yaml:"level"`
-	Filename   string `yaml:"filename"`
-	MaxSize    int    `yaml:"maxsize"`
-	MaxBackups int    `yaml:"maxbackups"`
-	MaxAge     int    `yaml:"maxage"`
-	Compress   bool   `yaml:"compress"`
+	Level         string `yaml:"level"`
+	InfoFilename  string `yaml:"infoFilename"`
+	errorFilename string `yaml:"errorFilename"`
+	MaxSize       int    `yaml:"maxsize"`
+	MaxBackups    int    `yaml:"maxbackups"`
+	MaxAge        int    `yaml:"maxage"`
+	Compress      bool   `yaml:"compress"`
 }
 
 var logger *zap.Logger
@@ -33,17 +34,28 @@ func InitLogger(configPath string) {
 		log.Fatalf("Failed to parse logger config: %v", err)
 	}
 
-	writeSyncer := zapcore.AddSync(os.Stdout) // 控制台输出
-	if cfg.Filename != "" {
-		fileSyncer := &lumberjack.Logger{
-			Filename:   cfg.Filename,
-			MaxSize:    cfg.MaxSize,
-			MaxBackups: cfg.MaxBackups,
-			MaxAge:     cfg.MaxAge,
-			Compress:   cfg.Compress,
-		}
-		writeSyncer = zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(fileSyncer))
+	// Info 日志配置
+	infoLogger := &lumberjack.Logger{
+		Filename:   cfg.InfoFilename,
+		MaxSize:    cfg.MaxSize,
+		MaxBackups: cfg.MaxBackups,
+		MaxAge:     cfg.MaxAge,
+		Compress:   cfg.Compress,
 	}
+
+	// Error 日志配置
+	errorLogger := &lumberjack.Logger{
+		Filename:   cfg.errorFilename,
+		MaxSize:    cfg.MaxSize,
+		MaxBackups: cfg.MaxBackups,
+		MaxAge:     cfg.MaxAge,
+		Compress:   cfg.Compress,
+	}
+
+	writeSyncerInfo := zapcore.AddSync(infoLogger)
+	writeSyncerError := zapcore.AddSync(errorLogger)
+	consoleWriter := zapcore.AddSync(os.Stdout)
+	writeSyncer := zapcore.NewMultiWriteSyncer(consoleWriter, writeSyncerInfo, writeSyncerError)
 
 	// 日志级别
 	var level zapcore.Level

@@ -1,6 +1,7 @@
 level: debug
-filename: ./logs/game.log
-maxsize: 100   # MB
+infoFilename: "logs/info.log"
+errorFilename: "logs/error.log"
+maxsize: 100    # MB
 maxbackups: 7
-maxage: 7      # days
+maxage: 7       # days
 compress: true
