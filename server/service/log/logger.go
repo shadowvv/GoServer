@@ -5,7 +5,6 @@ import (
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
 	"log"
 	"os"
 )
@@ -17,20 +16,19 @@ type Config struct {
 	MaxBackups int    `yaml:"maxbackups"`
 	MaxAge     int    `yaml:"maxage"`
 	Compress   bool   `yaml:"compress"`
-	ServerType string `yaml:"server_type"`
-	ServerID   string `yaml:"server_id"`
 }
 
-var Logger *zap.Logger
-var cfg Config
+var logger *zap.Logger
 
 // InitLogger 初始化日志
 func InitLogger(configPath string) {
-	data, err := ioutil.ReadFile(configPath)
+
+	data, err := os.ReadFile(configPath)
 	if err != nil {
 		log.Fatalf("Failed to read logger config: %v", err)
 	}
 
+	var cfg Config
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		log.Fatalf("Failed to parse logger config: %v", err)
 	}
@@ -77,41 +75,35 @@ func InitLogger(configPath string) {
 		level,
 	)
 
-	Logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
+	logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 }
 
 // Info
-func Info(msg string, playerID ...uint) {
+func Info(msg string, playerID int64, serverId int32, serverType int32) {
 	fields := []zap.Field{
-		zap.String("server_type", cfg.ServerType),
-		zap.String("server_id", cfg.ServerID),
+		zap.Int64("player_id", playerID),
+		zap.Int32("server_type", serverType),
+		zap.Int32("server_id", serverId),
 	}
-	if len(playerID) > 0 {
-		fields = append(fields, zap.Uint("player_id", playerID[0]))
-	}
-	Logger.Info(msg, fields...)
+	logger.Info(msg, fields...)
 }
 
 // Debug
-func Debug(msg string, playerID ...uint) {
+func Debug(msg string, playerID int64, serverId int32, serverType int32) {
 	fields := []zap.Field{
-		zap.String("server_type", cfg.ServerType),
-		zap.String("server_id", cfg.ServerID),
+		zap.Int64("player_id", playerID),
+		zap.Int32("server_type", serverType),
+		zap.Int32("server_id", serverId),
 	}
-	if len(playerID) > 0 {
-		fields = append(fields, zap.Uint("player_id", playerID[0]))
-	}
-	Logger.Debug(msg, fields...)
+	logger.Debug(msg, fields...)
 }
 
 // Error
-func Error(msg string, playerID ...uint) {
+func Error(msg string, playerID int64, serverId int32, serverType int32) {
 	fields := []zap.Field{
-		zap.String("server_type", cfg.ServerType),
-		zap.String("server_id", cfg.ServerID),
+		zap.Int64("player_id", playerID),
+		zap.Int32("server_type", serverType),
+		zap.Int32("server_id", serverId),
 	}
-	if len(playerID) > 0 {
-		fields = append(fields, zap.Uint("player_id", playerID[0]))
-	}
-	Logger.Error(msg, fields...)
+	logger.Error(msg, fields...)
 }
