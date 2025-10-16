@@ -1,45 +1,78 @@
 package net
 
 import (
+	"context"
+	"fmt"
+	"github.com/drop/GoServer/server/service/logger"
+	"github.com/drop/GoServer/server/service/serviceInterface"
 	"github.com/gorilla/websocket"
-	"log"
 	"net/http"
 )
 
+// Server 是 websocket 服务
 type Server struct {
-	addr      string
-	upgrader  websocket.Upgrader
-	OnMessage func(conn *Conn, data []byte)
+	Addr     string
+	Upgrader websocket.Upgrader
+	Router   *Router
+	srv      *http.Server
+	Acceptor serviceInterface.AcceptorInterface
+	codec    serviceInterface.CodecInterface
+	RouterT  serviceInterface.RouterInterface
 }
 
-func NewServer(addr string) *Server {
+// NewServer 返回默认 Server
+func NewServer(addr string, acceptorInterface serviceInterface.AcceptorInterface, codec serviceInterface.CodecInterface, router serviceInterface.RouterInterface) *Server {
+	r := NewRouter()
 	return &Server{
-		addr: addr,
-		upgrader: websocket.Upgrader{
-			ReadBufferSize:  1024,
-			WriteBufferSize: 1024,
-			CheckOrigin: func(r *http.Request) bool {
-				return true // TODO: 安全策略可加白名单验证
-			},
+		Addr: addr,
+		Upgrader: websocket.Upgrader{
+			ReadBufferSize:  4096,
+			WriteBufferSize: 4096,
+			CheckOrigin:     func(r *http.Request) bool { return true },
 		},
+		Router:   r,
+		Acceptor: acceptorInterface,
+		codec:    codec,
+		RouterT:  router,
 	}
 }
 
-func (s *Server) Start() {
-	http.HandleFunc("/ws", s.handleWS)
-	log.Printf("WebSocket server started at %s\n", s.addr)
-	if err := http.ListenAndServe(s.addr, nil); err != nil {
-		log.Fatalf("WebSocket ListenAndServe failed: %v", err)
+// Start 启动服务，阻塞式
+func (s *Server) Start() error {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/ws", s.serveWS)
+	s.srv = &http.Server{
+		Addr:         s.Addr,
+		Handler:      mux,
+		ReadTimeout:  0,
+		WriteTimeout: 0,
 	}
+	logger.Info(fmt.Sprintf("ws server listen %s\n", s.Addr))
+	return s.srv.ListenAndServe()
 }
 
-func (s *Server) handleWS(w http.ResponseWriter, r *http.Request) {
-	conn, err := s.upgrader.Upgrade(w, r, nil)
+func (s *Server) serveWS(w http.ResponseWriter, r *http.Request) {
+	conn, err := s.Upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Printf("upgrade error: %v\n", err)
+		logger.Error(fmt.Sprintf("upgrade failed: %v", err))
 		return
 	}
 
-	c := NewConn(conn)
-	go c.ReadLoop(s.OnMessage)
+	c := newConn(conn, s.Router)
+	c.Start()
+}
+
+// Handle 注册消息处理器
+func (s *Server) Handle(msgID uint32, h HandlerFunc) {
+	s.Router.Handle(msgID, h)
+}
+
+// Shutdown 优雅停服
+func (s *Server) Shutdown(ctx context.Context) error {
+	// 先停止 http server（不再接收新连接）
+	if s.srv != nil {
+		_ = s.srv.Shutdown(ctx)
+	}
+	// Router/Conn 会自行在 Context cancel 下关闭
+	return nil
 }
