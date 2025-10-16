@@ -19,6 +19,8 @@ type Platform struct {
 	NetRoutines map[int32]map[int32]NetRoutine
 }
 
-func (p *Platform) Init(env enum.Enviroment) {
-	log.InitLogger("config/log.yaml")
+func Init(env enum.Enviroment) {
+	log.InitLogger("config/logger_config.yaml")
+	log.Info("Init platform", 0, 0, int32(env))
+	log.Error("Error platform", 0, 0, int32(env))
 }

@@ -12,7 +12,7 @@ import (
 type Config struct {
 	Level         string `yaml:"level"`
 	InfoFilename  string `yaml:"infoFilename"`
-	errorFilename string `yaml:"errorFilename"`
+	ErrorFilename string `yaml:"errorFilename"`
 	MaxSize       int    `yaml:"maxsize"`
 	MaxBackups    int    `yaml:"maxbackups"`
 	MaxAge        int    `yaml:"maxage"`
@@ -20,72 +20,77 @@ type Config struct {
 }
 
 var logger *zap.Logger
+var cfg Config
 
 // InitLogger 初始化日志
 func InitLogger(configPath string) {
-
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		log.Fatalf("Failed to read logger config: %v", err)
 	}
 
-	var cfg Config
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		log.Fatalf("Failed to parse logger config: %v", err)
 	}
 
-	// Info 日志配置
-	infoLogger := &lumberjack.Logger{
+	// Info 日志配置（包含 Debug/Info/Warn）
+	infoWriter := zapcore.AddSync(&lumberjack.Logger{
 		Filename:   cfg.InfoFilename,
 		MaxSize:    cfg.MaxSize,
 		MaxBackups: cfg.MaxBackups,
 		MaxAge:     cfg.MaxAge,
 		Compress:   cfg.Compress,
-	}
+	})
 
-	// Error 日志配置
-	errorLogger := &lumberjack.Logger{
-		Filename:   cfg.errorFilename,
+	// Error 日志配置（Error 及以上）
+	errorWriter := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   cfg.ErrorFilename,
 		MaxSize:    cfg.MaxSize,
 		MaxBackups: cfg.MaxBackups,
 		MaxAge:     cfg.MaxAge,
 		Compress:   cfg.Compress,
-	}
+	})
 
-	writeSyncerInfo := zapcore.AddSync(infoLogger)
-	writeSyncerError := zapcore.AddSync(errorLogger)
 	consoleWriter := zapcore.AddSync(os.Stdout)
-	writeSyncer := zapcore.NewMultiWriteSyncer(consoleWriter, writeSyncerInfo, writeSyncerError)
-
-	// 日志级别
-	var level zapcore.Level
-	switch cfg.Level {
-	case "debug":
-		level = zapcore.DebugLevel
-	case "info":
-		level = zapcore.InfoLevel
-	case "warn":
-		level = zapcore.WarnLevel
-	case "error":
-		level = zapcore.ErrorLevel
-	default:
-		level = zapcore.InfoLevel
-	}
 
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.TimeKey = "time"
 	encoderConfig.LevelKey = "level"
 	encoderConfig.CallerKey = "caller"
+	encoderConfig.FunctionKey = "func"
 	encoderConfig.MessageKey = "msg"
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 	encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 
-	core := zapcore.NewCore(
-		zapcore.NewJSONEncoder(encoderConfig),
-		writeSyncer,
-		level,
-	)
+	// 选择最小写入等级
+	var lvl zapcore.Level
+	switch cfg.Level {
+	case "debug":
+		lvl = zapcore.DebugLevel
+	case "info":
+		lvl = zapcore.InfoLevel
+	case "warn":
+		lvl = zapcore.WarnLevel
+	case "error":
+		lvl = zapcore.ErrorLevel
+	default:
+		lvl = zapcore.InfoLevel
+	}
+
+	// infoCore: 处理 Debug/Info/Warn （小于 Error 的都归 info）
+	infoLevelEnabler := zap.LevelEnablerFunc(func(l zapcore.Level) bool {
+		return l >= zapcore.DebugLevel && l < zapcore.ErrorLevel && l >= lvl
+	})
+	infoCore := zapcore.NewCore(zapcore.NewJSONEncoder(encoderConfig), zapcore.NewMultiWriteSyncer(infoWriter, consoleWriter), infoLevelEnabler)
+
+	// errorCore: 处理 Error 及以上
+	errorLevelEnabler := zap.LevelEnablerFunc(func(l zapcore.Level) bool {
+		return l >= zapcore.ErrorLevel && l >= lvl
+	})
+	errorCore := zapcore.NewCore(zapcore.NewJSONEncoder(encoderConfig), zapcore.NewMultiWriteSyncer(errorWriter, consoleWriter), errorLevelEnabler)
+
+	core := zapcore.NewTee(infoCore, errorCore)
 
 	logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 }
