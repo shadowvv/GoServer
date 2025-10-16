@@ -1,4 +1,4 @@
-package log
+package logger
 
 import (
 	"go.uber.org/zap"
@@ -9,8 +9,7 @@ import (
 	"os"
 )
 
-type Config struct {
-	Level         string `yaml:"level"`
+type config struct {
 	InfoFilename  string `yaml:"infoFilename"`
 	ErrorFilename string `yaml:"errorFilename"`
 	MaxSize       int    `yaml:"maxsize"`
@@ -20,9 +19,8 @@ type Config struct {
 }
 
 var logger *zap.Logger
-var cfg Config
+var cfg config
 
-// InitLogger 初始化日志
 func InitLogger(configPath string) {
 	data, err := os.ReadFile(configPath)
 	if err != nil {
@@ -56,37 +54,21 @@ func InitLogger(configPath string) {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.TimeKey = "time"
 	encoderConfig.LevelKey = "level"
-	encoderConfig.CallerKey = "caller"
 	encoderConfig.FunctionKey = "func"
 	encoderConfig.MessageKey = "msg"
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 	encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 
-	// 选择最小写入等级
-	var lvl zapcore.Level
-	switch cfg.Level {
-	case "debug":
-		lvl = zapcore.DebugLevel
-	case "info":
-		lvl = zapcore.InfoLevel
-	case "warn":
-		lvl = zapcore.WarnLevel
-	case "error":
-		lvl = zapcore.ErrorLevel
-	default:
-		lvl = zapcore.InfoLevel
-	}
-
 	// infoCore: 处理 Debug/Info/Warn （小于 Error 的都归 info）
 	infoLevelEnabler := zap.LevelEnablerFunc(func(l zapcore.Level) bool {
-		return l >= zapcore.DebugLevel && l < zapcore.ErrorLevel && l >= lvl
+		return l >= zapcore.DebugLevel && l < zapcore.ErrorLevel
 	})
 	infoCore := zapcore.NewCore(zapcore.NewJSONEncoder(encoderConfig), zapcore.NewMultiWriteSyncer(infoWriter, consoleWriter), infoLevelEnabler)
 
 	// errorCore: 处理 Error 及以上
 	errorLevelEnabler := zap.LevelEnablerFunc(func(l zapcore.Level) bool {
-		return l >= zapcore.ErrorLevel && l >= lvl
+		return l >= zapcore.ErrorLevel
 	})
 	errorCore := zapcore.NewCore(zapcore.NewJSONEncoder(encoderConfig), zapcore.NewMultiWriteSyncer(errorWriter, consoleWriter), errorLevelEnabler)
 
@@ -95,32 +77,14 @@ func InitLogger(configPath string) {
 	logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 }
 
-// Info
-func Info(msg string, playerID int64, serverId int32, serverType int32) {
-	fields := []zap.Field{
-		zap.Int64("player_id", playerID),
-		zap.Int32("server_type", serverType),
-		zap.Int32("server_id", serverId),
-	}
+func Info(msg string, fields ...zap.Field) {
 	logger.Info(msg, fields...)
 }
 
-// Debug
-func Debug(msg string, playerID int64, serverId int32, serverType int32) {
-	fields := []zap.Field{
-		zap.Int64("player_id", playerID),
-		zap.Int32("server_type", serverType),
-		zap.Int32("server_id", serverId),
-	}
+func Debug(msg string, fields ...zap.Field) {
 	logger.Debug(msg, fields...)
 }
 
-// Error
-func Error(msg string, playerID int64, serverId int32, serverType int32) {
-	fields := []zap.Field{
-		zap.Int64("player_id", playerID),
-		zap.Int32("server_type", serverType),
-		zap.Int32("server_id", serverId),
-	}
+func Error(msg string, fields ...zap.Field) {
 	logger.Error(msg, fields...)
 }

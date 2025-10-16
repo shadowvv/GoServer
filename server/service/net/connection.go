@@ -2,7 +2,7 @@ package net
 
 import (
 	"fmt"
-	"github.com/drop/GoServer/server/service/log"
+	"github.com/drop/GoServer/server/service/logger"
 	"github.com/gorilla/websocket"
 	"sync"
 )
@@ -20,7 +20,7 @@ func (c *Conn) ReadLoop(onMessage func(conn *Conn, data []byte)) {
 	for {
 		_, data, err := c.ws.ReadMessage()
 		if err != nil {
-			log.Error(fmt.Sprintf("read error: %v", err), 0, 0, 0)
+			logger.Error(fmt.Sprintf("read error: %v", err), 0, 0, 0)
 			return
 		}
 		onMessage(c, data)

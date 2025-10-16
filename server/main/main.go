@@ -7,6 +7,6 @@ import (
 
 func main() {
 
-	platform.Init(enum.ENV_DEV)
+	platform.Init(enum.ENV_DEVELOP)
 
 }

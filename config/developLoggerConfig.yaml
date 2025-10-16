@@ -1,4 +1,3 @@
-level: debug
 infoFilename: "logs/info.log"
 errorFilename: "logs/error.log"
 maxsize: 100    # MB

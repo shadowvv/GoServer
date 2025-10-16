@@ -3,7 +3,6 @@ package platform
 import (
 	"github.com/drop/GoServer/server/logic/enum"
 	"github.com/drop/GoServer/server/logic/logicInterface"
-	"github.com/drop/GoServer/server/service/log"
 )
 
 type NetRoutine func(message interface{}, user logicInterface.UserBaseInterface)
@@ -20,7 +19,8 @@ type Platform struct {
 }
 
 func Init(env enum.Enviroment) {
-	log.InitLogger("config/logger_config.yaml")
-	log.Info("Init platform", 0, 0, int32(env))
-	log.Error("Error platform", 0, 0, int32(env))
+	InitLogger(env)
+	user := &logicInterface.BasicUserInfo{}
+	Info("Init platform", user)
+	Error("Error platform", user)
 }
