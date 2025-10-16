@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/binary"
 	"errors"
+	"github.com/drop/GoServer/server/service/serviceInterface"
 	"sync"
 	"time"
 
@@ -24,7 +25,7 @@ var ErrConnClosed = errors.New("connection closed")
 // Conn 包装 websocket.Conn
 type Conn struct {
 	conn   *websocket.Conn
-	router *Router
+	router serviceInterface.RouterInterface
 
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -36,8 +37,13 @@ type Conn struct {
 	meta sync.Map
 }
 
+func (c *Conn) OnDisconnect() {
+	//TODO implement me
+	panic("implement me")
+}
+
 // newConn
-func newConn(ws *websocket.Conn, router *Router) *Conn {
+func newConn(ws *websocket.Conn, router serviceInterface.RouterInterface) *Conn {
 	ctx, cancel := context.WithCancel(context.Background())
 	c := &Conn{
 		conn:      ws,

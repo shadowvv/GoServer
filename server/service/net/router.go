@@ -1,26 +1,24 @@
 package net
 
 import (
+	"github.com/drop/GoServer/server/service/serviceInterface"
 	"sync"
 )
 
-// HandlerFunc 是消息处理函数签名（用户实现）
-type HandlerFunc func(c *Conn, payload []byte)
-
 // MiddlewareFunc 可选的中间件（链式调用）
-type MiddlewareFunc func(next HandlerFunc) HandlerFunc
+type MiddlewareFunc func(next serviceInterface.HandlerFunc) serviceInterface.HandlerFunc
 
 // Router 简单的 msgID -> Handler 映射，支持中间件链
 type Router struct {
 	mu       sync.RWMutex
-	handlers map[uint32]HandlerFunc
+	handlers map[uint32]serviceInterface.HandlerFunc
 	mw       []MiddlewareFunc
 }
 
 // NewRouter
 func NewRouter() *Router {
 	return &Router{
-		handlers: make(map[uint32]HandlerFunc),
+		handlers: make(map[uint32]serviceInterface.HandlerFunc),
 	}
 }
 
@@ -32,7 +30,7 @@ func (r *Router) Use(m MiddlewareFunc) {
 }
 
 // Handle 注册 handler
-func (r *Router) Handle(msgID uint32, h HandlerFunc) {
+func (r *Router) Handle(msgID uint32, h serviceInterface.HandlerFunc) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	// 应用中间件链（从后到前包裹）

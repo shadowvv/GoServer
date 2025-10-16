@@ -1,4 +1,4 @@
-package net
+package platform
 
 import (
 	"google.golang.org/protobuf/proto"

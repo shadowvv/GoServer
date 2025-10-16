@@ -2,11 +2,8 @@ package serviceInterface
 
 import "google.golang.org/protobuf/proto"
 
-type NetInterface interface {
-	GetName() string
-	GetIp() string
-	GetMac() string
-}
+// HandlerFunc 是消息处理函数签名（用户实现）
+type HandlerFunc func(c ConnectionInterface, payload []byte)
 
 type CodecInterface interface {
 	Marshal(pb proto.Message) ([]byte, error)
@@ -18,11 +15,12 @@ type AcceptorInterface interface {
 }
 
 type RouterInterface interface {
-	Dispatch(msgID uint32, c SocketInterface, payload []byte)
+	Register(msgID uint32, h HandlerFunc)
+	Dispatch(msgID uint32, c ConnectionInterface, payload []byte)
 }
 
-type SocketInterface interface {
-	Send(data []byte)
+type ConnectionInterface interface {
+	Send(data []byte) error
 	Close()
 	OnDisconnect()
 }

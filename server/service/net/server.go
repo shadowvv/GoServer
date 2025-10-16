@@ -11,29 +11,26 @@ import (
 
 // Server 是 websocket 服务
 type Server struct {
-	Addr     string
-	Upgrader websocket.Upgrader
-	Router   *Router
+	addr     string
+	upgrader websocket.Upgrader
 	srv      *http.Server
-	Acceptor serviceInterface.AcceptorInterface
+	acceptor serviceInterface.AcceptorInterface
 	codec    serviceInterface.CodecInterface
-	RouterT  serviceInterface.RouterInterface
+	router   serviceInterface.RouterInterface
 }
 
 // NewServer 返回默认 Server
 func NewServer(addr string, acceptorInterface serviceInterface.AcceptorInterface, codec serviceInterface.CodecInterface, router serviceInterface.RouterInterface) *Server {
-	r := NewRouter()
 	return &Server{
-		Addr: addr,
-		Upgrader: websocket.Upgrader{
+		addr: addr,
+		upgrader: websocket.Upgrader{
 			ReadBufferSize:  4096,
 			WriteBufferSize: 4096,
 			CheckOrigin:     func(r *http.Request) bool { return true },
 		},
-		Router:   r,
-		Acceptor: acceptorInterface,
+		acceptor: acceptorInterface,
 		codec:    codec,
-		RouterT:  router,
+		router:   router,
 	}
 }
 
@@ -42,29 +39,29 @@ func (s *Server) Start() error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", s.serveWS)
 	s.srv = &http.Server{
-		Addr:         s.Addr,
+		Addr:         s.addr,
 		Handler:      mux,
 		ReadTimeout:  0,
 		WriteTimeout: 0,
 	}
-	logger.Info(fmt.Sprintf("ws server listen %s\n", s.Addr))
+	logger.Info(fmt.Sprintf("ws server listen %s\n", s.addr))
 	return s.srv.ListenAndServe()
 }
 
 func (s *Server) serveWS(w http.ResponseWriter, r *http.Request) {
-	conn, err := s.Upgrader.Upgrade(w, r, nil)
+	conn, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		logger.Error(fmt.Sprintf("upgrade failed: %v", err))
 		return
 	}
 
-	c := newConn(conn, s.Router)
+	c := newConn(conn, s.router)
 	c.Start()
 }
 
-// Handle 注册消息处理器
-func (s *Server) Handle(msgID uint32, h HandlerFunc) {
-	s.Router.Handle(msgID, h)
+// Register 注册消息处理器
+func (s *Server) Register(msgID uint32, h serviceInterface.HandlerFunc) {
+	s.router.Register(msgID, h)
 }
 
 // Shutdown 优雅停服
