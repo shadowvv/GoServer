@@ -1,9 +1,9 @@
 package platform
 
 import (
-	"GoServer/server/logic/enum"
-	"GoServer/server/logic/logicInterface"
-	"GoServer/server/service/log"
+	"github.com/drop/GoServer/server/logic/enum"
+	"github.com/drop/GoServer/server/logic/logicInterface"
+	"github.com/drop/GoServer/server/service/log"
 )
 
 type NetRoutine func(message interface{}, user logicInterface.UserBaseInterface)

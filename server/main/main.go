@@ -1,8 +1,8 @@
 package main
 
 import (
-	"GoServer/server/logic/enum"
-	"GoServer/server/logic/platform"
+	"github.com/drop/GoServer/server/logic/enum"
+	"github.com/drop/GoServer/server/logic/platform"
 )
 
 func main() {

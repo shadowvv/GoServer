@@ -1,0 +1,21 @@
+syntax = "proto3";
+package proto;
+
+// 玩家登录请求
+message LoginRequest {
+  string token = 1;
+  string platform = 2;
+}
+
+// 登录响应
+message LoginResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// 聊天消息
+message ChatMessage {
+  uint64 player_id = 1;
+  string content = 2;
+  int64 timestamp = 3;
+}
