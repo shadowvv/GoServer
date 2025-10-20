@@ -2,11 +2,11 @@ package serviceInterface
 
 import "google.golang.org/protobuf/proto"
 
-type HandlerFunc func(msgID uint32, msg proto.Message)
+type HandlerFunc func(msgID uint32, msg *proto.Message)
 
 type CodecInterface interface {
-	Marshal(pb proto.Message) ([]byte, error)
-	Unmarshal(data []byte, msg proto.Message) error
+	Marshal(msg *proto.Message) ([]byte, error)
+	Unmarshal(data []byte, msg *proto.Message) error
 }
 
 type AcceptorInterface interface {
@@ -14,12 +14,13 @@ type AcceptorInterface interface {
 }
 
 type RouterInterface interface {
-	Register(msgID uint32, h HandlerFunc)
-	Dispatch(msgID uint32, msg proto.Message)
+	Register(msgID uint32, msg *proto.Message, h HandlerFunc)
+	Dispatch(msgID uint32, msg *proto.Message)
+	GetMessage(msgID uint32) *proto.Message
 }
 
 type ConnectionInterface interface {
-	Send(data []byte) error
+	Send(msg *proto.Message) error
 	Close()
 	OnDisconnect()
 	GetID() int64

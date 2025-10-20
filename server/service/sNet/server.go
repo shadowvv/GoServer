@@ -1,26 +1,29 @@
-package net
+package sNet
 
 import (
 	"context"
 	"fmt"
 	"github.com/drop/GoServer/server/service/logger"
 	"github.com/drop/GoServer/server/service/serviceInterface"
+	"github.com/drop/GoServer/server/tool"
 	"github.com/gorilla/websocket"
+	"google.golang.org/protobuf/proto"
 	"net/http"
 )
 
 // Server 是 websocket 服务
 type Server struct {
-	addr     string
-	upgrader websocket.Upgrader
-	srv      *http.Server
-	acceptor serviceInterface.AcceptorInterface
-	codec    serviceInterface.CodecInterface
-	router   serviceInterface.RouterInterface
+	addr        string
+	upgrader    websocket.Upgrader
+	srv         *http.Server
+	idGenerator *tool.IdGenerator
+	acceptor    serviceInterface.AcceptorInterface
+	codec       serviceInterface.CodecInterface
+	router      serviceInterface.RouterInterface
 }
 
 // NewServer 返回默认 Server
-func NewServer(addr string, acceptorInterface serviceInterface.AcceptorInterface, codec serviceInterface.CodecInterface, router serviceInterface.RouterInterface) *Server {
+func NewServer(addr string, serverId int32, acceptorInterface serviceInterface.AcceptorInterface, codec serviceInterface.CodecInterface, router serviceInterface.RouterInterface) *Server {
 	return &Server{
 		addr: addr,
 		upgrader: websocket.Upgrader{
@@ -28,6 +31,8 @@ func NewServer(addr string, acceptorInterface serviceInterface.AcceptorInterface
 			WriteBufferSize: 4096,
 			CheckOrigin:     func(r *http.Request) bool { return true },
 		},
+		idGenerator: tool.NewIdGenerator(int64(serverId), 1),
+
 		acceptor: acceptorInterface,
 		codec:    codec,
 		router:   router,
@@ -55,13 +60,14 @@ func (s *Server) serveWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c := newConn(conn, s.router)
+	c := newConn(conn, s.router, s.codec, s.idGenerator.NextId())
+	s.acceptor.Accept(c)
 	c.Start()
 }
 
 // Register 注册消息处理器
-func (s *Server) Register(msgID uint32, h serviceInterface.HandlerFunc) {
-	s.router.Register(msgID, h)
+func (s *Server) Register(msgID uint32, msg *proto.Message, h serviceInterface.HandlerFunc) {
+	s.router.Register(msgID, msg, h)
 }
 
 // Shutdown 优雅停服

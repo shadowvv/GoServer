@@ -2,14 +2,29 @@ package platform
 
 import (
 	"google.golang.org/protobuf/proto"
+	"log"
 )
 
-// MarshalProto 将 proto.Message 编为 payload（用户侧）
-func MarshalProto(m proto.Message) ([]byte, error) {
-	return proto.Marshal(m)
+type Codec struct {
 }
 
-// UnmarshalProto 将 payload 解为指定 message（用户侧）
-func UnmarshalProto(data []byte, m proto.Message) error {
-	return proto.Unmarshal(data, m)
+func NewCodec() *Codec {
+	return &Codec{}
+}
+
+func (c *Codec) Marshal(msg *proto.Message) ([]byte, error) {
+	data, err := proto.Marshal(*msg)
+	if err != nil {
+		log.Printf("msg marshal error: %v", err)
+		return nil, err
+	}
+	return data, nil
+}
+
+func (c *Codec) Unmarshal(data []byte, msg *proto.Message) error {
+	if err := proto.Unmarshal(data, *msg); err != nil {
+		log.Printf("msg unmarshal error: %v", err)
+		return err
+	}
+	return nil
 }

@@ -1,10 +1,11 @@
-package net
+package sNet
 
 import (
 	"context"
 	"encoding/binary"
 	"errors"
 	"github.com/drop/GoServer/server/service/serviceInterface"
+	"google.golang.org/protobuf/proto"
 	"sync"
 	"time"
 
@@ -24,38 +25,42 @@ var ErrConnClosed = errors.New("connection closed")
 
 // Conn 包装 websocket.Conn
 type Conn struct {
-	conn   *websocket.Conn
-	router serviceInterface.RouterInterface
-
-	ctx    context.Context
-	cancel context.CancelFunc
-	wg     sync.WaitGroup
-
-	sendQueue chan []byte
-
+	id   int64
+	conn *websocket.Conn
 	// meta 用于保存 session 信息
 	meta sync.Map
-}
 
-func (c *Conn) OnDisconnect() {
-	//TODO implement me
-	panic("implement me")
+	codec  serviceInterface.CodecInterface
+	router serviceInterface.RouterInterface
+
+	ctx       context.Context
+	cancel    context.CancelFunc
+	wg        sync.WaitGroup
+	sendQueue chan []byte
 }
 
 // newConn
-func newConn(ws *websocket.Conn, router serviceInterface.RouterInterface) *Conn {
+func newConn(ws *websocket.Conn, router serviceInterface.RouterInterface, codec serviceInterface.CodecInterface, id int64) *Conn {
 	ctx, cancel := context.WithCancel(context.Background())
 	c := &Conn{
+		id:        id,
 		conn:      ws,
+		codec:     codec,
 		router:    router,
 		ctx:       ctx,
 		cancel:    cancel,
 		sendQueue: make(chan []byte, sendQueueSize),
 	}
 	// pong handler updates deadline
-	ws.SetReadDeadline(time.Now().Add(pongTimeout))
+	err := ws.SetReadDeadline(time.Now().Add(pongTimeout))
+	if err != nil {
+		return nil
+	}
 	ws.SetPongHandler(func(appData string) error {
-		ws.SetReadDeadline(time.Now().Add(pongTimeout))
+		err := ws.SetReadDeadline(time.Now().Add(pongTimeout))
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 	return c
@@ -72,12 +77,19 @@ func (c *Conn) Start() {
 // Close 关闭连接（可并发调用）
 func (c *Conn) Close() {
 	c.cancel()
-	c.conn.Close()
+	err := c.conn.Close()
+	if err != nil {
+		return
+	}
 	c.wg.Wait()
 }
 
 // Send 安全发送（非阻塞，队列满时返回 ErrConnClosed 或错误）
-func (c *Conn) Send(frame []byte) error {
+func (c *Conn) Send(message *proto.Message) error {
+	frame, err := c.codec.Marshal(message)
+	if err != nil {
+		return err
+	}
 	select {
 	case <-c.ctx.Done():
 		return ErrConnClosed
@@ -89,6 +101,11 @@ func (c *Conn) Send(frame []byte) error {
 	case <-c.ctx.Done():
 		return ErrConnClosed
 	}
+}
+
+func (c *Conn) OnDisconnect() {
+	//TODO implement me
+	panic("implement me")
 }
 
 // readPump: 持续读，解帧后交给 Router 处理
@@ -122,8 +139,18 @@ func (c *Conn) readPump() {
 		msgID := binary.BigEndian.Uint32(data[:4])
 		payload := data[4:]
 
+		msg := c.router.GetMessage(msgID)
+		if msg == nil {
+			// log.Printf("unknown message type: %d", msgID)
+			continue
+		}
+		err = c.codec.Unmarshal(payload, msg)
+		if err != nil {
+			// log.Printf("unmarshal message error: %v", err)
+			continue
+		}
 		// dispatch (synchronous handler)
-		c.router.Dispatch(msgID, c, payload)
+		c.router.Dispatch(msgID, msg)
 	}
 }
 
@@ -140,7 +167,10 @@ func (c *Conn) writePump() {
 			// flush remaining? 忽略
 			return
 		case data := <-c.sendQueue:
-			c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+			err := c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+			if err != nil {
+				return
+			}
 			if err := c.conn.WriteMessage(websocket.BinaryMessage, data); err != nil {
 				// log.Printf("write message error: %v", err)
 				return
@@ -164,7 +194,10 @@ func (c *Conn) heartbeat() {
 		case <-c.ctx.Done():
 			return
 		case <-ticker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+			err := c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+			if err != nil {
+				return
+			}
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
@@ -173,15 +206,11 @@ func (c *Conn) heartbeat() {
 	}
 }
 
+func (c *Conn) GetID() int64 {
+	return c.id
+}
+
 // Meta 操作
 func (c *Conn) SetMeta(k string, v interface{})      { c.meta.Store(k, v) }
 func (c *Conn) GetMeta(k string) (interface{}, bool) { return c.meta.Load(k) }
 func (c *Conn) DelMeta(k string)                     { c.meta.Delete(k) }
-
-// Utility：将 msgID + payload 封包
-func Pack(msgID uint32, payload []byte) []byte {
-	frame := make([]byte, 4+len(payload))
-	binary.BigEndian.PutUint32(frame[:4], msgID)
-	copy(frame[4:], payload)
-	return frame
-}
