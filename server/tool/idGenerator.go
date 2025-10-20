@@ -5,19 +5,19 @@ import (
 )
 
 type IdGenerator struct {
-	lastTimestamp int64
-	sequence      int64
-	workerId      int64
-	dataCenterId  int64
+	lastTimestamp int64 // 上一次生成ID的时间戳
+	sequence      int64 // 当前毫秒内的序列号
+	workerId      int64 // 工作节点ID
+	functionId    int64 // 数据中心ID
 	lock          sync.Mutex
 }
 
-func NewIdGenerator(workerId, dataCenterId int64) *IdGenerator {
+func NewIdGenerator(workerId, functionId int64) *IdGenerator {
 	return &IdGenerator{
 		lastTimestamp: 0,
 		sequence:      0,
 		workerId:      workerId,
-		dataCenterId:  dataCenterId,
+		functionId:    functionId,
 	}
 }
 
@@ -45,11 +45,7 @@ func (g *IdGenerator) NextId() int64 {
 	}
 
 	g.lastTimestamp = timestamp
-	return generateIdWithTime(g.workerId, g.dataCenterId, timestamp)
-}
-
-func generateIdWithTime(workerId, dataCenterId, timestamp int64) int64 {
-	return ((timestamp - 1288834974657) << 22) | (dataCenterId << 17) | (workerId << 12) | (timestamp % 4096)
+	return generateIdWithTime(g.workerId, g.functionId, timestamp)
 }
 
 // waitUntilNextMillis 等待到下一毫秒
@@ -59,4 +55,8 @@ func waitUntilNextMillis(lastTimestamp int64) int64 {
 		timestamp = GetCurrentTimeMillis()
 	}
 	return timestamp
+}
+
+func generateIdWithTime(workerId, functionId, timestamp int64) int64 {
+	return ((timestamp - 1288834974657) << 22) | (functionId << 17) | (workerId << 12) | (timestamp % 4096)
 }

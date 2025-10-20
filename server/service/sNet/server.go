@@ -11,8 +11,8 @@ import (
 	"net/http"
 )
 
-// Server 是 websocket 服务
-type Server struct {
+// websocketServer 是 websocket 服务
+type websocketServer struct {
 	addr        string
 	upgrader    websocket.Upgrader
 	srv         *http.Server
@@ -22,9 +22,9 @@ type Server struct {
 	router      serviceInterface.RouterInterface
 }
 
-// NewServer 返回默认 Server
-func NewServer(addr string, serverId int32, acceptorInterface serviceInterface.AcceptorInterface, codec serviceInterface.CodecInterface, router serviceInterface.RouterInterface) *Server {
-	return &Server{
+// NewServer 返回默认 websocketServer
+func NewServer(addr string, serverId int32, acceptorInterface serviceInterface.AcceptorInterface, codec serviceInterface.CodecInterface, router serviceInterface.RouterInterface) *websocketServer {
+	return &websocketServer{
 		addr: addr,
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  4096,
@@ -40,7 +40,7 @@ func NewServer(addr string, serverId int32, acceptorInterface serviceInterface.A
 }
 
 // Start 启动服务，阻塞式
-func (s *Server) Start() error {
+func (s *websocketServer) Start() error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", s.serveWS)
 	s.srv = &http.Server{
@@ -49,32 +49,35 @@ func (s *Server) Start() error {
 		ReadTimeout:  0,
 		WriteTimeout: 0,
 	}
-	logger.Info(fmt.Sprintf("ws server listen %s\n", s.addr))
+	logger.Info(fmt.Sprintf("[net] ws server listen %s\n", s.addr))
 	return s.srv.ListenAndServe()
 }
 
-func (s *Server) serveWS(w http.ResponseWriter, r *http.Request) {
+func (s *websocketServer) serveWS(w http.ResponseWriter, r *http.Request) {
 	conn, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		logger.Error(fmt.Sprintf("upgrade failed: %v", err))
+		logger.Error(fmt.Sprintf("[net] upgrade failed: %v", err))
 		return
 	}
 
 	c := newConn(conn, s.router, s.codec, s.idGenerator.NextId())
 	s.acceptor.Accept(c)
 	c.Start()
+	logger.Info(fmt.Sprintf("[net] new connection: %d", c.GetID()))
 }
 
 // Register 注册消息处理器
-func (s *Server) Register(msgID uint32, msg *proto.Message, h serviceInterface.HandlerFunc) {
+func (s *websocketServer) Register(msgID uint32, msg *proto.Message, h serviceInterface.HandlerFunc) {
 	s.router.Register(msgID, msg, h)
+	logger.Info(fmt.Sprintf("[net] register msg id:%d", msgID))
 }
 
 // Shutdown 优雅停服
-func (s *Server) Shutdown(ctx context.Context) error {
+func (s *websocketServer) Shutdown(ctx context.Context) error {
 	// 先停止 http server（不再接收新连接）
 	if s.srv != nil {
 		_ = s.srv.Shutdown(ctx)
+		logger.Info(fmt.Sprintf("[net] ws server shutdown"))
 	}
 	// Router/Conn 会自行在 Context cancel 下关闭
 	return nil

@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/binary"
 	"errors"
+	"fmt"
+	"github.com/drop/GoServer/server/service/logger"
 	"github.com/drop/GoServer/server/service/serviceInterface"
 	"google.golang.org/protobuf/proto"
 	"sync"
@@ -21,13 +23,10 @@ const (
 	sendQueueSize = 256
 )
 
-var ErrConnClosed = errors.New("connection closed")
-
 // Conn 包装 websocket.Conn
 type Conn struct {
 	id   int64
 	conn *websocket.Conn
-	// meta 用于保存 session 信息
 	meta sync.Map
 
 	codec  serviceInterface.CodecInterface
@@ -54,11 +53,13 @@ func newConn(ws *websocket.Conn, router serviceInterface.RouterInterface, codec 
 	// pong handler updates deadline
 	err := ws.SetReadDeadline(time.Now().Add(pongTimeout))
 	if err != nil {
+		logger.Error(fmt.Sprintf("[net] ws set read deadline connectionId:%d, error: %v", id, err))
 		return nil
 	}
 	ws.SetPongHandler(func(appData string) error {
 		err := ws.SetReadDeadline(time.Now().Add(pongTimeout))
 		if err != nil {
+			logger.Error(fmt.Sprintf("[net] ws set pong read deadline connectionId:%d, error: %v", id, err))
 			return err
 		}
 		return nil
@@ -79,6 +80,7 @@ func (c *Conn) Close() {
 	c.cancel()
 	err := c.conn.Close()
 	if err != nil {
+		logger.Error(fmt.Sprintf("[net] ws close connectionId:%d, error: %v", c.GetID(), err))
 		return
 	}
 	c.wg.Wait()
@@ -92,18 +94,18 @@ func (c *Conn) Send(message *proto.Message) error {
 	}
 	select {
 	case <-c.ctx.Done():
-		return ErrConnClosed
+		return errors.New(fmt.Sprintf("[net] connectionId:%d closed", c.GetID()))
 	default:
 	}
 	select {
 	case c.sendQueue <- frame:
 		return nil
 	case <-c.ctx.Done():
-		return ErrConnClosed
+		return errors.New(fmt.Sprintf("[net] connectionId:%d closed", c.GetID()))
 	}
 }
 
-func (c *Conn) OnDisconnect() {
+func (c *Conn) HandleConnectionClosed() {
 	//TODO implement me
 	panic("implement me")
 }
@@ -141,15 +143,14 @@ func (c *Conn) readPump() {
 
 		msg := c.router.GetMessage(msgID)
 		if msg == nil {
-			// log.Printf("unknown message type: %d", msgID)
+			logger.Error(fmt.Sprintf("[net] connectionId:%d unknown message type: %d", c.GetID(), msgID))
 			continue
 		}
 		err = c.codec.Unmarshal(payload, msg)
 		if err != nil {
-			// log.Printf("unmarshal message error: %v", err)
+			logger.Error(fmt.Sprintf("[net] connectionId:%d unmarshal error: %v", c.GetID(), err))
 			continue
 		}
-		// dispatch (synchronous handler)
 		c.router.Dispatch(msgID, msg)
 	}
 }
@@ -169,6 +170,7 @@ func (c *Conn) writePump() {
 		case data := <-c.sendQueue:
 			err := c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if err != nil {
+				logger.Error(fmt.Sprintf("[net] ws set write deadline connectionId:%d, error: %v", c.GetID(), err))
 				return
 			}
 			if err := c.conn.WriteMessage(websocket.BinaryMessage, data); err != nil {
@@ -196,6 +198,7 @@ func (c *Conn) heartbeat() {
 		case <-ticker.C:
 			err := c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if err != nil {
+				logger.Error(fmt.Sprintf("[net] ws set write deadline connectionId:%d, error: %v", c.GetID(), err))
 				return
 			}
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
