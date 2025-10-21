@@ -5,25 +5,33 @@ import (
 	"sync"
 )
 
-type UserSession struct {
-	Account    string
-	UserID     int64
-	Connection serviceInterface.ConnectionInterface
-}
-
 type SessionManager struct {
-	sessions sync.Map // map[int64]*UserSession
+	mu                 sync.Mutex
+	sessionCount       int32
+	sessionMap         map[int64]serviceInterface.ConnectionInterface
+	accountSessionMap  map[string]*UserSession
+	playerIdSessionMap map[int64]*UserSession
 }
 
 func (sm *SessionManager) Accept(connection serviceInterface.ConnectionInterface) {
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
 
+	sm.sessionMap[connection.GetID()] = connection
+	sm.sessionCount++
 }
 
 func (sm *SessionManager) Bind(userID int64, conn serviceInterface.ConnectionInterface) {
-	if old, ok := sm.sessions.Load(userID); ok {
-		// 断开旧连接
-		old.(*UserSession).Connection.Close()
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
+
+	if old, ok := sm.playerIdSessionMap[userID]; ok {
+		old.Connection.Close()
+		sm.sessionCount--
+		Info("unbind session", old)
 	}
 	session := &UserSession{UserID: userID, Connection: conn}
-	sm.sessions.Store(userID, session)
+	sm.playerIdSessionMap[userID] = session
+	sm.sessionCount++
+	Info("bind session", session)
 }

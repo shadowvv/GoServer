@@ -5,6 +5,7 @@ import (
 	"github.com/drop/GoServer/server/logic/enum"
 	"github.com/drop/GoServer/server/logic/logicInterface"
 	"github.com/drop/GoServer/server/logic/pb"
+	"github.com/drop/GoServer/server/service/db"
 	"github.com/drop/GoServer/server/service/logger"
 	"github.com/drop/GoServer/server/service/sNet"
 	"google.golang.org/protobuf/proto"
@@ -44,4 +45,11 @@ func InitServer(env enum.Environment) {
 	if err != nil {
 		return
 	}
+}
+
+var dbPool = NewDBPool(1, db.DB)
+
+func InitDB() {
+	dbConfig := db.DBConfig{}
+	db.InitAll(&dbConfig)
 }

@@ -9,20 +9,6 @@ import (
 
 var DB *gorm.DB
 
-type DBConfig struct {
-	MySQL struct {
-		DSN         string `yaml:"dsn"`
-		MaxIdle     int    `yaml:"maxIdle"`
-		MaxOpen     int    `yaml:"maxOpen"`
-		MaxLifetime int    `yaml:"maxLifetime"`
-	} `yaml:"mysql"`
-	Redis struct {
-		Addr     string `yaml:"addr"`
-		DB       int    `yaml:"db"`
-		PoolSize int    `yaml:"poolSize"`
-	} `yaml:"redis"`
-}
-
 func InitMySQL(dsn string, maxIdle, maxOpen, maxLifetime int) error {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Warn),
