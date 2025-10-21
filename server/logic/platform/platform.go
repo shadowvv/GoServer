@@ -1,9 +1,11 @@
 package platform
 
 import (
+	"fmt"
 	"github.com/drop/GoServer/server/logic/enum"
 	"github.com/drop/GoServer/server/logic/logicInterface"
 	"github.com/drop/GoServer/server/logic/pb"
+	"github.com/drop/GoServer/server/service/logger"
 	"github.com/drop/GoServer/server/service/sNet"
 	"google.golang.org/protobuf/proto"
 )
@@ -23,16 +25,21 @@ type Platform struct {
 
 func InitPlatform(env enum.Enviroment) {
 	InitLogger(env)
-	go InitServer(env)
 	user := &logicInterface.BasicUserInfo{}
 	Info("Init platform", user)
 	Error("Error platform", user)
+
+	InitServer(env)
 }
 
-func InitServer(env enum.Enviroment) {
-	server := sNet.NewServer(":8080", 1, nil, NewCodec(), sNet.NewRouter())
-	server.Register(1, &pb.TestMessageReq{}, func(msgId uint32, message proto.Message) {
+var sessionManager SessionManager
 
+func InitServer(env enum.Enviroment) {
+	server := sNet.NewServer(":8080", 1, &sessionManager, NewCodec(), sNet.NewRouter())
+	server.Register(1, &pb.TestMessageReq{}, func(msgId uint32, message proto.Message) {
+		req := message.(*pb.TestMessageReq)
+		logger.Info(fmt.Sprintf("Receive message token:%s platform:%s", req.Token, req.Platform))
+		logger.Info("test Receive message")
 	})
 
 	err := server.Start()
