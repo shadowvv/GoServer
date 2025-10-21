@@ -23,19 +23,17 @@ type Platform struct {
 	NetRoutines map[int32]map[int32]NetRoutine
 }
 
-func InitPlatform(env enum.Enviroment) {
+func InitPlatform(env enum.Environment) {
 	InitLogger(env)
-	user := &logicInterface.BasicUserInfo{}
-	Info("Init platform", user)
-	Error("Error platform", user)
-
 	InitServer(env)
 }
 
 var sessionManager SessionManager
+var codec = NewCodec()
+var router = sNet.NewRouter()
 
-func InitServer(env enum.Enviroment) {
-	server := sNet.NewServer(":8080", 1, &sessionManager, NewCodec(), sNet.NewRouter())
+func InitServer(env enum.Environment) {
+	server := sNet.NewServer(":8080", 1, &sessionManager, codec, router)
 	server.Register(1, &pb.TestMessageReq{}, func(msgId uint32, message proto.Message) {
 		req := message.(*pb.TestMessageReq)
 		logger.Info(fmt.Sprintf("Receive message token:%s platform:%s", req.Token, req.Platform))

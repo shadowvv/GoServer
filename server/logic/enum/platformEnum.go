@@ -1,9 +1,9 @@
 package enum
 
-type Enviroment int32
+type Environment int32
 
 const (
-	ENV_DEVELOP Enviroment = 0
-	ENV_TEST    Enviroment = 1
-	ENV_PRODUCT Enviroment = 2
+	ENV_DEVELOP Environment = 0
+	ENV_TEST    Environment = 1
+	ENV_PRODUCT Environment = 2
 )

@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func InitLogger(env enum.Enviroment) {
+func InitLogger(env enum.Environment) {
 	switch env {
 	case enum.ENV_DEVELOP:
 		logger.InitLogger("config/developLoggerConfig.yaml")
