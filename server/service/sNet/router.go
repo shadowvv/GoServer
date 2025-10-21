@@ -1,6 +1,8 @@
 package sNet
 
 import (
+	"fmt"
+	"github.com/drop/GoServer/server/service/logger"
 	"github.com/drop/GoServer/server/service/serviceInterface"
 	"google.golang.org/protobuf/proto"
 	"reflect"
@@ -20,12 +22,13 @@ func NewRouter() *Router {
 	}
 }
 
-func (r *Router) Register(msgID uint32, msg *proto.Message, h serviceInterface.HandlerFunc) {
+func (r *Router) Register(msgID uint32, msg proto.Message, h serviceInterface.HandlerFunc) {
 	r.msgRegistry[msgID] = reflect.TypeOf(msg).Elem()
 	r.handlers[msgID] = h
+	logger.Info(fmt.Sprintf("[net] register msg id:%d", msgID))
 }
 
-func (r *Router) Dispatch(msgID uint32, msg *proto.Message) {
+func (r *Router) Dispatch(msgID uint32, msg proto.Message) {
 	h, ok := r.handlers[msgID]
 	if !ok {
 		return
@@ -33,7 +36,7 @@ func (r *Router) Dispatch(msgID uint32, msg *proto.Message) {
 	h(msgID, msg)
 }
 
-func (r *Router) GetMessage(msgID uint32) *proto.Message {
+func (r *Router) GetMessage(msgID uint32) proto.Message {
 	t, ok := r.msgRegistry[msgID]
 	if !ok {
 		return nil
@@ -41,7 +44,7 @@ func (r *Router) GetMessage(msgID uint32) *proto.Message {
 
 	v := reflect.New(t).Interface()
 	if m, ok := v.(proto.Message); ok {
-		return &m
+		return m
 	}
 	return nil
 }

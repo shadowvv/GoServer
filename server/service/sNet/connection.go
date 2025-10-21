@@ -87,7 +87,7 @@ func (c *Conn) Close() {
 }
 
 // Send 安全发送（非阻塞，队列满时返回 ErrConnClosed 或错误）
-func (c *Conn) Send(message *proto.Message) error {
+func (c *Conn) Send(message proto.Message) error {
 	frame, err := c.codec.Marshal(message)
 	if err != nil {
 		return err
