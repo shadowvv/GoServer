@@ -11,7 +11,8 @@ var DB *gorm.DB
 
 func InitMySQL(dsn string, maxIdle, maxOpen, maxLifetime int) error {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Warn),
+		Logger:         logger.Default.LogMode(logger.Warn),
+		NamingStrategy: CamelNamingStrategy{},
 	})
 	if err != nil {
 		return err

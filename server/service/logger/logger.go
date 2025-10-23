@@ -55,6 +55,8 @@ func InitLogger(configPath string) {
 	encoderConfig.TimeKey = "time"
 	encoderConfig.LevelKey = "level"
 	encoderConfig.FunctionKey = "func"
+	encoderConfig.CallerKey = ""
+	encoderConfig.StacktraceKey = "stacktrace"
 	encoderConfig.MessageKey = "msg"
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
@@ -74,7 +76,7 @@ func InitLogger(configPath string) {
 
 	core := zapcore.NewTee(infoCore, errorCore)
 
-	logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
+	logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zapcore.ErrorLevel))
 }
 
 func Info(msg string, fields ...zap.Field) {

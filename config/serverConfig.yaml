@@ -1,0 +1,10 @@
+mysql:
+  dsn: "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+  maxIdleConnections: 10
+  maxOpenConnections: 100
+  maxLifetime: 10
+
+redis:
+  addr: "127.0.0.1:6379"
+  db: 0
+  poolSize: 10

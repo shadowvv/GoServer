@@ -6,24 +6,28 @@ import (
 )
 
 type DBConfig struct {
-	MySQL struct {
-		DSN         string `yaml:"dsn"`
-		MaxIdle     int    `yaml:"maxIdle"`
-		MaxOpen     int    `yaml:"maxOpen"`
-		MaxLifetime int    `yaml:"maxLifetime"`
-	} `yaml:"mysql"`
-	Redis struct {
-		Addr     string `yaml:"addr"`
-		DB       int    `yaml:"db"`
-		PoolSize int    `yaml:"poolSize"`
-	} `yaml:"redis"`
+	MySQL MySQLConfig `yaml:"mysql"`
+	Redis RedisConfig `yaml:"redis"`
+}
+
+type MySQLConfig struct {
+	DSN                string `yaml:"dsn"`
+	MaxIdleConnections int    `yaml:"maxIdleConnections"`
+	MaxOpenConnections int    `yaml:"maxOpenConnections"`
+	MaxLifetime        int    `yaml:"maxLifetime"`
+}
+
+type RedisConfig struct {
+	Addr     string `yaml:"addr"`
+	DB       int    `yaml:"db"`
+	PoolSize int    `yaml:"poolSize"`
 }
 
 func InitAll(cfg *DBConfig) {
 	if err := InitMySQL(
 		cfg.MySQL.DSN,
-		cfg.MySQL.MaxIdle,
-		cfg.MySQL.MaxOpen,
+		cfg.MySQL.MaxIdleConnections,
+		cfg.MySQL.MaxOpenConnections,
 		cfg.MySQL.MaxLifetime,
 	); err != nil {
 		logger.Error(fmt.Sprintf("[db] Failed to init MySQL: %v", err))
