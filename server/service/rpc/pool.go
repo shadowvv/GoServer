@@ -1,4 +1,4 @@
-package etcd
+package rpc
 
 import (
 	"errors"

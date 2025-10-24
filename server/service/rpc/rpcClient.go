@@ -15,7 +15,7 @@ import (
 // ServiceClientManager 管理某个服务的地址与连接池
 type ServiceClientManager struct {
 	serviceName string
-	pool        *etcd.ConnPool
+	pool        *ConnPool
 	logger      *zap.Logger
 	cancelWatch context.CancelFunc
 }
@@ -24,7 +24,7 @@ type ServiceClientManager struct {
 func NewServiceClientManager(ctx context.Context, logger *zap.Logger, registry *etcd.EtcdRegistry, serviceName string, dialOptions ...grpc.DialOption) (*ServiceClientManager, error) {
 	mgr := &ServiceClientManager{
 		serviceName: serviceName,
-		pool: etcd.NewConnPool(func(addr string) (*grpc.ClientConn, error) {
+		pool: NewConnPool(func(addr string) (*grpc.ClientConn, error) {
 			// use supplied dial options
 			return grpc.Dial(addr, dialOptions...)
 		}),
