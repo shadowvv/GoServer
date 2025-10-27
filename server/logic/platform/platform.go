@@ -6,18 +6,29 @@ import (
 	"github.com/drop/GoServer/server/logic/enum"
 	"github.com/drop/GoServer/server/logic/pb"
 	"github.com/drop/GoServer/server/service/db"
+	"github.com/drop/GoServer/server/service/fileLoader"
 	"github.com/drop/GoServer/server/service/logger"
 	"github.com/drop/GoServer/server/service/sNet"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 	"gorm.io/gorm"
 	"log"
 	"os"
 )
 
-func InitPlatform(env enum.Environment) {
-	InitLogger(env)
+func InitPlatform(serverType enum.ServerType, env enum.Environment) {
+
+	config := platformConfigList{}
+	err := fileLoader.LoadYaml("config/serverConfig.yaml", &config)
+	if err != nil {
+		return
+	}
+	cfg := config.PlatformConfigList[env]
+	if cfg == nil {
+		return
+	}
+	logger.InitLoggerByConfig(cfg.LoggerConfig)
 	InitDB()
 	InitServer(env)
 }
