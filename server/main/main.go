@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	platform.InitPlatform()
+	platform.BootPlatform()
 }

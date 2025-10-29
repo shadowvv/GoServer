@@ -139,7 +139,7 @@ func (c *Conn) readPump() {
 			logger.Error(fmt.Sprintf("[net] connectionId:%d unmarshal error: %v", c.GetID(), err))
 			continue
 		}
-		c.router.Dispatch(msgID, msg)
+		c.router.Dispatch(c.GetID(), msgID, msg)
 	}
 }
 

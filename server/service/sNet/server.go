@@ -89,8 +89,8 @@ func (s *WebsocketServer) serveWS(w http.ResponseWriter, r *http.Request) {
 }
 
 // Register 注册消息处理器
-func (s *WebsocketServer) Register(msgID uint32, msg proto.Message, h serviceInterface.HandlerFunc) {
-	s.router.Register(msgID, msg, h)
+func (s *WebsocketServer) Register(msgID uint32, msg proto.Message, processor serviceInterface.MessageProcessorInterface) {
+	s.router.RegisterProcess(msgID, msg, processor)
 }
 
 // Shutdown 优雅停服

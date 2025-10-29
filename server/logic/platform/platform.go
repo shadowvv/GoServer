@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/drop/GoServer/server/logic/enum"
-	"github.com/drop/GoServer/server/logic/pb"
+	"github.com/drop/GoServer/server/logic/logicInterface"
 	"github.com/drop/GoServer/server/service/db"
 	"github.com/drop/GoServer/server/service/fileLoader"
 	"github.com/drop/GoServer/server/service/logger"
 	"github.com/drop/GoServer/server/service/sNet"
+	"github.com/drop/GoServer/server/service/serviceInterface"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
@@ -20,20 +21,18 @@ var serverId int32             // 服务ID
 var serverType enum.ServerType // 服务类型
 var env enum.Environment       // 环境
 
-func InitPlatform() error {
+func BootPlatform() {
 	InitBootingLog()
 	config := &ServerConfig{}
 	err := fileLoader.LoadYaml("config/serverConfig.yaml", config)
 	if err != nil {
-		log.Fatalf("Load server config error:%v", err)
-		return err
+		log.Fatalf("[platform] Load server config error:%v", err)
 	}
 
 	allPlatformConfig := &AllPlatformConfig{}
 	err = fileLoader.LoadYaml("config/platformConfig.yaml", allPlatformConfig)
 	if err != nil {
-		log.Fatalf("Load platform config error:%v", err)
-		return err
+		log.Fatalf("[platform] Load platform config error:%v", err)
 	}
 	env = config.Environment
 	serverId = config.ServerId
@@ -41,34 +40,31 @@ func InitPlatform() error {
 
 	configs := allPlatformConfig.configs[serverType]
 	if configs == nil {
-		log.Fatalf("No config for server type %d", serverType)
-		return err
+		log.Fatalf("[platform] No config for server type %d", serverType)
 	}
 	cfg := configs[env]
 	if cfg == nil {
-		log.Fatalf("No config for server type %d and environment %d", serverType, env)
-		return err
+		log.Fatalf("[platform] No config for server type %d and environment %d", serverType, env)
 	}
 
 	err = logger.InitLoggerByConfig(cfg.LoggerConfig)
 	if err != nil {
-		return err
+		logger.Error("[platform] Init logger error", zap.Error(err))
 	}
 	err = InitDB(cfg.MySQLConfig, cfg.RedisConfig)
 	if err != nil {
-		return err
+		logger.Error("[platform] Init db error", zap.Error(err))
 	}
 	err = InitServer(cfg.NetConfig)
 	if err != nil {
-		return err
+		logger.Error("[platform] Init server error", zap.Error(err))
 	}
-	return nil
 }
 
 func InitBootingLog() {
 	file, err := os.OpenFile("bootingLog.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
-		log.Fatalf("faildd to open file: %v", err)
+		log.Fatalf("[platform] faildd to open file: %v", err)
 	}
 	defer func(file *os.File) {
 		_ = file.Close()
@@ -84,17 +80,22 @@ var router = sNet.NewRouter()
 
 func InitServer(config *sNet.NetConfig) error {
 	server := sNet.NewServer(config, serverId, &sessionManager, codec, router)
-	server.Register(1, &pb.TestMessageReq{}, func(msgId uint32, message proto.Message) {
-		req := message.(*pb.TestMessageReq)
-		logger.Info(fmt.Sprintf("Receive message token:%s platform:%s", req.Token, req.Platform))
-		logger.Info("test Receive message")
-	})
-
 	err := server.Start()
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+type UserHandleFunc func(msgId uint32, message proto.Message, user logicInterface.UserBaseInterface)
+
+func RegisterProcessor(msgId uint32, msg proto.Message, processor serviceInterface.MessageProcessorInterface) {
+	//server.RegisterProcess(1, &pb.TestMessageReq{}, func(msgId uint32, message proto.Message) {
+	//	req := message.(*pb.TestMessageReq)
+	//	logger.Info(fmt.Sprintf("Receive message token:%s platform:%s", req.Token, req.Platform))
+	//	logger.Info("test Receive message")
+	//})
+	router.RegisterProcess(msgId, msg, processor)
 }
 
 var dbPool *DBPool

@@ -8,32 +8,31 @@ import (
 	"reflect"
 )
 
-// Router 简单的 msgID -> Handler 映射，支持中间件链
 type Router struct {
-	handlers    map[uint32]serviceInterface.HandlerFunc
+	handlers    map[uint32]serviceInterface.MessageProcessorInterface
 	msgRegistry map[uint32]reflect.Type
 }
 
 // NewRouter
 func NewRouter() *Router {
 	return &Router{
-		handlers:    make(map[uint32]serviceInterface.HandlerFunc),
+		handlers:    make(map[uint32]serviceInterface.MessageProcessorInterface),
 		msgRegistry: make(map[uint32]reflect.Type),
 	}
 }
 
-func (r *Router) Register(msgID uint32, msg proto.Message, h serviceInterface.HandlerFunc) {
+func (r *Router) RegisterProcess(msgID uint32, msg proto.Message, processor serviceInterface.MessageProcessorInterface) {
 	r.msgRegistry[msgID] = reflect.TypeOf(msg).Elem()
-	r.handlers[msgID] = h
+	r.handlers[msgID] = processor
 	logger.Info(fmt.Sprintf("[net] register msg id:%d", msgID))
 }
 
-func (r *Router) Dispatch(msgID uint32, msg proto.Message) {
-	h, ok := r.handlers[msgID]
+func (r *Router) Dispatch(connectionId int64, msgID uint32, msg proto.Message) {
+	processor, ok := r.handlers[msgID]
 	if !ok {
 		return
 	}
-	h(msgID, msg)
+	processor.Put(connectionId, msgID, msg)
 }
 
 func (r *Router) GetMessage(msgID uint32) proto.Message {
