@@ -13,6 +13,10 @@ type SessionManager struct {
 	playerIdSessionMap map[int64]*UserSession
 }
 
+func (sm *SessionManager) OnConnectionTimeout(connectionInterface serviceInterface.ConnectionInterface) {
+	// TODO: 断线处理
+}
+
 func (sm *SessionManager) Accept(connection serviceInterface.ConnectionInterface) {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()

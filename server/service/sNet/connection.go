@@ -14,23 +14,15 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const (
-	// 默认心跳/超时
-	pingInterval = 25 * time.Second
-	pongTimeout  = 60 * time.Second
-
-	// 发送队列大小
-	sendQueueSize = 256
-)
-
 // Conn 包装 websocket.Conn
 type Conn struct {
 	id   int64
 	conn *websocket.Conn
 	meta sync.Map
 
-	codec  serviceInterface.CodecInterface
-	router serviceInterface.RouterInterface
+	acceptor serviceInterface.AcceptorInterface
+	codec    serviceInterface.CodecInterface
+	router   serviceInterface.RouterInterface
 
 	ctx       context.Context
 	cancel    context.CancelFunc
@@ -39,11 +31,12 @@ type Conn struct {
 }
 
 // newConn
-func newConn(ws *websocket.Conn, router serviceInterface.RouterInterface, codec serviceInterface.CodecInterface, id int64) *Conn {
+func newConn(ws *websocket.Conn, router serviceInterface.RouterInterface, codec serviceInterface.CodecInterface, id int64, acceptor serviceInterface.AcceptorInterface) *Conn {
 	ctx, cancel := context.WithCancel(context.Background())
 	c := &Conn{
 		id:        id,
 		conn:      ws,
+		acceptor:  acceptor,
 		codec:     codec,
 		router:    router,
 		ctx:       ctx,
@@ -51,13 +44,13 @@ func newConn(ws *websocket.Conn, router serviceInterface.RouterInterface, codec 
 		sendQueue: make(chan []byte, sendQueueSize),
 	}
 	// pong handler updates deadline
-	err := ws.SetReadDeadline(time.Now().Add(pongTimeout))
+	err := ws.SetReadDeadline(time.Now().Add(time.Duration(pongTimeout)))
 	if err != nil {
 		logger.Error(fmt.Sprintf("[net] ws set read deadline connectionId:%d, error: %v", id, err))
 		return nil
 	}
 	ws.SetPongHandler(func(appData string) error {
-		err := ws.SetReadDeadline(time.Now().Add(pongTimeout))
+		err := ws.SetReadDeadline(time.Now().Add(time.Duration(pongTimeout)))
 		if err != nil {
 			logger.Error(fmt.Sprintf("[net] ws set pong read deadline connectionId:%d, error: %v", id, err))
 			return err
@@ -103,11 +96,6 @@ func (c *Conn) Send(message proto.Message) error {
 	case <-c.ctx.Done():
 		return errors.New(fmt.Sprintf("[net] connectionId:%d closed", c.GetID()))
 	}
-}
-
-func (c *Conn) HandleConnectionClosed() {
-	//TODO implement me
-	panic("implement me")
 }
 
 // readPump: 持续读，解帧后交给 Router 处理
@@ -188,7 +176,7 @@ func (c *Conn) heartbeat() {
 		c.wg.Done()
 	}()
 
-	ticker := time.NewTicker(pingInterval)
+	ticker := time.NewTicker(time.Duration(pingInterval))
 	defer ticker.Stop()
 
 	for {
@@ -199,6 +187,7 @@ func (c *Conn) heartbeat() {
 			err := c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if err != nil {
 				logger.Error(fmt.Sprintf("[net] ws set write deadline connectionId:%d, error: %v", c.GetID(), err))
+				c.acceptor.OnConnectionTimeout(c)
 				return
 			}
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {

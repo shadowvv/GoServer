@@ -11,34 +11,79 @@ import (
 	"github.com/drop/GoServer/server/service/sNet"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
-	"gopkg.in/yaml.v3"
 	"gorm.io/gorm"
 	"log"
 	"os"
 )
 
-func InitPlatform(serverType enum.ServerType, env enum.Environment) {
+var serverId int32             // 服务ID
+var serverType enum.ServerType // 服务类型
+var env enum.Environment       // 环境
 
-	config := platformConfigList{}
-	err := fileLoader.LoadYaml("config/serverConfig.yaml", &config)
+func InitPlatform() error {
+	InitBootingLog()
+	config := &ServerConfig{}
+	err := fileLoader.LoadYaml("config/serverConfig.yaml", config)
 	if err != nil {
-		return
+		log.Fatalf("Load server config error:%v", err)
+		return err
 	}
-	cfg := config.PlatformConfigList[env]
+
+	allPlatformConfig := &AllPlatformConfig{}
+	err = fileLoader.LoadYaml("config/platformConfig.yaml", allPlatformConfig)
+	if err != nil {
+		log.Fatalf("Load platform config error:%v", err)
+		return err
+	}
+	env = config.Environment
+	serverId = config.ServerId
+	serverType = config.ServerType
+
+	configs := allPlatformConfig.configs[serverType]
+	if configs == nil {
+		log.Fatalf("No config for server type %d", serverType)
+		return err
+	}
+	cfg := configs[env]
 	if cfg == nil {
-		return
+		log.Fatalf("No config for server type %d and environment %d", serverType, env)
+		return err
 	}
-	logger.InitLoggerByConfig(cfg.LoggerConfig)
-	InitDB()
-	InitServer(env)
+
+	err = logger.InitLoggerByConfig(cfg.LoggerConfig)
+	if err != nil {
+		return err
+	}
+	err = InitDB(cfg.MySQLConfig, cfg.RedisConfig)
+	if err != nil {
+		return err
+	}
+	err = InitServer(cfg.NetConfig)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func InitBootingLog() {
+	file, err := os.OpenFile("bootingLog.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		log.Fatalf("faildd to open file: %v", err)
+	}
+	defer func(file *os.File) {
+		_ = file.Close()
+	}(file)
+
+	log.SetOutput(file)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 }
 
 var sessionManager SessionManager
 var codec = NewCodec()
 var router = sNet.NewRouter()
 
-func InitServer(env enum.Environment) {
-	server := sNet.NewServer(":8080", 1, &sessionManager, codec, router)
+func InitServer(config *sNet.NetConfig) error {
+	server := sNet.NewServer(config, serverId, &sessionManager, codec, router)
 	server.Register(1, &pb.TestMessageReq{}, func(msgId uint32, message proto.Message) {
 		req := message.(*pb.TestMessageReq)
 		logger.Info(fmt.Sprintf("Receive message token:%s platform:%s", req.Token, req.Platform))
@@ -47,25 +92,20 @@ func InitServer(env enum.Environment) {
 
 	err := server.Start()
 	if err != nil {
-		return
+		return err
 	}
+	return nil
 }
 
 var dbPool *DBPool
 
-func InitDB() {
-	dbConfig := db.DBConfig{}
-	data, err := os.ReadFile("config/serverConfig.yaml")
+func InitDB(mySQLConfig *db.MySQLConfig, redisConfig *db.RedisConfig) error {
+
+	err := db.InitAll(mySQLConfig, redisConfig)
 	if err != nil {
-		log.Fatalf("Failed to read database config: %v", err)
+		return err
 	}
-
-	if err := yaml.Unmarshal(data, &dbConfig); err != nil {
-		log.Fatalf("Failed to parse database config: %v", err)
-	}
-	db.InitAll(&dbConfig)
 	dbPool = NewDBPool(3, db.DB)
-
 	dbPool.Submit(1, func(gdb *gorm.DB) {
 		repo := db.PlayerRepository{}
 		player, err := repo.GetPlayerByUID(1)
@@ -91,7 +131,7 @@ func InitDB() {
 
 	if err := db.RDB.LPush(context.Background(), key, val).Err(); err != nil {
 		fmt.Printf("LPush error: %v\n", err)
-		return
+		return err
 	}
 	fmt.Printf("LPush %v -> %s\n", val, key)
 
@@ -99,7 +139,8 @@ func InitDB() {
 	result, err := db.RDB.LPop(context.Background(), key).Result()
 	if err != nil {
 		fmt.Printf("LPop error: %v\n", err)
-		return
+		return err
 	}
 	fmt.Printf("LPop from %s: %v\n", key, result)
+	return nil
 }

@@ -1,10 +1,3 @@
-mysql:
-  dsn: "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
-  maxIdleConnections: 10
-  maxOpenConnections: 100
-  maxLifetime: 10
-
-redis:
-  addr: "127.0.0.1:6379"
-  db: 0
-  poolSize: 10
+serverId: 1
+serverType: 1
+environment: 1 //0:开发环境 1:测试环境 2:预发布环境 3:正式环境

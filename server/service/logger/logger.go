@@ -20,7 +20,7 @@ type LoggerConfig struct {
 	Compress      bool   `yaml:"compress"`
 }
 
-func InitLoggerByConfigPath(configPath string) {
+func InitLoggerByConfigPath(configPath string) error {
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		log.Fatalf("[logger] Failed to read logger LoggerConfig: %v", err)
@@ -30,10 +30,10 @@ func InitLoggerByConfigPath(configPath string) {
 	if err := yaml.Unmarshal(data, &config); err != nil {
 		log.Fatalf("[logger] Failed to parse logger LoggerConfig: %v", err)
 	}
-	InitLoggerByConfig(config)
+	return InitLoggerByConfig(config)
 }
 
-func InitLoggerByConfig(config *LoggerConfig) {
+func InitLoggerByConfig(config *LoggerConfig) error {
 	// Info 日志配置（包含 Debug/Info/Warn）
 	infoWriter := zapcore.AddSync(&lumberjack.Logger{
 		Filename:   config.InfoFilename,
@@ -90,6 +90,7 @@ func InitLoggerByConfig(config *LoggerConfig) {
 	core := zapcore.NewTee(infoCore, errorCore)
 
 	logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zapcore.ErrorLevel))
+	return nil
 }
 
 func Info(msg string, fields ...zap.Field) {

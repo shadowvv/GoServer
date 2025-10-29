@@ -5,11 +5,6 @@ import (
 	"github.com/drop/GoServer/server/service/logger"
 )
 
-type DBConfig struct {
-	MySQL MySQLConfig `yaml:"mysql"`
-	Redis RedisConfig `yaml:"redis"`
-}
-
 type MySQLConfig struct {
 	DSN                string `yaml:"dsn"`
 	MaxIdleConnections int    `yaml:"maxIdleConnections"`
@@ -23,25 +18,28 @@ type RedisConfig struct {
 	PoolSize int    `yaml:"poolSize"`
 }
 
-func InitAll(cfg *DBConfig) {
+func InitAll(mysqlCfg *MySQLConfig, redisCfg *RedisConfig) error {
 	if err := InitMySQL(
-		cfg.MySQL.DSN,
-		cfg.MySQL.MaxIdleConnections,
-		cfg.MySQL.MaxOpenConnections,
-		cfg.MySQL.MaxLifetime,
+		mysqlCfg.DSN,
+		mysqlCfg.MaxIdleConnections,
+		mysqlCfg.MaxOpenConnections,
+		mysqlCfg.MaxLifetime,
 	); err != nil {
 		logger.Error(fmt.Sprintf("[db] Failed to init MySQL: %v", err))
+		return err
 	}
 
 	logger.Info("[db] MySQL initialized successfully")
 
 	if err := InitRedis(
-		cfg.Redis.Addr,
-		cfg.Redis.DB,
-		cfg.Redis.PoolSize,
+		redisCfg.Addr,
+		redisCfg.DB,
+		redisCfg.PoolSize,
 	); err != nil {
 		logger.Error(fmt.Sprintf("[db] Failed to init Redis: %v", err))
+		return err
 	}
 
 	logger.Info("[db] Database initialized successfully")
+	return nil
 }

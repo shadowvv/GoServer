@@ -17,6 +17,8 @@ type CodecInterface interface {
 type AcceptorInterface interface {
 	// 接收连接
 	Accept(connection ConnectionInterface)
+	// 连接超时处理
+	OnConnectionTimeout(connectionInterface ConnectionInterface)
 }
 
 // RouterInterface 路由器接口
@@ -35,8 +37,6 @@ type ConnectionInterface interface {
 	Send(msg proto.Message) error
 	// 主动关闭连接
 	Close()
-	// 连接断开事件处理
-	HandleConnectionClosed()
 	// 获取连接ID
 	GetID() int64
 }
