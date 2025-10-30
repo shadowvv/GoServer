@@ -1,12 +1,12 @@
 package logger
 
 import (
+	"fmt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
-	"gopkg.in/yaml.v3"
-	"log"
 	"os"
+	"time"
 )
 
 var logger *zap.Logger
@@ -20,36 +20,29 @@ type LoggerConfig struct {
 	Compress      bool   `yaml:"compress"`
 }
 
-func InitLoggerByConfigPath(configPath string) error {
-	data, err := os.ReadFile(configPath)
-	if err != nil {
-		log.Fatalf("[logger] Failed to read logger LoggerConfig: %v", err)
-	}
-
-	config := &LoggerConfig{}
-	if err := yaml.Unmarshal(data, &config); err != nil {
-		log.Fatalf("[logger] Failed to parse logger LoggerConfig: %v", err)
-	}
-	return InitLoggerByConfig(config)
-}
-
 func InitLoggerByConfig(config *LoggerConfig) error {
+
+	// 获取当前日期用于文件名
+	currentDate := time.Now().Format("2006-01-02")
+
 	// Info 日志配置（包含 Debug/Info/Warn）
 	infoWriter := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   config.InfoFilename,
+		Filename:   fmt.Sprintf("%s-%s.log", config.InfoFilename, currentDate),
 		MaxSize:    config.MaxSize,
 		MaxBackups: config.MaxBackups,
 		MaxAge:     config.MaxAge,
 		Compress:   config.Compress,
+		LocalTime:  true,
 	})
 
 	// Error 日志配置（Error 及以上）
 	errorWriter := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   config.ErrorFilename,
+		Filename:   fmt.Sprintf("%s-%s.log", config.ErrorFilename, currentDate),
 		MaxSize:    config.MaxSize,
 		MaxBackups: config.MaxBackups,
 		MaxAge:     config.MaxAge,
 		Compress:   config.Compress,
+		LocalTime:  true,
 	})
 
 	consoleWriter := zapcore.AddSync(os.Stdout)

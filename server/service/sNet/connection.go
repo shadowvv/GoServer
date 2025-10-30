@@ -30,6 +30,8 @@ type Conn struct {
 	sendQueue chan []byte
 }
 
+var _ serviceInterface.ConnectionInterface = (*Conn)(nil)
+
 // newConn
 func newConn(ws *websocket.Conn, router serviceInterface.RouterInterface, codec serviceInterface.CodecInterface, id int64, acceptor serviceInterface.AcceptorInterface) *Conn {
 	ctx, cancel := context.WithCancel(context.Background())

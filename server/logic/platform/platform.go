@@ -1,10 +1,7 @@
 package platform
 
 import (
-	"context"
-	"fmt"
 	"github.com/drop/GoServer/server/logic/enum"
-	"github.com/drop/GoServer/server/logic/logicInterface"
 	"github.com/drop/GoServer/server/service/db"
 	"github.com/drop/GoServer/server/service/fileLoader"
 	"github.com/drop/GoServer/server/service/logger"
@@ -12,7 +9,6 @@ import (
 	"github.com/drop/GoServer/server/service/serviceInterface"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
-	"gorm.io/gorm"
 	"log"
 	"os"
 )
@@ -38,12 +34,12 @@ func BootPlatform() {
 	serverId = config.ServerId
 	serverType = config.ServerType
 
-	configs := allPlatformConfig.configs[serverType]
-	if configs == nil {
+	configs, ok := allPlatformConfig.configs[serverType]
+	if !ok {
 		log.Fatalf("[platform] No config for server type %d", serverType)
 	}
-	cfg := configs[env]
-	if cfg == nil {
+	cfg, ok := configs[env]
+	if !ok {
 		log.Fatalf("[platform] No config for server type %d and environment %d", serverType, env)
 	}
 
@@ -51,7 +47,10 @@ func BootPlatform() {
 	if err != nil {
 		logger.Error("[platform] Init logger error", zap.Error(err))
 	}
-	err = InitDB(cfg.MySQLConfig, cfg.RedisConfig)
+
+	logger.Info("[platform] boot platform", zap.Int32("serverId", serverId), zap.Int32("serverType", int32(serverType)), zap.Int32("env", int32(env)))
+
+	err = InitDB(cfg.MySQLConfig, cfg.RedisConfig, cfg.RunConfig)
 	if err != nil {
 		logger.Error("[platform] Init db error", zap.Error(err))
 	}
@@ -59,10 +58,12 @@ func BootPlatform() {
 	if err != nil {
 		logger.Error("[platform] Init server error", zap.Error(err))
 	}
+
+	logger.Info("[platform] Boot platform success")
 }
 
 func InitBootingLog() {
-	file, err := os.OpenFile("bootingLog.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	file, err := os.OpenFile("bootingErrorLog.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		log.Fatalf("[platform] faildd to open file: %v", err)
 	}
@@ -75,11 +76,11 @@ func InitBootingLog() {
 }
 
 var sessionManager SessionManager
-var codec = NewCodec()
+var messageCodec = NewCodec()
 var router = sNet.NewRouter()
 
 func InitServer(config *sNet.NetConfig) error {
-	server := sNet.NewServer(config, serverId, &sessionManager, codec, router)
+	server := sNet.NewServer(config, serverId, &sessionManager, messageCodec, router)
 	err := server.Start()
 	if err != nil {
 		return err
@@ -87,61 +88,27 @@ func InitServer(config *sNet.NetConfig) error {
 	return nil
 }
 
-type UserHandleFunc func(msgId uint32, message proto.Message, user logicInterface.UserBaseInterface)
+// RegisterProcess 注册消息处理
+func RegisterProcess(msgType, msgID uint32, msg proto.Message) {
+	router.RegisterProcess(msgType, msgID, msg)
+}
 
-func RegisterProcessor(msgId uint32, msg proto.Message, processor serviceInterface.MessageProcessorInterface) {
-	//server.RegisterProcess(1, &pb.TestMessageReq{}, func(msgId uint32, message proto.Message) {
-	//	req := message.(*pb.TestMessageReq)
-	//	logger.Info(fmt.Sprintf("Receive message token:%s platform:%s", req.Token, req.Platform))
-	//	logger.Info("test Receive message")
-	//})
-	router.RegisterProcess(msgId, msg, processor)
+// RegisterProcessor 注册消息处理
+func RegisterProcessor(msgType uint32, processor serviceInterface.MessageProcessorInterface) {
+	router.RegisterProcessor(msgType, processor)
 }
 
 var dbPool *DBPool
 
-func InitDB(mySQLConfig *db.MySQLConfig, redisConfig *db.RedisConfig) error {
-
-	err := db.InitAll(mySQLConfig, redisConfig)
+func InitDB(mySQLConfig *db.MySQLConfig, redisConfig *db.RedisConfig, runConfig *RunConfig) error {
+	err := db.InitDatabase(mySQLConfig, redisConfig)
 	if err != nil {
 		return err
 	}
-	dbPool = NewDBPool(3, db.DB)
-	dbPool.Submit(1, func(gdb *gorm.DB) {
-		repo := db.PlayerRepository{}
-		player, err := repo.GetPlayerByUID(1)
-		if err != nil {
-			logger.Error("GetPlayerByUID error", zap.Error(err))
-			player = &db.Player{
-				Account: "test",
-				UserId:  1,
-			}
-			err := repo.SavePlayer(player)
-			if err != nil {
-				logger.Error("SavePlayer error", zap.Error(err))
-				return
-			}
-			return
-		}
-		logger.Info("GetPlayerByUID success", zap.Any("player", player))
-	})
-
-	// 2. 测试写入
-	key := "test"
-	val := 10
-
-	if err := db.RDB.LPush(context.Background(), key, val).Err(); err != nil {
-		fmt.Printf("LPush error: %v\n", err)
-		return err
-	}
-	fmt.Printf("LPush %v -> %s\n", val, key)
-
-	// 3. 测试读取
-	result, err := db.RDB.LPop(context.Background(), key).Result()
-	if err != nil {
-		fmt.Printf("LPop error: %v\n", err)
-		return err
-	}
-	fmt.Printf("LPop from %s: %v\n", key, result)
+	dbPool = NewDBPool(runConfig.DBPoolSize, runConfig.DBWorkerTaskSize, db.DB)
 	return nil
+}
+
+func RegisterDBTask(playerID int64, task DBTask) {
+	dbPool.Submit(playerID, task)
 }

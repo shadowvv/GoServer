@@ -9,9 +9,9 @@ type DBWorker struct {
 	db    *gorm.DB
 }
 
-func NewDBWorker(db *gorm.DB) *DBWorker {
+func NewDBWorker(db *gorm.DB, workerTaskSize int32) *DBWorker {
 	w := &DBWorker{
-		tasks: make(chan DBTask, 1000),
+		tasks: make(chan DBTask, workerTaskSize),
 		db:    db,
 	}
 	go w.run()

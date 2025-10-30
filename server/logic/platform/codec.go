@@ -3,11 +3,14 @@ package platform
 import (
 	"fmt"
 	"github.com/drop/GoServer/server/service/logger"
+	"github.com/drop/GoServer/server/service/serviceInterface"
 	"google.golang.org/protobuf/proto"
 )
 
 type Codec struct {
 }
+
+var _ serviceInterface.CodecInterface = (*Codec)(nil)
 
 func NewCodec() *Codec {
 	return &Codec{}

@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"github.com/drop/GoServer/server/service/logger"
+	"go.uber.org/zap"
 )
 
 type MySQLConfig struct {
@@ -18,7 +19,10 @@ type RedisConfig struct {
 	PoolSize int    `yaml:"poolSize"`
 }
 
-func InitAll(mysqlCfg *MySQLConfig, redisCfg *RedisConfig) error {
+func InitDatabase(mysqlCfg *MySQLConfig, redisCfg *RedisConfig) error {
+
+	logger.Info("[db] Init database", zap.String("dsn", mysqlCfg.DSN), zap.Int("maxIdleConnections", mysqlCfg.MaxIdleConnections), zap.Int("maxOpenConnections", mysqlCfg.MaxOpenConnections), zap.Int("maxLifetime", mysqlCfg.MaxLifetime))
+
 	if err := InitMySQL(
 		mysqlCfg.DSN,
 		mysqlCfg.MaxIdleConnections,
@@ -30,6 +34,8 @@ func InitAll(mysqlCfg *MySQLConfig, redisCfg *RedisConfig) error {
 	}
 
 	logger.Info("[db] MySQL initialized successfully")
+
+	logger.Info("[db] Init redis", zap.String("addr", redisCfg.Addr), zap.Int("db", redisCfg.DB), zap.Int("poolSize", redisCfg.PoolSize))
 
 	if err := InitRedis(
 		redisCfg.Addr,

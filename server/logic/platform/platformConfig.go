@@ -26,4 +26,6 @@ type PlatformConfig struct {
 }
 
 type RunConfig struct {
+	DBPoolSize       int32 `yaml:"dbPoolSize"`
+	DBWorkerTaskSize int32 `yaml:"dbWorkerTaskSize"`
 }

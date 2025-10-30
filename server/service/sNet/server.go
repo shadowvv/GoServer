@@ -7,7 +7,6 @@ import (
 	"github.com/drop/GoServer/server/service/serviceInterface"
 	"github.com/drop/GoServer/server/tool"
 	"github.com/gorilla/websocket"
-	"google.golang.org/protobuf/proto"
 	"net/http"
 )
 
@@ -86,11 +85,6 @@ func (s *WebsocketServer) serveWS(w http.ResponseWriter, r *http.Request) {
 	s.acceptor.Accept(c)
 	c.Start()
 	logger.Info(fmt.Sprintf("[net] new connection: %d", c.GetID()))
-}
-
-// Register 注册消息处理器
-func (s *WebsocketServer) Register(msgID uint32, msg proto.Message, processor serviceInterface.MessageProcessorInterface) {
-	s.router.RegisterProcess(msgID, msg, processor)
 }
 
 // Shutdown 优雅停服

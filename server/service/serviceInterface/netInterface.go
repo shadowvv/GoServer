@@ -4,9 +4,9 @@ import "google.golang.org/protobuf/proto"
 
 // CodecInterface 消息编解码接口
 type CodecInterface interface {
-	// Marshal 编码
+	// 编码
 	Marshal(msg proto.Message) ([]byte, error)
-	// Unmarshal 解码
+	// 解码
 	Unmarshal(data []byte, msg proto.Message) error
 }
 
@@ -20,8 +20,10 @@ type AcceptorInterface interface {
 
 // RouterInterface 路由器接口
 type RouterInterface interface {
-	// 注册消息处理函数
-	RegisterProcess(msgID uint32, msg proto.Message, processor MessageProcessorInterface)
+	// 注册消息
+	RegisterProcess(msgType, msgID uint32, msg proto.Message)
+	// 注册消息处理器
+	RegisterProcessor(msgType uint32, processor MessageProcessorInterface)
 	// 分发消息
 	Dispatch(connectionId int64, msgID uint32, msg proto.Message)
 	// 获取消息
