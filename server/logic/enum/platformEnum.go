@@ -14,3 +14,10 @@ const (
 	SERVER_TYPE_GAME  ServerType = 0
 	SERVER_TYPE_LOGIC ServerType = 1
 )
+
+type DBPoolType int32
+
+const (
+	DB_POOL_TYPE_LOGIN DBPoolType = 0
+	DB_POOL_TYPE_SCENE DBPoolType = 1
+)

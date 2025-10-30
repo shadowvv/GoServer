@@ -98,17 +98,27 @@ func RegisterProcessor(msgType uint32, processor serviceInterface.MessageProcess
 	router.RegisterProcessor(msgType, processor)
 }
 
-var dbPool *DBPool
+var dbPoolManager *DBPoolManager
 
 func InitDB(mySQLConfig *db.MySQLConfig, redisConfig *db.RedisConfig, runConfig *RunConfig) error {
 	err := db.InitDatabase(mySQLConfig, redisConfig)
 	if err != nil {
 		return err
 	}
-	dbPool = NewDBPool(runConfig.DBPoolSize, runConfig.DBWorkerTaskSize, db.DB)
+	dbPoolManager = NewDBPoolManager(db.DB)
+	for _, poolInfo := range runConfig.DBPoolInfo {
+		err := AddDBPool(poolInfo.PoolType, poolInfo.WorkerNum, poolInfo.WorkerTaskSize)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
-func RegisterDBTask(playerID int64, task DBTask) {
-	dbPool.Submit(playerID, task)
+func AddDBPool(poolType enum.DBPoolType, workerNum, workerTaskSize int32) error {
+	return dbPoolManager.AddDBPool(poolType, workerNum, workerTaskSize)
+}
+
+func AddDBTask(poolType enum.DBPoolType, playerID int64, task DBTask) {
+
 }

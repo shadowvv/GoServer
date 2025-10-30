@@ -14,18 +14,23 @@ type ServerConfig struct {
 }
 
 type AllPlatformConfig struct {
-	configs map[enum.ServerType]map[enum.Environment]*PlatformConfig
+	configs map[enum.ServerType]map[enum.Environment]*PlatformConfig `yaml:"configs"`
 }
 
 type PlatformConfig struct {
-	*sNet.NetConfig
-	*db.MySQLConfig
-	*db.RedisConfig
-	*logger.LoggerConfig
-	*RunConfig
+	*logger.LoggerConfig `yaml:"loggerConfig"`
+	*sNet.NetConfig      `yaml:"netConfig"`
+	*db.MySQLConfig      `yaml:"mysqlConfig"`
+	*db.RedisConfig      `yaml:"redisConfig"`
+	*RunConfig           `yaml:"runConfig"`
 }
 
 type RunConfig struct {
-	DBPoolSize       int32 `yaml:"dbPoolSize"`
-	DBWorkerTaskSize int32 `yaml:"dbWorkerTaskSize"`
+	DBPoolInfo []*DBPoolInfo `yaml:"dbPoolInfo"`
+}
+
+type DBPoolInfo struct {
+	PoolType       enum.DBPoolType `yaml:"poolType"`
+	WorkerNum      int32           `yaml:"workerNum"`
+	WorkerTaskSize int32           `yaml:"workerTaskSize"`
 }
