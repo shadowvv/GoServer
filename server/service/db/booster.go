@@ -19,7 +19,7 @@ type RedisConfig struct {
 	PoolSize int    `yaml:"poolSize"`
 }
 
-func InitDatabase(mysqlCfg *MySQLConfig, redisCfg *RedisConfig) error {
+func InitDBService(mysqlCfg *MySQLConfig, redisCfg *RedisConfig) error {
 
 	logger.Info("[db] Init database", zap.String("dsn", mysqlCfg.DSN), zap.Int("maxIdleConnections", mysqlCfg.MaxIdleConnections), zap.Int("maxOpenConnections", mysqlCfg.MaxOpenConnections), zap.Int("maxLifetime", mysqlCfg.MaxLifetime))
 

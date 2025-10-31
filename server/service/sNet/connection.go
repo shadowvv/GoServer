@@ -131,7 +131,7 @@ func (c *Conn) readPump() {
 		msgID := binary.BigEndian.Uint32(data[:4])
 		payload := data[4:]
 
-		msg := c.router.GetMessage(msgID)
+		msg := c.router.GetMessage(int32(msgID))
 		if msg == nil {
 			logger.Error(fmt.Sprintf("[net] connectionId:%d unknown message type: %d", c.GetID(), msgID))
 			continue
@@ -141,7 +141,7 @@ func (c *Conn) readPump() {
 			logger.Error(fmt.Sprintf("[net] connectionId:%d unmarshal error: %v", c.GetID(), err))
 			continue
 		}
-		c.router.Dispatch(c.GetID(), msgID, msg)
+		c.router.Dispatch(c.GetID(), int32(msgID), msg)
 	}
 }
 

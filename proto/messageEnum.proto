@@ -1,0 +1,10 @@
+syntax = "proto3";
+option go_package = "../logic/pb;pb";
+
+enum MESSAGE_ID
+{
+  MESSAGE_ID_BEGIN = 0;
+  //登录相关消息
+  LOGIN_REQ = 1001;
+  LOGIN_RESP = 1002;
+}

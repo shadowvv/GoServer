@@ -1,6 +1,9 @@
 package main
 
 import (
+	"encoding/binary"
+	"github.com/drop/GoServer/server/logic/pb"
+	"google.golang.org/protobuf/proto"
 	"log"
 	"time"
 
@@ -27,8 +30,20 @@ func main() {
 		}
 	}()
 
+	req := &pb.LoginReq{
+		Account: "test",
+		Token:   "123456",
+	}
+	data, err := proto.Marshal(req)
+	if err != nil {
+		log.Println("marshal:", err)
+		return
+	}
+	bytes := make([]byte, 4)
+	binary.BigEndian.PutUint32(bytes, uint32(1001)) // 大端序（按需切换）
+	data = append(bytes, data...)
 	// 发送一条测试消息
-	err = conn.WriteMessage(websocket.TextMessage, []byte("Hello, Server!"))
+	err = conn.WriteMessage(websocket.BinaryMessage, data)
 	if err != nil {
 		log.Println("write:", err)
 		return

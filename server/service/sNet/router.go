@@ -10,8 +10,8 @@ import (
 
 type Router struct {
 	processors   map[uint32]serviceInterface.MessageProcessorInterface
-	messageTypes map[uint32]uint32
-	msgRegistry  map[uint32]reflect.Type
+	messageTypes map[int32]uint32
+	msgRegistry  map[int32]reflect.Type
 }
 
 var _ serviceInterface.RouterInterface = (*Router)(nil)
@@ -20,12 +20,12 @@ var _ serviceInterface.RouterInterface = (*Router)(nil)
 func NewRouter() *Router {
 	return &Router{
 		processors:   make(map[uint32]serviceInterface.MessageProcessorInterface),
-		messageTypes: make(map[uint32]uint32),
-		msgRegistry:  make(map[uint32]reflect.Type),
+		messageTypes: make(map[int32]uint32),
+		msgRegistry:  make(map[int32]reflect.Type),
 	}
 }
 
-func (r *Router) RegisterProcess(msgType, msgID uint32, msg proto.Message) {
+func (r *Router) RegisterProcess(msgType uint32, msgID int32, msg proto.Message) {
 	r.messageTypes[msgID] = msgType
 	r.msgRegistry[msgID] = reflect.TypeOf(msg).Elem()
 
@@ -38,7 +38,7 @@ func (r *Router) RegisterProcessor(msgType uint32, processor serviceInterface.Me
 	logger.Info(fmt.Sprintf("[net] register msg processor msgType:%d", msgType))
 }
 
-func (r *Router) Dispatch(connectionId int64, msgID uint32, msg proto.Message) {
+func (r *Router) Dispatch(connectionId int64, msgID int32, msg proto.Message) {
 	msgType, ok := r.messageTypes[msgID]
 	if !ok {
 		logger.Error(fmt.Sprintf("[net] unknown msgId:%d", msgID))
@@ -54,7 +54,7 @@ func (r *Router) Dispatch(connectionId int64, msgID uint32, msg proto.Message) {
 	logger.Info(fmt.Sprintf("[net] dispatch msgId:%d", msgID))
 }
 
-func (r *Router) GetMessage(msgID uint32) proto.Message {
+func (r *Router) GetMessage(msgID int32) proto.Message {
 	t, ok := r.msgRegistry[msgID]
 	if !ok {
 		return nil

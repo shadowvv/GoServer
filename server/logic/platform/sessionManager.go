@@ -1,6 +1,7 @@
 package platform
 
 import (
+	"github.com/drop/GoServer/server/logic/logicInterface"
 	"github.com/drop/GoServer/server/service/serviceInterface"
 	"sync"
 )
@@ -11,6 +12,14 @@ type SessionManager struct {
 	sessionMap         map[int64]serviceInterface.ConnectionInterface
 	accountSessionMap  map[string]*UserSession
 	playerIdSessionMap map[int64]*UserSession
+}
+
+func NewSessionManager() *SessionManager {
+	return &SessionManager{
+		sessionMap:         make(map[int64]serviceInterface.ConnectionInterface),
+		accountSessionMap:  make(map[string]*UserSession),
+		playerIdSessionMap: make(map[int64]*UserSession),
+	}
 }
 
 func (sm *SessionManager) OnConnectionTimeout(connectionInterface serviceInterface.ConnectionInterface) {
@@ -38,4 +47,8 @@ func (sm *SessionManager) Bind(userID int64, conn serviceInterface.ConnectionInt
 	sm.playerIdSessionMap[userID] = session
 	sm.sessionCount++
 	Info("bind session", session)
+}
+
+func (sm *SessionManager) getUserByConnectionID(id int64) logicInterface.UserBaseInterface {
+
 }

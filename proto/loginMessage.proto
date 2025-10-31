@@ -2,13 +2,13 @@ syntax = "proto3";
 option go_package = "../logic/pb;pb";
 
 // 玩家登录请求
-message TestMessageReq {
+message LoginReq {
   string token = 1;
-  string platform = 2;
+  string account = 2;
 }
 
 // 登录响应
-message TestMessageResp {
+message LoginResp {
   bool success = 1;
   string message = 2;
 }
