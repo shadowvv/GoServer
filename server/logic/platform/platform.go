@@ -2,11 +2,10 @@ package platform
 
 import (
 	"github.com/drop/GoServer/server/logic/enum"
-	"github.com/drop/GoServer/server/logic/logicInterface"
 	"github.com/drop/GoServer/server/service/db"
 	"github.com/drop/GoServer/server/service/fileLoader"
 	"github.com/drop/GoServer/server/service/logger"
-	"github.com/drop/GoServer/server/service/sNet"
+	"github.com/drop/GoServer/server/service/netService"
 	"github.com/drop/GoServer/server/service/serviceInterface"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
@@ -78,10 +77,10 @@ func InitBootingLog() {
 
 var sessionManager = NewSessionManager()
 var messageCodec = NewCodec()
-var router = sNet.NewRouter()
+var router = netService.NewRouter()
 
-func InitNetService(config *sNet.NetConfig) error {
-	server := sNet.NewNetService(config, serverId, sessionManager, messageCodec, router)
+func InitNetService(config *netService.NetConfig) error {
+	server := netService.NewNetService(config, serverId, sessionManager, messageCodec, router)
 	go func() {
 		err := server.Start()
 		if err != nil {
@@ -124,8 +123,4 @@ func AddDBPool(poolType enum.DBPoolType, workerNum, workerTaskSize int32) error 
 
 func AddDBTask(poolType enum.DBPoolType, playerID int64, task DBTask) {
 
-}
-
-func GetUserByConnectionID(id int64) logicInterface.UserBaseInterface {
-	return sessionManager.getUserByConnectionID(id)
 }

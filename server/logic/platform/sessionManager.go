@@ -1,32 +1,31 @@
 package platform
 
 import (
-	"github.com/drop/GoServer/server/logic/logicInterface"
 	"github.com/drop/GoServer/server/service/serviceInterface"
 	"sync"
 )
 
 type SessionManager struct {
-	mu                 sync.Mutex
+	mu                 sync.RWMutex
 	sessionCount       int32
-	sessionMap         map[int64]serviceInterface.ConnectionInterface
+	sessionMap         map[int64]serviceInterface.SessionInterface
 	accountSessionMap  map[string]*UserSession
 	playerIdSessionMap map[int64]*UserSession
 }
 
 func NewSessionManager() *SessionManager {
 	return &SessionManager{
-		sessionMap:         make(map[int64]serviceInterface.ConnectionInterface),
+		sessionMap:         make(map[int64]serviceInterface.SessionInterface),
 		accountSessionMap:  make(map[string]*UserSession),
 		playerIdSessionMap: make(map[int64]*UserSession),
 	}
 }
 
-func (sm *SessionManager) OnConnectionTimeout(connectionInterface serviceInterface.ConnectionInterface) {
+func (sm *SessionManager) OnConnectionTimeout(connectionInterface serviceInterface.SessionInterface) {
 	// TODO: 断线处理
 }
 
-func (sm *SessionManager) Accept(connection serviceInterface.ConnectionInterface) {
+func (sm *SessionManager) Accept(connection serviceInterface.SessionInterface) {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
 
@@ -34,7 +33,7 @@ func (sm *SessionManager) Accept(connection serviceInterface.ConnectionInterface
 	sm.sessionCount++
 }
 
-func (sm *SessionManager) Bind(userID int64, conn serviceInterface.ConnectionInterface) {
+func (sm *SessionManager) Bind(userID int64, conn serviceInterface.SessionInterface) {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
 
@@ -47,8 +46,4 @@ func (sm *SessionManager) Bind(userID int64, conn serviceInterface.ConnectionInt
 	sm.playerIdSessionMap[userID] = session
 	sm.sessionCount++
 	Info("bind session", session)
-}
-
-func (sm *SessionManager) getUserByConnectionID(id int64) logicInterface.UserBaseInterface {
-
 }

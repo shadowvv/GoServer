@@ -1,4 +1,4 @@
-package sNet
+package netService
 
 import (
 	"context"
@@ -81,7 +81,7 @@ func (s *WebsocketService) serveWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c := newConn(conn, s.router, s.codec, s.idGenerator.NextId(), s.acceptor)
+	c := newSession(conn, s.router, s.codec, s.idGenerator.NextId(), s.acceptor)
 	s.acceptor.Accept(c)
 	c.Start()
 	logger.Info(fmt.Sprintf("[net] new connection: %d", c.GetID()))
@@ -94,6 +94,6 @@ func (s *WebsocketService) Shutdown(ctx context.Context) error {
 		_ = s.srv.Shutdown(ctx)
 		logger.Info(fmt.Sprintf("[net] ws server shutdown"))
 	}
-	// Router/Conn 会自行在 Context cancel 下关闭
+	// Router/Session 会自行在 Context cancel 下关闭
 	return nil
 }

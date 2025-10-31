@@ -1,24 +1,40 @@
 package logic
 
 import (
-	"github.com/drop/GoServer/server/logic/platform"
 	"github.com/drop/GoServer/server/service/serviceInterface"
 	"google.golang.org/protobuf/proto"
 )
 
 type LoginMessageProcessor struct {
-	processMap map[int32]MessageHandleFunc
+	processMap   map[int32]MessageHandleFunc
+	processors   []*LoginProcessor
+	processorNum int64
+}
+
+func NewLoginMessageProcessor(processorNum int32) *LoginMessageProcessor {
+	processor := &LoginMessageProcessor{
+		processMap:   make(map[int32]MessageHandleFunc),
+		processors:   make([]*LoginProcessor, processorNum),
+		processorNum: int64(processorNum),
+	}
+	for i := 0; i < int(processorNum); i++ {
+		processor.processors[i] = NewProcessor()
+	}
+	for _, p := range processor.processors {
+		go p.start()
+	}
+	return processor
 }
 
 var _ serviceInterface.MessageProcessorInterface = (*LoginMessageProcessor)(nil)
 
-func (l *LoginMessageProcessor) RegisterProcess(id int32, msg proto.Message, h MessageHandleFunc) {
-
+func (l *LoginMessageProcessor) RegisterProcess(msgId int32, h MessageHandleFunc) {
+	l.processMap[msgId] = h
 }
 
 func (l *LoginMessageProcessor) Put(connectionId int64, msgID int32, msg proto.Message) {
-	//TODO implement me
-	panic("implement me")
+	index := connectionId % l.processorNum
+	l.processors[index].Put(connectionId, msgID, msg, l.processMap[msgID])
 }
 
 func (l *LoginMessageProcessor) Process(connectionId int64, msgID int32, msg proto.Message) {
@@ -28,7 +44,7 @@ func (l *LoginMessageProcessor) Process(connectionId int64, msgID int32, msg pro
 
 type LoginTask struct {
 	connectionID int64
-	msgID        uint32
+	msgID        int32
 	msg          proto.Message
 	handler      MessageHandleFunc
 }
@@ -37,7 +53,7 @@ func (l *LoginTask) GetConnectionID() int64 {
 	return l.connectionID
 }
 
-func (l *LoginTask) GetMsgID() uint32 {
+func (l *LoginTask) GetMsgID() int32 {
 	return l.msgID
 }
 
@@ -45,17 +61,17 @@ func (l *LoginTask) GetMsg() proto.Message {
 	return l.msg
 }
 
-type Processor struct {
+type LoginProcessor struct {
 	tasks chan *LoginTask
 }
 
-func NewProcessor() *Processor {
-	return &Processor{
+func NewProcessor() *LoginProcessor {
+	return &LoginProcessor{
 		tasks: make(chan *LoginTask, 1000),
 	}
 }
 
-func (p *Processor) Put(connectionId int64, msgID uint32, msg proto.Message, handler MessageHandleFunc) {
+func (p *LoginProcessor) Put(connectionId int64, msgID int32, msg proto.Message, handler MessageHandleFunc) {
 	task := &LoginTask{
 		connectionID: connectionId,
 		msgID:        msgID,
@@ -65,13 +81,8 @@ func (p *Processor) Put(connectionId int64, msgID uint32, msg proto.Message, han
 	p.tasks <- task
 }
 
-func (p *Processor) start() {
+func (p *LoginProcessor) start() {
 	for task := range p.tasks {
-		user := platform.GetUserByConnectionID(task.connectionID)
-		if user == nil {
-			platform.Error("[login] user not found", user)
-			continue
-		}
-		task.handler(task.msg, user)
+		task.handler(task.msg, nil)
 	}
 }

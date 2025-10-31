@@ -1,4 +1,4 @@
-package sNet
+package netService
 
 import (
 	"fmt"
@@ -50,8 +50,8 @@ func (r *Router) Dispatch(connectionId int64, msgID int32, msg proto.Message) {
 		return
 	}
 
-	processor.Put(connectionId, msgID, msg)
 	logger.Info(fmt.Sprintf("[net] dispatch msgId:%d", msgID))
+	processor.Put(connectionId, msgID, msg)
 }
 
 func (r *Router) GetMessage(msgID int32) proto.Message {

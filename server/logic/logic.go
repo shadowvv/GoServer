@@ -8,7 +8,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var loginMsgProcessor = &LoginMessageProcessor{}
+var loginMsgProcessor = NewLoginMessageProcessor(2)
 var sceneMsgProcessor = &SceneMessageProcessor{}
 var serviceMsgProcessor = &ServiceMessageProcessor{}
 var innerMsgProcessor = &InnerMessageProcessor{}
@@ -28,13 +28,13 @@ func RegisterProcess(msgType uint32, msgID pb.MESSAGE_ID, msg proto.Message, h M
 	platform.RegisterProcess(msgType, messageId, msg)
 	switch msgType {
 	case enum.MSG_TYPE_LOGIN:
-		loginMsgProcessor.RegisterProcess(messageId, msg, h)
+		loginMsgProcessor.RegisterProcess(messageId, h)
 	case enum.MSG_TYPE_PLAYER:
-		loginMsgProcessor.RegisterProcess(messageId, msg, h)
+		loginMsgProcessor.RegisterProcess(messageId, h)
 	case enum.MSG_TYPE_SERVICE:
-		loginMsgProcessor.RegisterProcess(messageId, msg, h)
+		loginMsgProcessor.RegisterProcess(messageId, h)
 	case enum.MSG_TYPE_INNER:
-		loginMsgProcessor.RegisterProcess(messageId, msg, h)
+		loginMsgProcessor.RegisterProcess(messageId, h)
 	}
 
 }

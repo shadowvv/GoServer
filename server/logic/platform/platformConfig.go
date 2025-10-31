@@ -3,7 +3,7 @@ package platform
 import (
 	"github.com/drop/GoServer/server/service/db"
 	"github.com/drop/GoServer/server/service/logger"
-	"github.com/drop/GoServer/server/service/sNet"
+	"github.com/drop/GoServer/server/service/netService"
 )
 
 type ServerConfig struct {
@@ -17,11 +17,11 @@ type AllPlatformConfig struct {
 }
 
 type PlatformConfig struct {
-	LoggerConfig *logger.LoggerConfig `yaml:"loggerConfig"`
-	NetConfig    *sNet.NetConfig      `yaml:"netConfig"`
-	MySQLConfig  *db.MySQLConfig      `yaml:"mysqlConfig"`
-	RedisConfig  *db.RedisConfig      `yaml:"redisConfig"`
-	RunConfig    *RunConfig           `yaml:"runConfig"`
+	LoggerConfig *logger.LoggerConfig  `yaml:"loggerConfig"`
+	NetConfig    *netService.NetConfig `yaml:"netConfig"`
+	MySQLConfig  *db.MySQLConfig       `yaml:"mysqlConfig"`
+	RedisConfig  *db.RedisConfig       `yaml:"redisConfig"`
+	RunConfig    *RunConfig            `yaml:"runConfig"`
 }
 
 type RunConfig struct {

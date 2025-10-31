@@ -1,4 +1,4 @@
-package sNet
+package netService
 
 import (
 	"context"
@@ -14,8 +14,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Conn 包装 websocket.Conn
-type Conn struct {
+// Session 包装 websocket.Session
+type Session struct {
 	id   int64
 	conn *websocket.Conn
 	meta sync.Map
@@ -30,12 +30,12 @@ type Conn struct {
 	sendQueue chan []byte
 }
 
-var _ serviceInterface.ConnectionInterface = (*Conn)(nil)
+var _ serviceInterface.SessionInterface = (*Session)(nil)
 
-// newConn
-func newConn(ws *websocket.Conn, router serviceInterface.RouterInterface, codec serviceInterface.CodecInterface, id int64, acceptor serviceInterface.AcceptorInterface) *Conn {
+// newSession
+func newSession(ws *websocket.Conn, router serviceInterface.RouterInterface, codec serviceInterface.CodecInterface, id int64, acceptor serviceInterface.AcceptorInterface) *Session {
 	ctx, cancel := context.WithCancel(context.Background())
-	c := &Conn{
+	s := &Session{
 		id:        id,
 		conn:      ws,
 		acceptor:  acceptor,
@@ -59,62 +59,62 @@ func newConn(ws *websocket.Conn, router serviceInterface.RouterInterface, codec 
 		}
 		return nil
 	})
-	return c
+	return s
 }
 
 // Start 启动 read/write pump 与 heartbeat
-func (c *Conn) Start() {
-	c.wg.Add(3)
-	go c.readPump()
-	go c.writePump()
-	go c.heartbeat()
+func (s *Session) Start() {
+	s.wg.Add(3)
+	go s.readPump()
+	go s.writePump()
+	go s.heartbeat()
 }
 
 // Close 关闭连接（可并发调用）
-func (c *Conn) Close() {
-	c.cancel()
-	err := c.conn.Close()
+func (s *Session) Close() {
+	s.cancel()
+	err := s.conn.Close()
 	if err != nil {
-		logger.Error(fmt.Sprintf("[net] ws close connectionId:%d, error: %v", c.GetID(), err))
+		logger.Error(fmt.Sprintf("[net] ws close connectionId:%d, error: %v", s.GetID(), err))
 		return
 	}
-	c.wg.Wait()
+	s.wg.Wait()
 }
 
 // Send 安全发送（非阻塞，队列满时返回 ErrConnClosed 或错误）
-func (c *Conn) Send(message proto.Message) error {
-	frame, err := c.codec.Marshal(message)
+func (s *Session) Send(message proto.Message) error {
+	frame, err := s.codec.Marshal(message)
 	if err != nil {
 		return err
 	}
 	select {
-	case <-c.ctx.Done():
-		return errors.New(fmt.Sprintf("[net] connectionId:%d closed", c.GetID()))
+	case <-s.ctx.Done():
+		return errors.New(fmt.Sprintf("[net] connectionId:%d closed", s.GetID()))
 	default:
 	}
 	select {
-	case c.sendQueue <- frame:
+	case s.sendQueue <- frame:
 		return nil
-	case <-c.ctx.Done():
-		return errors.New(fmt.Sprintf("[net] connectionId:%d closed", c.GetID()))
+	case <-s.ctx.Done():
+		return errors.New(fmt.Sprintf("[net] connectionId:%d closed", s.GetID()))
 	}
 }
 
 // readPump: 持续读，解帧后交给 Router 处理
-func (c *Conn) readPump() {
+func (s *Session) readPump() {
 	defer func() {
-		c.cancel()
-		c.wg.Done()
+		s.cancel()
+		s.wg.Done()
 	}()
 
 	for {
 		select {
-		case <-c.ctx.Done():
+		case <-s.ctx.Done():
 			return
 		default:
 		}
 
-		typ, data, err := c.conn.ReadMessage()
+		typ, data, err := s.conn.ReadMessage()
 		if err != nil {
 			// log.Printf("read message error: %v", err)
 			return
@@ -131,39 +131,39 @@ func (c *Conn) readPump() {
 		msgID := binary.BigEndian.Uint32(data[:4])
 		payload := data[4:]
 
-		msg := c.router.GetMessage(int32(msgID))
+		msg := s.router.GetMessage(int32(msgID))
 		if msg == nil {
-			logger.Error(fmt.Sprintf("[net] connectionId:%d unknown message type: %d", c.GetID(), msgID))
+			logger.Error(fmt.Sprintf("[net] connectionId:%d unknown message type: %d", s.GetID(), msgID))
 			continue
 		}
-		err = c.codec.Unmarshal(payload, msg)
+		err = s.codec.Unmarshal(payload, msg)
 		if err != nil {
-			logger.Error(fmt.Sprintf("[net] connectionId:%d unmarshal error: %v", c.GetID(), err))
+			logger.Error(fmt.Sprintf("[net] connectionId:%d unmarshal error: %v", s.GetID(), err))
 			continue
 		}
-		c.router.Dispatch(c.GetID(), int32(msgID), msg)
+		s.router.Dispatch(s.GetID(), int32(msgID), msg)
 	}
 }
 
 // writePump: 持续写，合并控制写超时等
-func (c *Conn) writePump() {
+func (s *Session) writePump() {
 	defer func() {
-		c.cancel()
-		c.wg.Done()
+		s.cancel()
+		s.wg.Done()
 	}()
 
 	for {
 		select {
-		case <-c.ctx.Done():
+		case <-s.ctx.Done():
 			// flush remaining? 忽略
 			return
-		case data := <-c.sendQueue:
-			err := c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+		case data := <-s.sendQueue:
+			err := s.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if err != nil {
-				logger.Error(fmt.Sprintf("[net] ws set write deadline connectionId:%d, error: %v", c.GetID(), err))
+				logger.Error(fmt.Sprintf("[net] ws set write deadline connectionId:%d, error: %v", s.GetID(), err))
 				return
 			}
-			if err := c.conn.WriteMessage(websocket.BinaryMessage, data); err != nil {
+			if err := s.conn.WriteMessage(websocket.BinaryMessage, data); err != nil {
 				// log.Printf("write message error: %v", err)
 				return
 			}
@@ -172,10 +172,10 @@ func (c *Conn) writePump() {
 }
 
 // heartbeat: 定期发送 Ping，检查 Pong 更新的 read deadline
-func (c *Conn) heartbeat() {
+func (s *Session) heartbeat() {
 	defer func() {
-		c.cancel()
-		c.wg.Done()
+		s.cancel()
+		s.wg.Done()
 	}()
 
 	ticker := time.NewTicker(time.Duration(pingInterval))
@@ -183,16 +183,16 @@ func (c *Conn) heartbeat() {
 
 	for {
 		select {
-		case <-c.ctx.Done():
+		case <-s.ctx.Done():
 			return
 		case <-ticker.C:
-			err := c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+			err := s.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if err != nil {
-				logger.Error(fmt.Sprintf("[net] ws set write deadline connectionId:%d, error: %v", c.GetID(), err))
-				c.acceptor.OnConnectionTimeout(c)
+				logger.Error(fmt.Sprintf("[net] ws set write deadline connectionId:%d, error: %v", s.GetID(), err))
+				s.acceptor.OnConnectionTimeout(s)
 				return
 			}
-			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+			if err := s.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
 			// 如果对端没有 pong，会在 read deadline 超时导致 readPump 退出
@@ -200,11 +200,11 @@ func (c *Conn) heartbeat() {
 	}
 }
 
-func (c *Conn) GetID() int64 {
-	return c.id
+func (s *Session) GetID() int64 {
+	return s.id
 }
 
 // Meta 操作
-func (c *Conn) SetMeta(k string, v interface{})      { c.meta.Store(k, v) }
-func (c *Conn) GetMeta(k string) (interface{}, bool) { return c.meta.Load(k) }
-func (c *Conn) DelMeta(k string)                     { c.meta.Delete(k) }
+func (s *Session) SetMeta(k string, v interface{})      { s.meta.Store(k, v) }
+func (s *Session) GetMeta(k string) (interface{}, bool) { return s.meta.Load(k) }
+func (s *Session) DelMeta(k string)                     { s.meta.Delete(k) }

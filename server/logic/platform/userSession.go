@@ -6,7 +6,7 @@ type UserSession struct {
 	Account    string
 	UserID     int64
 	ServerId   int32
-	Connection serviceInterface.ConnectionInterface
+	Connection serviceInterface.SessionInterface
 }
 
 func (u *UserSession) GetSessionId() int64 {
