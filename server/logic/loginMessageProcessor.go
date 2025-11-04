@@ -1,6 +1,10 @@
 package logic
 
 import (
+	"github.com/drop/GoServer/server/logic/enum"
+	"github.com/drop/GoServer/server/logic/logicInterface"
+	"github.com/drop/GoServer/server/logic/model"
+	"github.com/drop/GoServer/server/logic/platform"
 	"github.com/drop/GoServer/server/service/serviceInterface"
 	"google.golang.org/protobuf/proto"
 )
@@ -32,29 +36,24 @@ func (l *LoginMessageProcessor) RegisterProcess(msgId int32, h MessageHandleFunc
 	l.processMap[msgId] = h
 }
 
-func (l *LoginMessageProcessor) Put(connectionId int64, msgID int32, msg proto.Message) {
-	index := connectionId % l.processorNum
-	l.processors[index].Put(connectionId, msgID, msg, l.processMap[msgID])
+func (l *LoginMessageProcessor) Put(session serviceInterface.SessionInterface, msgID int32, msg proto.Message) {
+	index := session.GetID() % l.processorNum
+	l.processors[index].Put(session, msgID, msg, l.processMap[msgID])
 }
 
-func (l *LoginMessageProcessor) Process(connectionId int64, msgID int32, msg proto.Message) {
+func (l *LoginMessageProcessor) Process(session serviceInterface.SessionInterface, msgID int32, msg proto.Message) {
 	//TODO implement me
 	panic("implement me")
 }
 
 type LoginTask struct {
-	connectionID int64
-	msgID        int32
-	msg          proto.Message
-	handler      MessageHandleFunc
+	user    *model.LoginUser
+	msg     proto.Message
+	handler MessageHandleFunc
 }
 
-func (l *LoginTask) GetConnectionID() int64 {
-	return l.connectionID
-}
-
-func (l *LoginTask) GetMsgID() int32 {
-	return l.msgID
+func (l *LoginTask) GetUser() logicInterface.UserBaseInterface {
+	return l.user
 }
 
 func (l *LoginTask) GetMsg() proto.Message {
@@ -71,18 +70,29 @@ func NewProcessor() *LoginProcessor {
 	}
 }
 
-func (p *LoginProcessor) Put(connectionId int64, msgID int32, msg proto.Message, handler MessageHandleFunc) {
+func (p *LoginProcessor) Put(session serviceInterface.SessionInterface, msgID int32, msg proto.Message, handler MessageHandleFunc) {
 	task := &LoginTask{
-		connectionID: connectionId,
-		msgID:        msgID,
-		msg:          msg,
-		handler:      handler,
+		user:    model.NewLoginUser(session),
+		msg:     msg,
+		handler: handler,
 	}
 	p.tasks <- task
 }
 
 func (p *LoginProcessor) start() {
 	for task := range p.tasks {
-		task.handler(task.msg, nil)
+		if task.handler == nil {
+			platform.ErrorWithFunction(enum.FUNC_LOGIN, "handler is nil", task.user, nil)
+			continue
+		}
+		if task.msg == nil {
+			platform.ErrorWithFunction(enum.FUNC_LOGIN, "msg is nil", task.user, nil)
+			continue
+		}
+		if task.user == nil {
+			platform.ErrorWithFunction(enum.FUNC_LOGIN, "user is nil", task.user, nil)
+			continue
+		}
+		task.handler(task.msg, task.user)
 	}
 }

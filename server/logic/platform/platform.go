@@ -2,6 +2,7 @@ package platform
 
 import (
 	"github.com/drop/GoServer/server/logic/enum"
+	"github.com/drop/GoServer/server/logic/logicInterface"
 	"github.com/drop/GoServer/server/service/db"
 	"github.com/drop/GoServer/server/service/fileLoader"
 	"github.com/drop/GoServer/server/service/logger"
@@ -16,6 +17,7 @@ import (
 var serverId int32    // 服务ID
 var serverType string // 服务类型
 var env string        // 环境
+var messageCodec = NewCodec()
 
 func BootPlatform() {
 	InitBootingLog()
@@ -76,8 +78,6 @@ func InitBootingLog() {
 }
 
 var sessionManager = NewSessionManager()
-var messageCodec = NewCodec()
-var router = netService.NewRouter()
 
 func InitNetService(config *netService.NetConfig) error {
 	server := netService.NewNetService(config, serverId, sessionManager, messageCodec, router)
@@ -89,6 +89,8 @@ func InitNetService(config *netService.NetConfig) error {
 	}()
 	return nil
 }
+
+var router = netService.NewRouter()
 
 // RegisterProcess 注册消息处理
 func RegisterProcess(msgType uint32, msgID int32, msg proto.Message) {
@@ -103,7 +105,7 @@ func RegisterProcessor(msgType uint32, processor serviceInterface.MessageProcess
 var dbPoolManager *DBPoolManager
 
 func InitDBService(mySQLConfig *db.MySQLConfig, redisConfig *db.RedisConfig, runConfig *RunConfig) error {
-	err := db.InitDBService(mySQLConfig, redisConfig)
+	err := db.InitDBService(mySQLConfig, redisConfig, logger.Logger)
 	if err != nil {
 		return err
 	}
@@ -114,6 +116,7 @@ func InitDBService(mySQLConfig *db.MySQLConfig, redisConfig *db.RedisConfig, run
 			return err
 		}
 	}
+	dbPoolManager.initModel()
 	return nil
 }
 
@@ -123,4 +126,10 @@ func AddDBPool(poolType enum.DBPoolType, workerNum, workerTaskSize int32) error 
 
 func AddDBTask(poolType enum.DBPoolType, playerID int64, task DBTask) {
 
+}
+
+var userMap = make(map[int64]logicInterface.UserBaseInterface)
+
+func AddUser(userId int64, user logicInterface.UserBaseInterface) {
+	sessionManager.Bind(userId, user.GetSession())
 }

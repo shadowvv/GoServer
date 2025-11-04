@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var logger *zap.Logger
+var Logger *zap.Logger
 
 type LoggerConfig struct {
 	InfoFilename  string `yaml:"infoFilename"`
@@ -60,8 +60,8 @@ func InitLoggerByConfig(config *LoggerConfig) error {
 	errorEncoderConfig := zap.NewProductionEncoderConfig()
 	errorEncoderConfig.TimeKey = "time"
 	errorEncoderConfig.LevelKey = "level"
-	errorEncoderConfig.FunctionKey = "func"
-	errorEncoderConfig.CallerKey = "caller"
+	errorEncoderConfig.FunctionKey = ""
+	errorEncoderConfig.CallerKey = ""
 	errorEncoderConfig.StacktraceKey = "stacktrace"
 	errorEncoderConfig.MessageKey = "msg"
 	errorEncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
@@ -82,18 +82,18 @@ func InitLoggerByConfig(config *LoggerConfig) error {
 
 	core := zapcore.NewTee(infoCore, errorCore)
 
-	logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zapcore.ErrorLevel))
+	Logger = zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zapcore.ErrorLevel))
 	return nil
 }
 
 func Info(msg string, fields ...zap.Field) {
-	logger.Info(msg, fields...)
+	Logger.Info(msg, fields...)
 }
 
 func Debug(msg string, fields ...zap.Field) {
-	logger.Debug(msg, fields...)
+	Logger.Debug(msg, fields...)
 }
 
 func Error(msg string, fields ...zap.Field) {
-	logger.Error(msg, fields...)
+	Logger.Error(msg, fields...)
 }

@@ -10,12 +10,12 @@ type InnerMessageProcessor struct {
 
 var _ serviceInterface.MessageProcessorInterface = (*InnerMessageProcessor)(nil)
 
-func (p *InnerMessageProcessor) Put(connectionId int64, msgID int32, msg proto.Message) {
+func (p *InnerMessageProcessor) Put(session serviceInterface.SessionInterface, msgID int32, msg proto.Message) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (p *InnerMessageProcessor) Process(connectionId int64, msgID int32, msg proto.Message) {
+func (p *InnerMessageProcessor) Process(session serviceInterface.SessionInterface, msgID int32, msg proto.Message) {
 	//TODO implement me
 	panic("implement me")
 }

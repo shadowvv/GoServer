@@ -46,19 +46,19 @@ func newSession(ws *websocket.Conn, router serviceInterface.RouterInterface, cod
 		sendQueue: make(chan []byte, sendQueueSize),
 	}
 	// pong handler updates deadline
-	err := ws.SetReadDeadline(time.Now().Add(time.Duration(pongTimeout)))
-	if err != nil {
-		logger.Error(fmt.Sprintf("[net] ws set read deadline connectionId:%d, error: %v", id, err))
-		return nil
-	}
-	ws.SetPongHandler(func(appData string) error {
-		err := ws.SetReadDeadline(time.Now().Add(time.Duration(pongTimeout)))
-		if err != nil {
-			logger.Error(fmt.Sprintf("[net] ws set pong read deadline connectionId:%d, error: %v", id, err))
-			return err
-		}
-		return nil
-	})
+	//err := ws.SetReadDeadline(time.Now().Add(time.Duration(pongTimeout)))
+	//if err != nil {
+	//	logger.Error(fmt.Sprintf("[net] ws set read deadline connectionId:%d, error: %v", id, err))
+	//	return nil
+	//}
+	//ws.SetPongHandler(func(appData string) error {
+	//	err := ws.SetReadDeadline(time.Now().Add(time.Duration(pongTimeout)))
+	//	if err != nil {
+	//		logger.Error(fmt.Sprintf("[net] ws set pong read deadline connectionId:%d, error: %v", id, err))
+	//		return err
+	//	}
+	//	return nil
+	//})
 	return s
 }
 
@@ -82,8 +82,8 @@ func (s *Session) Close() {
 }
 
 // Send 安全发送（非阻塞，队列满时返回 ErrConnClosed 或错误）
-func (s *Session) Send(message proto.Message) error {
-	frame, err := s.codec.Marshal(message)
+func (s *Session) Send(msgId int32, message proto.Message) error {
+	frame, err := s.codec.Marshal(msgId, message)
 	if err != nil {
 		return err
 	}
@@ -141,7 +141,7 @@ func (s *Session) readPump() {
 			logger.Error(fmt.Sprintf("[net] connectionId:%d unmarshal error: %v", s.GetID(), err))
 			continue
 		}
-		s.router.Dispatch(s.GetID(), int32(msgID), msg)
+		s.router.Dispatch(s, int32(msgID), msg)
 	}
 }
 
@@ -186,15 +186,15 @@ func (s *Session) heartbeat() {
 		case <-s.ctx.Done():
 			return
 		case <-ticker.C:
-			err := s.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-			if err != nil {
-				logger.Error(fmt.Sprintf("[net] ws set write deadline connectionId:%d, error: %v", s.GetID(), err))
-				s.acceptor.OnConnectionTimeout(s)
-				return
-			}
-			if err := s.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-				return
-			}
+			//err := s.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+			//if err != nil {
+			//	logger.Error(fmt.Sprintf("[net] ws set write deadline connectionId:%d, error: %v", s.GetID(), err))
+			//	s.acceptor.OnConnectionTimeout(s)
+			//	return
+			//}
+			//if err := s.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+			//	return
+			//}
 			// 如果对端没有 pong，会在 read deadline 超时导致 readPump 退出
 		}
 	}

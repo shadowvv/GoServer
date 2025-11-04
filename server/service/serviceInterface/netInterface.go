@@ -5,7 +5,7 @@ import "google.golang.org/protobuf/proto"
 // CodecInterface 消息编解码接口
 type CodecInterface interface {
 	// 编码
-	Marshal(msg proto.Message) ([]byte, error)
+	Marshal(msgID int32, msg proto.Message) ([]byte, error)
 	// 解码
 	Unmarshal(data []byte, msg proto.Message) error
 }
@@ -25,7 +25,7 @@ type RouterInterface interface {
 	// 注册消息处理器
 	RegisterProcessor(msgType uint32, processor MessageProcessorInterface)
 	// 分发消息
-	Dispatch(connectionId int64, msgID int32, msg proto.Message)
+	Dispatch(session SessionInterface, msgID int32, msg proto.Message)
 	// 获取消息
 	GetMessage(msgID int32) proto.Message
 }
@@ -33,15 +33,15 @@ type RouterInterface interface {
 // MessageProcessorInterface 消息处理接口
 type MessageProcessorInterface interface {
 	// 放入消息
-	Put(connectionId int64, msgID int32, msg proto.Message)
+	Put(session SessionInterface, msgID int32, msg proto.Message)
 	// 处理消息
-	Process(connectionId int64, msgID int32, msg proto.Message)
+	Process(session SessionInterface, msgID int32, msg proto.Message)
 }
 
 // SessionInterface 连接接口
 type SessionInterface interface {
 	// 发送消息
-	Send(msg proto.Message) error
+	Send(msgId int32, msg proto.Message) error
 	// 主动关闭连接
 	Close()
 	// 获取连接ID

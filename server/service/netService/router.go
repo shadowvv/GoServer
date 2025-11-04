@@ -38,7 +38,7 @@ func (r *Router) RegisterProcessor(msgType uint32, processor serviceInterface.Me
 	logger.Info(fmt.Sprintf("[net] register msg processor msgType:%d", msgType))
 }
 
-func (r *Router) Dispatch(connectionId int64, msgID int32, msg proto.Message) {
+func (r *Router) Dispatch(session serviceInterface.SessionInterface, msgID int32, msg proto.Message) {
 	msgType, ok := r.messageTypes[msgID]
 	if !ok {
 		logger.Error(fmt.Sprintf("[net] unknown msgId:%d", msgID))
@@ -51,7 +51,7 @@ func (r *Router) Dispatch(connectionId int64, msgID int32, msg proto.Message) {
 	}
 
 	logger.Info(fmt.Sprintf("[net] dispatch msgId:%d", msgID))
-	processor.Put(connectionId, msgID, msg)
+	processor.Put(session, msgID, msg)
 }
 
 func (r *Router) GetMessage(msgID int32) proto.Message {

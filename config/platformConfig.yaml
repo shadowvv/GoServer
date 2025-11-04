@@ -21,10 +21,10 @@ configs:
         poolSize: 10
       runConfig:
         dbPoolInfo:
-          - poolType: 0 # DB_POOL_TYPE_LOGIN
+          - poolType: "login" # DB_POOL_TYPE_LOGIN
             workerNum: 10
             workerTaskSize: 100
-          - poolType: 1 # DB_POOL_TYPE_SCENE
+          - poolType: "scene" # DB_POOL_TYPE_SCENE
             workerNum: 20
             workerTaskSize: 200
   gate: # SERVER_TYPE_LOGIC
