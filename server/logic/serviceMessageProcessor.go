@@ -8,14 +8,14 @@ import (
 type ServiceMessageProcessor struct {
 }
 
-var _ serviceInterface.MessageProcessorInterface = (*SceneMessageProcessor)(nil)
+var _ serviceInterface.MessageProcessorInterface = (*ServiceMessageProcessor)(nil)
 
-func (s *ServiceMessageProcessor) Put(connectionId int64, msgID uint32, msg proto.Message) {
+func (s *ServiceMessageProcessor) Put(session serviceInterface.SessionInterface, msgID int32, msg proto.Message) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ServiceMessageProcessor) Process(connectionId int64, msgID uint32, msg proto.Message) {
+func (s *ServiceMessageProcessor) Process(session serviceInterface.SessionInterface, msgID int32, msg proto.Message) {
 	//TODO implement me
 	panic("implement me")
 }

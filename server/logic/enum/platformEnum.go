@@ -1,23 +1,24 @@
 package enum
 
-type Environment int32
+type Environment string
 
 const (
-	ENV_DEVELOP Environment = 0
-	ENV_TEST    Environment = 1
-	ENV_PRODUCT Environment = 2
+	ENV_DEVELOP Environment = "dev"
+	ENV_TEST    Environment = "test"
+	ENV_STAGE   Environment = "stage"
+	ENV_PRODUCT Environment = "prod"
 )
 
-type ServerType int32
+type ServerType string
 
 const (
-	SERVER_TYPE_GAME  ServerType = 0
-	SERVER_TYPE_LOGIC ServerType = 1
+	SERVER_TYPE_GATE ServerType = "gate"
+	SERVER_TYPE_GAME ServerType = "game"
 )
 
-type DBPoolType int32
+type DBPoolType string
 
 const (
-	DB_POOL_TYPE_LOGIN DBPoolType = 0
-	DB_POOL_TYPE_SCENE DBPoolType = 1
+	DB_POOL_TYPE_LOGIN DBPoolType = "login"
+	DB_POOL_TYPE_SCENE DBPoolType = "scene"
 )

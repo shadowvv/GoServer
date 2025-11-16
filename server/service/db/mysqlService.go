@@ -1,6 +1,7 @@
 package db
 
 import (
+	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -9,9 +10,11 @@ import (
 
 var DB *gorm.DB
 
-func InitMySQL(dsn string, maxIdle, maxOpen, maxLifetime int) error {
+func InitMySQL(dsn string, maxIdle, maxOpen, maxLifetime int, zapLogger *zap.Logger) error {
+	gormLogger := NewZapGormLogger(zapLogger, logger.Info)
+
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger:         logger.Default.LogMode(logger.Warn),
+		Logger:         gormLogger,
 		NamingStrategy: CamelNamingStrategy{},
 	})
 	if err != nil {

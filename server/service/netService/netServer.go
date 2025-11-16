@@ -1,4 +1,4 @@
-package sNet
+package netService
 
 import (
 	"context"
@@ -21,8 +21,8 @@ var pingInterval = int64(25 * 1000)
 var pongTimeout = int64(60 * 1000)
 var sendQueueSize = int32(256)
 
-// WebsocketServer 是 websocket 服务
-type WebsocketServer struct {
+// WebsocketService 是 websocket 服务
+type WebsocketService struct {
 	addr        string
 	upgrader    websocket.Upgrader
 	srv         *http.Server
@@ -32,8 +32,8 @@ type WebsocketServer struct {
 	router      serviceInterface.RouterInterface
 }
 
-// NewServer 返回默认 websocketServer
-func NewServer(config *NetConfig, serverId int32, acceptorInterface serviceInterface.AcceptorInterface, codec serviceInterface.CodecInterface, router serviceInterface.RouterInterface) *WebsocketServer {
+// NewNetService 返回默认 websocketServer
+func NewNetService(config *NetConfig, serverId int32, acceptorInterface serviceInterface.AcceptorInterface, codec serviceInterface.CodecInterface, router serviceInterface.RouterInterface) *WebsocketService {
 	if config.pingInterval > 0 {
 		pingInterval = config.pingInterval * 1000
 	}
@@ -45,7 +45,7 @@ func NewServer(config *NetConfig, serverId int32, acceptorInterface serviceInter
 	}
 
 	logger.Info(fmt.Sprintf("[net] init server address:%s,pingInterval:%d,pongTimeout:%d", config.Address, pingInterval, pongTimeout))
-	return &WebsocketServer{
+	return &WebsocketService{
 		addr: config.Address,
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  4096,
@@ -61,7 +61,7 @@ func NewServer(config *NetConfig, serverId int32, acceptorInterface serviceInter
 }
 
 // Start 启动服务，阻塞式
-func (s *WebsocketServer) Start() error {
+func (s *WebsocketService) Start() error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", s.serveWS)
 	s.srv = &http.Server{
@@ -74,26 +74,26 @@ func (s *WebsocketServer) Start() error {
 	return s.srv.ListenAndServe()
 }
 
-func (s *WebsocketServer) serveWS(w http.ResponseWriter, r *http.Request) {
+func (s *WebsocketService) serveWS(w http.ResponseWriter, r *http.Request) {
 	conn, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		logger.Error(fmt.Sprintf("[net] upgrade failed: %v", err))
 		return
 	}
 
-	c := newConn(conn, s.router, s.codec, s.idGenerator.NextId(), s.acceptor)
+	c := newSession(conn, s.router, s.codec, s.idGenerator.NextId(), s.acceptor)
 	s.acceptor.Accept(c)
 	c.Start()
 	logger.Info(fmt.Sprintf("[net] new connection: %d", c.GetID()))
 }
 
 // Shutdown 优雅停服
-func (s *WebsocketServer) Shutdown(ctx context.Context) error {
+func (s *WebsocketService) Shutdown(ctx context.Context) error {
 	// 先停止 http server（不再接收新连接）
 	if s.srv != nil {
 		_ = s.srv.Shutdown(ctx)
 		logger.Info(fmt.Sprintf("[net] ws server shutdown"))
 	}
-	// Router/Conn 会自行在 Context cancel 下关闭
+	// Router/Session 会自行在 Context cancel 下关闭
 	return nil
 }

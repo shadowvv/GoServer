@@ -1,4 +1,5 @@
 serverId: 1
-serverType: 0
-# 0:开发环境 1:测试环境 2:预发布环境 3:正式环境
-environment: 0
+# gate:网关服 game:游戏服
+serverType: game
+# dev:开发环境 test:测试环境 stage:预发布环境 prod:正式环境
+environment: dev

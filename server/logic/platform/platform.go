@@ -2,10 +2,11 @@ package platform
 
 import (
 	"github.com/drop/GoServer/server/logic/enum"
+	"github.com/drop/GoServer/server/logic/logicInterface"
 	"github.com/drop/GoServer/server/service/db"
 	"github.com/drop/GoServer/server/service/fileLoader"
 	"github.com/drop/GoServer/server/service/logger"
-	"github.com/drop/GoServer/server/service/sNet"
+	"github.com/drop/GoServer/server/service/netService"
 	"github.com/drop/GoServer/server/service/serviceInterface"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
@@ -13,9 +14,10 @@ import (
 	"os"
 )
 
-var serverId int32             // 服务ID
-var serverType enum.ServerType // 服务类型
-var env enum.Environment       // 环境
+var serverId int32    // 服务ID
+var serverType string // 服务类型
+var env string        // 环境
+var messageCodec = NewCodec()
 
 func BootPlatform() {
 	InitBootingLog()
@@ -34,7 +36,7 @@ func BootPlatform() {
 	serverId = config.ServerId
 	serverType = config.ServerType
 
-	configs, ok := allPlatformConfig.configs[serverType]
+	configs, ok := allPlatformConfig.Configs[serverType]
 	if !ok {
 		log.Fatalf("[platform] No config for server type %d", serverType)
 	}
@@ -48,13 +50,13 @@ func BootPlatform() {
 		logger.Error("[platform] Init logger error", zap.Error(err))
 	}
 
-	logger.Info("[platform] boot platform", zap.Int32("serverId", serverId), zap.Int32("serverType", int32(serverType)), zap.Int32("env", int32(env)))
+	logger.Info("[platform] boot platform", zap.Int32("serverId", serverId), zap.String("serverType", serverType), zap.String("env", env))
 
-	err = InitDB(cfg.MySQLConfig, cfg.RedisConfig, cfg.RunConfig)
+	err = InitDBService(cfg.MySQLConfig, cfg.RedisConfig, cfg.RunConfig)
 	if err != nil {
 		logger.Error("[platform] Init db error", zap.Error(err))
 	}
-	err = InitServer(cfg.NetConfig)
+	err = InitNetService(cfg.NetConfig)
 	if err != nil {
 		logger.Error("[platform] Init server error", zap.Error(err))
 	}
@@ -75,21 +77,23 @@ func InitBootingLog() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 }
 
-var sessionManager SessionManager
-var messageCodec = NewCodec()
-var router = sNet.NewRouter()
+var sessionManager = NewSessionManager()
 
-func InitServer(config *sNet.NetConfig) error {
-	server := sNet.NewServer(config, serverId, &sessionManager, messageCodec, router)
-	err := server.Start()
-	if err != nil {
-		return err
-	}
+func InitNetService(config *netService.NetConfig) error {
+	server := netService.NewNetService(config, serverId, sessionManager, messageCodec, router)
+	go func() {
+		err := server.Start()
+		if err != nil {
+			logger.Error("[platform] Start server error", zap.Error(err))
+		}
+	}()
 	return nil
 }
 
+var router = netService.NewRouter()
+
 // RegisterProcess 注册消息处理
-func RegisterProcess(msgType, msgID uint32, msg proto.Message) {
+func RegisterProcess(msgType uint32, msgID int32, msg proto.Message) {
 	router.RegisterProcess(msgType, msgID, msg)
 }
 
@@ -100,18 +104,19 @@ func RegisterProcessor(msgType uint32, processor serviceInterface.MessageProcess
 
 var dbPoolManager *DBPoolManager
 
-func InitDB(mySQLConfig *db.MySQLConfig, redisConfig *db.RedisConfig, runConfig *RunConfig) error {
-	err := db.InitDatabase(mySQLConfig, redisConfig)
+func InitDBService(mySQLConfig *db.MySQLConfig, redisConfig *db.RedisConfig, runConfig *RunConfig) error {
+	err := db.InitDBService(mySQLConfig, redisConfig, logger.Logger)
 	if err != nil {
 		return err
 	}
 	dbPoolManager = NewDBPoolManager(db.DB)
 	for _, poolInfo := range runConfig.DBPoolInfo {
-		err := AddDBPool(poolInfo.PoolType, poolInfo.WorkerNum, poolInfo.WorkerTaskSize)
+		err := AddDBPool(enum.DBPoolType(poolInfo.PoolType), poolInfo.WorkerNum, poolInfo.WorkerTaskSize)
 		if err != nil {
 			return err
 		}
 	}
+	dbPoolManager.initModel()
 	return nil
 }
 
@@ -121,4 +126,10 @@ func AddDBPool(poolType enum.DBPoolType, workerNum, workerTaskSize int32) error 
 
 func AddDBTask(poolType enum.DBPoolType, playerID int64, task DBTask) {
 
+}
+
+var userMap = make(map[int64]logicInterface.UserBaseInterface)
+
+func AddUser(userId int64, user logicInterface.UserBaseInterface) {
+	sessionManager.Bind(userId, user.GetSession())
 }

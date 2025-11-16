@@ -1,6 +1,6 @@
 configs:
-  0: # SERVER_TYPE_GAME
-    0: # ENV_DEVELOP
+  game: # SERVER_TYPE_GAME
+    dev: # ENV_DEVELOP
       loggerConfig:
         infoFilename: "logs/info.log"
         errorFilename: "logs/error.log"
@@ -9,8 +9,7 @@ configs:
         maxage: 7       # days
         compress: true
       netConfig:
-        host: "localhost"
-        port: 8080
+        address: ":8080"
       mysqlConfig:
         dsn: "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
         maxIdleConnections: 10
@@ -22,14 +21,14 @@ configs:
         poolSize: 10
       runConfig:
         dbPoolInfo:
-          - poolType: 0 # DB_POOL_TYPE_LOGIN
+          - poolType: "login" # DB_POOL_TYPE_LOGIN
             workerNum: 10
             workerTaskSize: 100
-          - poolType: 1 # DB_POOL_TYPE_SCENE
+          - poolType: "scene" # DB_POOL_TYPE_SCENE
             workerNum: 20
             workerTaskSize: 200
-  1: # SERVER_TYPE_LOGIC
-    0: # ENV_DEVELOP
+  gate: # SERVER_TYPE_LOGIC
+    dev: # ENV_DEVELOP
       loggerConfig:
         infoFilename: "logs/info.log"
         errorFilename: "logs/error.log"
@@ -38,8 +37,7 @@ configs:
         maxage: 7       # days
         compress: true
       netConfig:
-        host: "localhost"
-        port: 8080
+        address: ":8080"
       mysqlConfig:
         dsn: "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
         maxIdleConnections: 10
