@@ -1,0 +1,32 @@
+{
+  "adventure": {
+    "401": {
+      "id": "401",
+      "limit": "5",
+      "timeLimit": "60",
+      "unlcok": "2006",
+      "weight": "3000"
+    },
+    "402": {
+      "id": "402",
+      "limit": "5",
+      "timeLimit": "60",
+      "unlcok": "2005",
+      "weight": "3000"
+    },
+    "403": {
+      "id": "403",
+      "limit": "2",
+      "timeLimit": "60",
+      "unlcok": "2007",
+      "weight": "2000"
+    },
+    "404": {
+      "id": "404",
+      "limit": "2",
+      "timeLimit": "60",
+      "unlcok": "410111|130102",
+      "weight": "2000"
+    }
+  }
+}

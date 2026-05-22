@@ -1,58 +1,1615 @@
 configs:
-  game: # SERVER_TYPE_GAME
-    dev: # ENV_DEVELOP
+  http:
+    local:
       loggerConfig:
-        infoFilename: "logs/info.log"
-        errorFilename: "logs/error.log"
-        maxsize: 100    # MB
-        maxbackups: 7
-        maxage: 7       # days
-        compress: true
-      netConfig:
-        address: ":8080"
-      mysqlConfig:
-        dsn: "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
-        maxIdleConnections: 10
-        maxOpenConnections: 100
-        maxLifetime: 10
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 30 # 文件数
+        onlyConsole: true
+      httpConfig:
+        address: ":8081"
+        readTimeout: 3000ms
+        writeTimeout: 3000ms
+        idleTimeout: 10000ms
+        maxBodySize: 1048576 # 1MB
+      serverDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
       redisConfig:
         addr: "127.0.0.1:6379"
         db: 0
         poolSize: 10
-      runConfig:
-        dbPoolInfo:
-          - poolType: "login" # DB_POOL_TYPE_LOGIN
-            workerNum: 10
-            workerTaskSize: 100
-          - poolType: "scene" # DB_POOL_TYPE_SCENE
-            workerNum: 20
-            workerTaskSize: 200
-  gate: # SERVER_TYPE_LOGIC
-    dev: # ENV_DEVELOP
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 60 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 300s
+        rpcPongTimeoutSecond: 100s
+      auditServerConfig:
+        addr: "ws://192.168.1.64:9001"
+    test:
       loggerConfig:
-        infoFilename: "logs/info.log"
-        errorFilename: "logs/error.log"
-        maxsize: 100    # MB
-        maxbackups: 7
-        maxage: 7       # days
-        compress: true
-      netConfig:
-        address: ":8080"
-      mysqlConfig:
-        dsn: "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
-        maxIdleConnections: 10
-        maxOpenConnections: 100
-        maxLifetime: 10
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 30 # 文件数
+        onlyConsole: false
+      httpConfig:
+        address: ":8081"
+        readTimeout: 3000ms
+        writeTimeout: 3000ms
+        idleTimeout: 1000ms
+        maxBodySize: 1048576 # 1MB
+      serverDBConfig:
+        dsn: "root:xzd_xx_mysql2024@dbcom@tcp(127.0.0.1:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:xzd_xx_mysql2024@dbcom@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
       redisConfig:
         addr: "127.0.0.1:6379"
         db: 0
         poolSize: 10
+        password: "xzd_xx_redis"
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 60 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      auditServerConfig:
+        addr: ""
+    stress:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 30 # 文件数
+        onlyConsole: true
+      httpConfig:
+        address: ":8081"
+        readTimeout: 3000ms
+        writeTimeout: 3000ms
+        idleTimeout: 10000ms
+        maxBodySize: 1048576 # 1MB
+      serverDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "127.0.0.1:6379"
+        db: 0
+        poolSize: 10
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 60 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 300s
+        rpcPongTimeoutSecond: 100s
+      auditServerConfig:
+        addr: "ws://192.168.1.64:9001"
+    stage:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      httpConfig:
+        address: ":8081"
+        readTimeout: 3000ms
+        writeTimeout: 3000ms
+        idleTimeout: 1000ms
+        maxBodySize: 1048576 # 1MB
+      serverDBConfig:
+        dsn: "root:123qweEWQ!@tcp(10.0.8.10:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123qweEWQ!@tcp(10.0.8.10:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.0.8.10:6379"
+        db: 0
+        poolSize: 10
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://10.0.8.10:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      payConfig:
+      auditServerConfig:
+        addr: "ws://192.168.1.64:9001"
+    prodTest:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      httpConfig:
+        address: ":8081"
+        readTimeout: 3000ms
+        writeTimeout: 3000ms
+        idleTimeout: 1000ms
+        maxBodySize: 1048576 # 1MB
+      serverDBConfig:
+        dsn: "root:123456@tcp(10.170.0.3:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.3:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.3:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.3:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      payConfig:
+        - platform: "google"
+          credentialFile: "/data/googlePay/google-services.json"
+          packageName: "com.dugeongoblinpromo.gp"
+      auditServerConfig:
+        addr: "ws://192.168.1.64:9001"
+    prodStage:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      httpConfig:
+        address: ":8081"
+        readTimeout: 3000ms
+        writeTimeout: 3000ms
+        idleTimeout: 1000ms
+        maxBodySize: 1048576 # 1MB
+      serverDBConfig:
+        dsn: "root:123456@tcp(10.170.0.5:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.5:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.5:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.5:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      payConfig:
+        - platform: "google"
+          credentialFile: "/data/googlePay/google-services.json"
+          packageName: "com.dugeongoblinpromo.gp"
+      auditServerConfig:
+        addr: "ws://192.168.1.64:9001"
+    prod:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      httpConfig:
+        address: ":8081"
+        readTimeout: 3000ms
+        writeTimeout: 3000ms
+        idleTimeout: 1000ms
+        maxBodySize: 1048576 # 1MB
+      serverDBConfig:
+        dsn: "root:123456@tcp(10.170.0.6:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.6:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.6:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.6:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      payConfig:
+        - platform: "google"
+          credentialFile: "/data/googlePay/google-services.json"
+          packageName: "com.dugeongoblinpromo.gp"
+      auditServerConfig:
+        addr: "ws://34.150.56.63:9001"
+  gateway:
+    local:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: true
+      netConfig:
+        address: "ws://192.168.1.182:9001"
+        heartbeatTimeout: 30s
+        sendQueueSize: 128
+        maxMsgSize: 1048576 # 1MB
+        writeTimeout: 2s
+        maxMsgPerSecond: 20
+        maxBytePerSecond: 1048576 # 1MB
+      serverDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "127.0.0.1:6379"
+        db: 0
+        poolSize: 10
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 60 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 300s
+        rpcPongTimeoutSecond: 100s
+      runConfig:
+        messageProcessConfig:
+          gateway:
+            routineNum: 40
+            tickInterval: 50ms
+            messageCountPerTick: 25
+            messageBufferSize: 1024
+    test:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      netConfig:
+        address: "ws://150.158.33.105:9001"
+        heartbeatTimeout: 30s
+        sendQueueSize: 128
+        maxMsgSize: 1048576 # 1MB
+        writeTimeout: 2s
+        maxMsgPerSecond: 20
+        maxBytePerSecond: 1048576 # 1MB
+      serverDBConfig:
+        dsn: "root:xzd_xx_mysql2024@dbcom@tcp(127.0.0.1:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:xzd_xx_mysql2024@dbcom@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "127.0.0.1:6379"
+        db: 0
+        poolSize: 10
+        password: "xzd_xx_redis"
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          gateway:
+            routineNum: 40
+            tickInterval: 50ms
+            messageCountPerTick: 25
+            messageBufferSize: 1024
+    stress:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: true
+      netConfig:
+        address: "ws://192.168.1.182:9001"
+        heartbeatTimeout: 30s
+        sendQueueSize: 128
+        maxMsgSize: 1048576 # 1MB
+        writeTimeout: 2s
+        maxMsgPerSecond: 20
+        maxBytePerSecond: 1048576 # 1MB
+      serverDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "127.0.0.1:6379"
+        db: 0
+        poolSize: 10
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 60 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 300s
+        rpcPongTimeoutSecond: 100s
+      runConfig:
+        messageProcessConfig:
+          gateway:
+            routineNum: 40
+            tickInterval: 50ms
+            messageCountPerTick: 25
+            messageBufferSize: 1024
+    stage:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      netConfig:
+        address: "ws://124.220.18.174:9001"
+        heartbeatTimeout: 30s
+        sendQueueSize: 128
+        maxMsgSize: 1048576 # 1MB
+        writeTimeout: 2s
+        maxMsgPerSecond: 20
+        maxBytePerSecond: 1048576 # 1MB
+      serverDBConfig:
+        dsn: "root:123qweEWQ!@tcp(10.0.8.10:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123qweEWQ!@tcp(10.0.8.10:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.0.8.10:6379"
+        db: 0
+        poolSize: 10
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://10.0.8.10:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          gateway:
+            routineNum: 40
+            tickInterval: 50ms
+            messageCountPerTick: 25
+            messageBufferSize: 1024
+    prodTest:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      netConfig:
+        address: "ws://34.92.150.26:9001"
+        heartbeatTimeout: 30s
+        sendQueueSize: 128
+        maxMsgSize: 1048576 # 1MB
+        writeTimeout: 2s
+        maxMsgPerSecond: 20
+        maxBytePerSecond: 1048576 # 1MB
+      serverDBConfig:
+        dsn: "root:123456@tcp(10.170.0.3:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.3:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.3:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.3:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          gateway:
+            routineNum: 40
+            tickInterval: 50ms
+            messageCountPerTick: 25
+            messageBufferSize: 1024
+    prodStage:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      netConfig:
+        address: "ws://34.150.56.63:9001"
+        heartbeatTimeout: 30s
+        sendQueueSize: 128
+        maxMsgSize: 1048576 # 1MB
+        writeTimeout: 2s
+        maxMsgPerSecond: 20
+        maxBytePerSecond: 1048576 # 1MB
+      serverDBConfig:
+        dsn: "root:123456@tcp(10.170.0.5:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.5:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.5:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.5:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          gateway:
+            routineNum: 40
+            tickInterval: 50ms
+            messageCountPerTick: 25
+            messageBufferSize: 1024
+    prod:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      netConfig:
+        address: "ws://34.96.145.28:9001"
+        heartbeatTimeout: 30s
+        sendQueueSize: 128
+        maxMsgSize: 1048576 # 1MB
+        writeTimeout: 2s
+        maxMsgPerSecond: 20
+        maxBytePerSecond: 1048576 # 1MB
+      serverDBConfig:
+        dsn: "root:123456@tcp(10.170.0.6:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.6:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.6:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.6:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          gateway:
+            routineNum: 40
+            tickInterval: 50ms
+            messageCountPerTick: 25
+            messageBufferSize: 1024
+  game:
+    local:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: true
+      serverDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      logDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/log?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "127.0.0.1:6379"
+        db: 0
+        poolSize: 10
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 60 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 300s
+        rpcPongTimeoutSecond: 100s
       runConfig:
         dbPoolInfo:
-          - poolType: 0 # DB_POOL_TYPE_LOGIN
-            workerNum: 10
-            workerTaskSize: 100
-          - poolType: 1 # DB_POOL_TYPE_SCENE
-            workerNum: 20
-            workerTaskSize: 200
-
+          - poolType: "player"
+            workerNum: 16
+            workerTaskSize: 1000
+        sceneGoroutineMaxPlayerNum: 100
+        playerOfflineTimeout: 30m
+        messageProcessConfig:
+          login:
+            routineNum: 16
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 1024
+          scene:
+            routineNum: 16
+            tickInterval: 100ms
+            messageCountPerTick: 10 # 该值当前无意义，所有消息是玩家的消息
+            messageBufferSize: 1024 # 该值当前无意义，所有消息是玩家的消息
+            innerMessageCountPerTick: 10
+            innerMessageBufferSize: 1024
+          player:
+            tickInterval: 50ms # 该值当前无意义，玩家消息tick依赖与场景tick
+            messageCountPerTick: 2
+            messageBufferSize: 100
+            innerMessageCountPerTick: 2
+            innerMessageBufferSize: 100
+    test:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      serverDBConfig:
+        dsn: "root:xzd_xx_mysql2024@dbcom@tcp(127.0.0.1:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:xzd_xx_mysql2024@dbcom@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      logDBConfig:
+        dsn: "root:xzd_xx_mysql2024@dbcom@tcp(127.0.0.1:3306)/log?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "127.0.0.1:6379"
+        db: 0
+        poolSize: 10
+        password: "xzd_xx_redis"
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 60 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        dbPoolInfo:
+          - poolType: "player"
+            workerNum: 16
+            workerTaskSize: 1000
+        sceneGoroutineMaxPlayerNum: 100
+        playerOfflineTimeout: 30m
+        messageProcessConfig:
+          login:
+            routineNum: 16
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 1024
+          scene:
+            routineNum: 16
+            tickInterval: 100ms
+            messageCountPerTick: 10 # 该值当前无意义，所有消息是玩家的消息
+            messageBufferSize: 1024 # 该值当前无意义，所有消息是玩家的消息
+            innerMessageCountPerTick: 10
+            innerMessageBufferSize: 1024
+          player:
+            tickInterval: 50ms # 该值当前无意义，玩家消息tick依赖与场景tick
+            messageCountPerTick: 2
+            messageBufferSize: 100
+            innerMessageCountPerTick: 2
+            innerMessageBufferSize: 100
+    stress:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: true
+      serverDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      logDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/log?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "127.0.0.1:6379"
+        db: 0
+        poolSize: 10
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 60 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 300s
+        rpcPongTimeoutSecond: 100s
+      runConfig:
+        dbPoolInfo:
+          - poolType: "player"
+            workerNum: 16
+            workerTaskSize: 1000
+        sceneGoroutineMaxPlayerNum: 100
+        playerOfflineTimeout: 30m
+        messageProcessConfig:
+          login:
+            routineNum: 16
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 1024
+          scene:
+            routineNum: 16
+            tickInterval: 100ms
+            messageCountPerTick: 10 # 该值当前无意义，所有消息是玩家的消息
+            messageBufferSize: 1024 # 该值当前无意义，所有消息是玩家的消息
+            innerMessageCountPerTick: 10
+            innerMessageBufferSize: 1024
+          player:
+            tickInterval: 50ms # 该值当前无意义，玩家消息tick依赖与场景tick
+            messageCountPerTick: 2
+            messageBufferSize: 100
+            innerMessageCountPerTick: 2
+            innerMessageBufferSize: 100
+    stage:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      serverDBConfig:
+        dsn: "root:123qweEWQ!@tcp(10.0.8.10:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123qweEWQ!@tcp(10.0.8.10:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      logDBConfig:
+        dsn: "root:123qweEWQ!@tcp(10.0.8.10:3306)/log?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.0.8.10:6379"
+        db: 0
+        poolSize: 10
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://10.0.8.10:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        dbPoolInfo:
+          - poolType: "player"
+            workerNum: 16
+            workerTaskSize: 1000
+        sceneGoroutineMaxPlayerNum: 100
+        playerOfflineTimeout: 30m
+        messageProcessConfig:
+          login:
+            routineNum: 16
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 1024
+          scene:
+            routineNum: 16
+            tickInterval: 100ms
+            messageCountPerTick: 10 # 该值当前无意义，所有消息是玩家的消息
+            messageBufferSize: 1024 # 该值当前无意义，所有消息是玩家的消息
+            innerMessageCountPerTick: 10
+            innerMessageBufferSize: 1024
+          player:
+            tickInterval: 50ms # 该值当前无意义，玩家消息tick依赖与场景tick
+            messageCountPerTick: 2
+            messageBufferSize: 100
+            innerMessageCountPerTick: 2
+            innerMessageBufferSize: 100
+    prodTest:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      serverDBConfig:
+        dsn: "root:123456@tcp(10.170.0.3:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.3:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      logDBConfig:
+        dsn: "root:123456@tcp(10.170.0.3:3306)/log?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.3:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.3:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        dbPoolInfo:
+          - poolType: "player"
+            workerNum: 16
+            workerTaskSize: 1000
+        sceneGoroutineMaxPlayerNum: 100
+        playerOfflineTimeout: 30m
+        messageProcessConfig:
+          login:
+            routineNum: 16
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 1024
+          scene:
+            routineNum: 16
+            tickInterval: 100ms
+            messageCountPerTick: 10 # 该值当前无意义，所有消息是玩家的消息
+            messageBufferSize: 1024 # 该值当前无意义，所有消息是玩家的消息
+            innerMessageCountPerTick: 10
+            innerMessageBufferSize: 1024
+          player:
+            tickInterval: 50ms # 该值当前无意义，玩家消息tick依赖与场景tick
+            messageCountPerTick: 2
+            messageBufferSize: 100
+            innerMessageCountPerTick: 2
+            innerMessageBufferSize: 100
+    prodStage:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      serverDBConfig:
+        dsn: "root:123456@tcp(10.170.0.5:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.5:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      logDBConfig:
+        dsn: "root:123456@tcp(10.170.0.5:3306)/log?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.5:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.5:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        dbPoolInfo:
+          - poolType: "player"
+            workerNum: 16
+            workerTaskSize: 1000
+        sceneGoroutineMaxPlayerNum: 100
+        playerOfflineTimeout: 30m
+        messageProcessConfig:
+          login:
+            routineNum: 16
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 1024
+          scene:
+            routineNum: 16
+            tickInterval: 100ms
+            messageCountPerTick: 10 # 该值当前无意义，所有消息是玩家的消息
+            messageBufferSize: 1024 # 该值当前无意义，所有消息是玩家的消息
+            innerMessageCountPerTick: 10
+            innerMessageBufferSize: 1024
+          player:
+            tickInterval: 50ms # 该值当前无意义，玩家消息tick依赖与场景tick
+            messageCountPerTick: 2
+            messageBufferSize: 100
+            innerMessageCountPerTick: 2
+            innerMessageBufferSize: 100
+    prod:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      serverDBConfig:
+        dsn: "root:123456@tcp(10.170.0.6:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.6:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      logDBConfig:
+        dsn: "root:123456@tcp(10.170.0.6:3306)/log?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.6:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.6:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        dbPoolInfo:
+          - poolType: "player"
+            workerNum: 16
+            workerTaskSize: 1000
+        sceneGoroutineMaxPlayerNum: 100
+        playerOfflineTimeout: 30m
+        messageProcessConfig:
+          login:
+            routineNum: 16
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 1024
+          scene:
+            routineNum: 16
+            tickInterval: 100ms
+            messageCountPerTick: 10 # 该值当前无意义，所有消息是玩家的消息
+            messageBufferSize: 1024 # 该值当前无意义，所有消息是玩家的消息
+            innerMessageCountPerTick: 10
+            innerMessageBufferSize: 1024
+          player:
+            tickInterval: 50ms # 该值当前无意义，玩家消息tick依赖与场景tick
+            messageCountPerTick: 2
+            messageBufferSize: 100
+            innerMessageCountPerTick: 2
+            innerMessageBufferSize: 100
+  rankBoard:
+    local:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: true
+      serverDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      rankDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/rankBoard?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "127.0.0.1:6379"
+        db: 0
+        poolSize: 10
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 60 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 300s
+        rpcPongTimeoutSecond: 100s
+      runConfig:
+        messageProcessConfig:
+          rankBoard:
+            routineNum: 16
+            tickInterval: 50ms
+            messageCountPerTick: 10
+            messageBufferSize: 500
+    test:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      serverDBConfig:
+        dsn: "root:xzd_xx_mysql2024@dbcom@tcp(127.0.0.1:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      rankDBConfig:
+        dsn: "root:xzd_xx_mysql2024@dbcom@tcp(127.0.0.1:3306)/rankBoard?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:xzd_xx_mysql2024@dbcom@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "127.0.0.1:6379"
+        db: 0
+        poolSize: 10
+        password: "xzd_xx_redis"
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 60 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          rankBoard:
+            routineNum: 10
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 500
+    stress:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: true
+      serverDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      rankDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/rankBoard?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "127.0.0.1:6379"
+        db: 0
+        poolSize: 10
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 60 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 300s
+        rpcPongTimeoutSecond: 100s
+      runConfig:
+        messageProcessConfig:
+          rankBoard:
+            routineNum: 16
+            tickInterval: 50ms
+            messageCountPerTick: 10
+            messageBufferSize: 500
+    stage:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      serverDBConfig:
+        dsn: "root:123qweEWQ!@tcp(10.0.8.10:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      rankDBConfig:
+        dsn: "root:123qweEWQ!@tcp(10.0.8.10:3306)/rankBoard?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123qweEWQ!@tcp(10.0.8.10:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.0.8.10:6379"
+        db: 0
+        poolSize: 10
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://10.0.8.10:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          rankBoard:
+            routineNum: 10
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 500
+    prodTest:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      serverDBConfig:
+        dsn: "root:123456@tcp(10.170.0.3:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      rankDBConfig:
+        dsn: "root:123456@tcp(10.170.0.3:3306)/rankBoard?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.3:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.3:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.3:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          rankBoard:
+            routineNum: 10
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 500
+    prodStage:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      serverDBConfig:
+        dsn: "root:123456@tcp(10.170.0.5:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      rankDBConfig:
+        dsn: "root:123456@tcp(10.170.0.5:3306)/rankBoard?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.5:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.5:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.5:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          rankBoard:
+            routineNum: 10
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 500
+    prod:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      serverDBConfig:
+        dsn: "root:123456@tcp(10.170.0.6:3306)/server?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      rankDBConfig:
+        dsn: "root:123456@tcp(10.170.0.6:3306)/rankBoard?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.6:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.6:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.6:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          rankBoard:
+            routineNum: 32
+            tickInterval: 50ms
+            messageCountPerTick: 10
+            messageBufferSize: 500
+  social:
+    local:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: true
+      gameDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "127.0.0.1:6379"
+        db: 0
+        poolSize: 10
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 60 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 300s
+        rpcPongTimeoutSecond: 100s
+      runConfig:
+        messageProcessConfig:
+          alliance:
+            routineNum: 16
+            tickInterval: 50ms
+            messageCountPerTick: 10
+            messageBufferSize: 500
+    test:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      gameDBConfig:
+        dsn: "root:xzd_xx_mysql2024@dbcom@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "127.0.0.1:6379"
+        db: 0
+        poolSize: 10
+        password: "xzd_xx_redis"
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 60 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          alliance:
+            routineNum: 16
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 500
+    stress:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: true
+      gameDBConfig:
+        dsn: "root:123456@tcp(127.0.0.1:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "127.0.0.1:6379"
+        db: 0
+        poolSize: 10
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://127.0.0.1:2379"
+        dialTimeout: 5000ms
+        ttl: 60 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 300s
+        rpcPongTimeoutSecond: 100s
+      runConfig:
+        messageProcessConfig:
+          alliance:
+            routineNum: 16
+            tickInterval: 50ms
+            messageCountPerTick: 10
+            messageBufferSize: 500
+    stage:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      gameDBConfig:
+        dsn: "root:123qweEWQ!@tcp(10.0.8.10:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.0.8.10:6379"
+        db: 0
+        poolSize: 10
+        password: ""
+      etcdConfig:
+        endpoints:
+          - "http://10.0.8.10:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          alliance:
+            routineNum: 10
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 500
+    prodTest:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.3:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.3:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.3:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          alliance:
+            routineNum: 10
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 500
+    prodStage:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.5:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.5:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.5:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 10
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          alliance:
+            routineNum: 10
+            tickInterval: 50ms
+            messageCountPerTick: 2
+            messageBufferSize: 500
+    prod:
+      loggerConfig:
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 7 # 文件数
+        onlyConsole: false
+      gameDBConfig:
+        dsn: "root:123456@tcp(10.170.0.6:3306)/game?charset=utf8mb4&parseTime=True&loc=Local"
+        maxIdleConnections: 16
+        maxOpenConnections: 32
+        maxLifetime: 5m
+      redisConfig:
+        addr: "10.170.0.6:6379"
+        db: 0
+        poolSize: 10
+        password: "123456"
+      etcdConfig:
+        endpoints:
+          - "http://10.170.0.6:2379"
+        dialTimeout: 5000ms
+        ttl: 10 # second
+      rpcConfig:
+        rpcStreamRoutineCount: 16
+        rpcStreamBufferSize: 1024
+        rpcPingTimeSecond: 30s
+        rpcPongTimeoutSecond: 10s
+      runConfig:
+        messageProcessConfig:
+          alliance:
+            routineNum: 32
+            tickInterval: 50ms
+            messageCountPerTick: 10
+            messageBufferSize: 500

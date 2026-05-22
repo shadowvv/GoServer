@@ -1,0 +1,1239 @@
+{
+  "main": {
+    "1": {
+      "actId": "",
+      "id": "1",
+      "refresh": "2",
+      "shopType": "1",
+      "systemId": "302"
+    },
+    "2": {
+      "actId": "",
+      "id": "2",
+      "refresh": "1",
+      "shopType": "1",
+      "systemId": "4"
+    },
+    "3": {
+      "actId": "",
+      "id": "3",
+      "refresh": "1",
+      "shopType": "5",
+      "systemId": "705"
+    },
+    "4": {
+      "actId": "",
+      "id": "4",
+      "refresh": "1",
+      "shopType": "1",
+      "systemId": ""
+    },
+    "5": {
+      "actId": "",
+      "id": "5",
+      "refresh": "1",
+      "shopType": "1",
+      "systemId": "307"
+    },
+    "6": {
+      "actId": "706",
+      "id": "6",
+      "refresh": "",
+      "shopType": "2",
+      "systemId": ""
+    },
+    "7": {
+      "actId": "707",
+      "id": "7",
+      "refresh": "",
+      "shopType": "2",
+      "systemId": ""
+    },
+    "8": {
+      "actId": "708",
+      "id": "8",
+      "refresh": "",
+      "shopType": "2",
+      "systemId": ""
+    },
+    "9": {
+      "actId": "709",
+      "id": "9",
+      "refresh": "",
+      "shopType": "2",
+      "systemId": ""
+    }
+  },
+  "reward": {
+    "1": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "120",
+      "id": "1",
+      "limitBuy": "99",
+      "shopId": "1",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "10": {
+      "discount": "10000|8000",
+      "discountWeight": "8000|2000",
+      "exchangeId": "129",
+      "id": "10",
+      "limitBuy": "10",
+      "shopId": "4",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "11": {
+      "discount": "10000|8000",
+      "discountWeight": "8000|2000",
+      "exchangeId": "130",
+      "id": "11",
+      "limitBuy": "5",
+      "shopId": "4",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "12": {
+      "discount": "10000|8000",
+      "discountWeight": "8000|2000",
+      "exchangeId": "131",
+      "id": "12",
+      "limitBuy": "3",
+      "shopId": "4",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "13": {
+      "discount": "10000|8000",
+      "discountWeight": "8000|2000",
+      "exchangeId": "132",
+      "id": "13",
+      "limitBuy": "2",
+      "shopId": "4",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "14": {
+      "discount": "10000|8000",
+      "discountWeight": "8000|2000",
+      "exchangeId": "133",
+      "id": "14",
+      "limitBuy": "3",
+      "shopId": "4",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "15": {
+      "discount": "10000|8000",
+      "discountWeight": "8000|2000",
+      "exchangeId": "134",
+      "id": "15",
+      "limitBuy": "3",
+      "shopId": "4",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "16": {
+      "discount": "10000|8000",
+      "discountWeight": "8000|2000",
+      "exchangeId": "135",
+      "id": "16",
+      "limitBuy": "10",
+      "shopId": "4",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "17": {
+      "discount": "10000|8000",
+      "discountWeight": "8000|2000",
+      "exchangeId": "136",
+      "id": "17",
+      "limitBuy": "20",
+      "shopId": "4",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "18": {
+      "discount": "10000|8000",
+      "discountWeight": "8000|2000",
+      "exchangeId": "137",
+      "id": "18",
+      "limitBuy": "20",
+      "shopId": "4",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "19": {
+      "discount": "10000|8000",
+      "discountWeight": "8000|2000",
+      "exchangeId": "140",
+      "id": "19",
+      "limitBuy": "10",
+      "shopId": "4",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "2": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "121",
+      "id": "2",
+      "limitBuy": "",
+      "shopId": "1",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "20164": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "164",
+      "id": "20164",
+      "limitBuy": "2",
+      "shopId": "2",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "20165": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "165",
+      "id": "20165",
+      "limitBuy": "5",
+      "shopId": "2",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "20166": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "166",
+      "id": "20166",
+      "limitBuy": "5",
+      "shopId": "2",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "20167": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "167",
+      "id": "20167",
+      "limitBuy": "5",
+      "shopId": "2",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "20168": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "168",
+      "id": "20168",
+      "limitBuy": "5",
+      "shopId": "2",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "20169": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "169",
+      "id": "20169",
+      "limitBuy": "5",
+      "shopId": "2",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "3": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "122",
+      "id": "3",
+      "limitBuy": "4",
+      "shopId": "1",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "30000": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "138",
+      "id": "30000",
+      "limitBuy": "1",
+      "shopId": "3",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "30001": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "139",
+      "id": "30001",
+      "limitBuy": "1",
+      "shopId": "3",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "30002": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "150",
+      "id": "30002",
+      "limitBuy": "1",
+      "shopId": "3",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "4": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "123",
+      "id": "4",
+      "limitBuy": "4",
+      "shopId": "1",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "5": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "124",
+      "id": "5",
+      "limitBuy": "10",
+      "shopId": "1",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50001": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "175",
+      "id": "50001",
+      "limitBuy": "4",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50002": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "176",
+      "id": "50002",
+      "limitBuy": "4",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50003": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "177",
+      "id": "50003",
+      "limitBuy": "3",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50004": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "178",
+      "id": "50004",
+      "limitBuy": "3",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50005": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "179",
+      "id": "50005",
+      "limitBuy": "3",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50006": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "180",
+      "id": "50006",
+      "limitBuy": "3",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50007": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "181",
+      "id": "50007",
+      "limitBuy": "3",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50008": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "182",
+      "id": "50008",
+      "limitBuy": "3",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50009": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "251",
+      "id": "50009",
+      "limitBuy": "3",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50010": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "252",
+      "id": "50010",
+      "limitBuy": "3",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50011": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "253",
+      "id": "50011",
+      "limitBuy": "3",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50012": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "254",
+      "id": "50012",
+      "limitBuy": "3",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50013": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "255",
+      "id": "50013",
+      "limitBuy": "3",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50014": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "256",
+      "id": "50014",
+      "limitBuy": "3",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50015": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "257",
+      "id": "50015",
+      "limitBuy": "3",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50016": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "258",
+      "id": "50016",
+      "limitBuy": "99",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50017": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "259",
+      "id": "50017",
+      "limitBuy": "",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50018": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "260",
+      "id": "50018",
+      "limitBuy": "5",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50019": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "261",
+      "id": "50019",
+      "limitBuy": "6",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50020": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "262",
+      "id": "50020",
+      "limitBuy": "6",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "50021": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "263",
+      "id": "50021",
+      "limitBuy": "6",
+      "shopId": "5",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "6": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "125",
+      "id": "6",
+      "limitBuy": "10",
+      "shopId": "1",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60000": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "183",
+      "id": "60000",
+      "limitBuy": "1",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60001": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "184",
+      "id": "60001",
+      "limitBuy": "3",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60002": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "185",
+      "id": "60002",
+      "limitBuy": "3",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60003": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "186",
+      "id": "60003",
+      "limitBuy": "3",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60004": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "187",
+      "id": "60004",
+      "limitBuy": "10",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60005": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "188",
+      "id": "60005",
+      "limitBuy": "10",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60006": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "189",
+      "id": "60006",
+      "limitBuy": "10",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60007": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "190",
+      "id": "60007",
+      "limitBuy": "10",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60008": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "191",
+      "id": "60008",
+      "limitBuy": "10",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60009": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "192",
+      "id": "60009",
+      "limitBuy": "10",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60010": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "193",
+      "id": "60010",
+      "limitBuy": "10",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60011": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "194",
+      "id": "60011",
+      "limitBuy": "10",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60012": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "195",
+      "id": "60012",
+      "limitBuy": "5",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60013": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "196",
+      "id": "60013",
+      "limitBuy": "5",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60014": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "197",
+      "id": "60014",
+      "limitBuy": "5",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60015": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "198",
+      "id": "60015",
+      "limitBuy": "5",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "60016": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "199",
+      "id": "60016",
+      "limitBuy": "5",
+      "shopId": "6",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "7": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "126",
+      "id": "7",
+      "limitBuy": "10",
+      "shopId": "1",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70000": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "200",
+      "id": "70000",
+      "limitBuy": "1",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70001": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "201",
+      "id": "70001",
+      "limitBuy": "3",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70002": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "202",
+      "id": "70002",
+      "limitBuy": "3",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70003": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "203",
+      "id": "70003",
+      "limitBuy": "3",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70004": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "204",
+      "id": "70004",
+      "limitBuy": "10",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70005": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "205",
+      "id": "70005",
+      "limitBuy": "10",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70006": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "206",
+      "id": "70006",
+      "limitBuy": "10",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70007": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "207",
+      "id": "70007",
+      "limitBuy": "10",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70008": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "208",
+      "id": "70008",
+      "limitBuy": "10",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70009": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "209",
+      "id": "70009",
+      "limitBuy": "10",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70010": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "210",
+      "id": "70010",
+      "limitBuy": "10",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70011": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "211",
+      "id": "70011",
+      "limitBuy": "10",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70012": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "212",
+      "id": "70012",
+      "limitBuy": "5",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70013": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "213",
+      "id": "70013",
+      "limitBuy": "5",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70014": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "214",
+      "id": "70014",
+      "limitBuy": "5",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70015": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "215",
+      "id": "70015",
+      "limitBuy": "5",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "70016": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "216",
+      "id": "70016",
+      "limitBuy": "5",
+      "shopId": "7",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "8": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "127",
+      "id": "8",
+      "limitBuy": "10",
+      "shopId": "1",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80000": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "217",
+      "id": "80000",
+      "limitBuy": "3",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80001": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "218",
+      "id": "80001",
+      "limitBuy": "3",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80002": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "219",
+      "id": "80002",
+      "limitBuy": "3",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80003": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "220",
+      "id": "80003",
+      "limitBuy": "3",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80004": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "221",
+      "id": "80004",
+      "limitBuy": "10",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80005": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "222",
+      "id": "80005",
+      "limitBuy": "10",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80006": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "223",
+      "id": "80006",
+      "limitBuy": "10",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80007": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "224",
+      "id": "80007",
+      "limitBuy": "10",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80008": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "225",
+      "id": "80008",
+      "limitBuy": "10",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80009": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "226",
+      "id": "80009",
+      "limitBuy": "10",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80010": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "227",
+      "id": "80010",
+      "limitBuy": "10",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80011": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "228",
+      "id": "80011",
+      "limitBuy": "10",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80012": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "229",
+      "id": "80012",
+      "limitBuy": "5",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80013": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "230",
+      "id": "80013",
+      "limitBuy": "5",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80014": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "231",
+      "id": "80014",
+      "limitBuy": "5",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80015": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "232",
+      "id": "80015",
+      "limitBuy": "5",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "80016": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "233",
+      "id": "80016",
+      "limitBuy": "5",
+      "shopId": "8",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "9": {
+      "discount": "10000|8000",
+      "discountWeight": "8000|2000",
+      "exchangeId": "128",
+      "id": "9",
+      "limitBuy": "20",
+      "shopId": "4",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90000": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "234",
+      "id": "90000",
+      "limitBuy": "3",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90001": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "235",
+      "id": "90001",
+      "limitBuy": "3",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90002": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "236",
+      "id": "90002",
+      "limitBuy": "3",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90003": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "237",
+      "id": "90003",
+      "limitBuy": "3",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90004": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "238",
+      "id": "90004",
+      "limitBuy": "10",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90005": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "239",
+      "id": "90005",
+      "limitBuy": "10",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90006": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "240",
+      "id": "90006",
+      "limitBuy": "10",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90007": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "241",
+      "id": "90007",
+      "limitBuy": "10",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90008": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "242",
+      "id": "90008",
+      "limitBuy": "10",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90009": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "243",
+      "id": "90009",
+      "limitBuy": "10",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90010": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "244",
+      "id": "90010",
+      "limitBuy": "10",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90011": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "245",
+      "id": "90011",
+      "limitBuy": "10",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90012": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "246",
+      "id": "90012",
+      "limitBuy": "5",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90013": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "247",
+      "id": "90013",
+      "limitBuy": "5",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90014": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "248",
+      "id": "90014",
+      "limitBuy": "5",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90015": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "249",
+      "id": "90015",
+      "limitBuy": "5",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    },
+    "90016": {
+      "discount": "",
+      "discountWeight": "",
+      "exchangeId": "250",
+      "id": "90016",
+      "limitBuy": "5",
+      "shopId": "9",
+      "unlockBuy": "",
+      "unlockShow": ""
+    }
+  }
+}

@@ -1,0 +1,420 @@
+{
+  "systemUnlock": {
+    "1": {
+      "areaLimit": "",
+      "id": "1",
+      "parentFunction": "",
+      "showId": "",
+      "unlockId": "",
+      "unlockReward": ""
+    },
+    "10": {
+      "areaLimit": "",
+      "id": "10",
+      "parentFunction": "",
+      "showId": "2001",
+      "unlockId": "2001",
+      "unlockReward": ""
+    },
+    "101": {
+      "areaLimit": "",
+      "id": "101",
+      "parentFunction": "1",
+      "showId": "",
+      "unlockId": "",
+      "unlockReward": ""
+    },
+    "102": {
+      "areaLimit": "",
+      "id": "102",
+      "parentFunction": "1",
+      "showId": "",
+      "unlockId": "",
+      "unlockReward": ""
+    },
+    "103": {
+      "areaLimit": "",
+      "id": "103",
+      "parentFunction": "1",
+      "showId": "",
+      "unlockId": "",
+      "unlockReward": ""
+    },
+    "104": {
+      "areaLimit": "",
+      "id": "104",
+      "parentFunction": "1",
+      "showId": "",
+      "unlockId": "",
+      "unlockReward": ""
+    },
+    "105": {
+      "areaLimit": "",
+      "id": "105",
+      "parentFunction": "1",
+      "showId": "",
+      "unlockId": "",
+      "unlockReward": ""
+    },
+    "106": {
+      "areaLimit": "",
+      "id": "106",
+      "parentFunction": "1",
+      "showId": "",
+      "unlockId": "",
+      "unlockReward": ""
+    },
+    "107": {
+      "areaLimit": "",
+      "id": "107",
+      "parentFunction": "1",
+      "showId": "",
+      "unlockId": "",
+      "unlockReward": ""
+    },
+    "108": {
+      "areaLimit": "",
+      "id": "108",
+      "parentFunction": "1",
+      "showId": "2006",
+      "unlockId": "2006",
+      "unlockReward": ""
+    },
+    "109": {
+      "areaLimit": "",
+      "id": "109",
+      "parentFunction": "1",
+      "showId": "",
+      "unlockId": "",
+      "unlockReward": ""
+    },
+    "11": {
+      "areaLimit": "",
+      "id": "11",
+      "parentFunction": "",
+      "showId": "2001",
+      "unlockId": "2001",
+      "unlockReward": ""
+    },
+    "110": {
+      "areaLimit": "",
+      "id": "110",
+      "parentFunction": "1",
+      "showId": "20001",
+      "unlockId": "2002",
+      "unlockReward": ""
+    },
+    "111": {
+      "areaLimit": "",
+      "id": "111",
+      "parentFunction": "1",
+      "showId": "20001",
+      "unlockId": "2004",
+      "unlockReward": ""
+    },
+    "112": {
+      "areaLimit": "",
+      "id": "112",
+      "parentFunction": "1",
+      "showId": "20001",
+      "unlockId": "2030",
+      "unlockReward": ""
+    },
+    "113": {
+      "areaLimit": "",
+      "id": "113",
+      "parentFunction": "1",
+      "showId": "20001",
+      "unlockId": "2060",
+      "unlockReward": ""
+    },
+    "114": {
+      "areaLimit": "",
+      "id": "114",
+      "parentFunction": "1",
+      "showId": "410111|130102",
+      "unlockId": "410111|130102",
+      "unlockReward": ""
+    },
+    "12": {
+      "areaLimit": "",
+      "id": "12",
+      "parentFunction": "",
+      "showId": "2001",
+      "unlockId": "2005",
+      "unlockReward": ""
+    },
+    "13": {
+      "areaLimit": "",
+      "id": "13",
+      "parentFunction": "",
+      "showId": "2005",
+      "unlockId": "2005",
+      "unlockReward": "1~20"
+    },
+    "1301": {
+      "areaLimit": "",
+      "id": "1301",
+      "parentFunction": "13",
+      "showId": "2008",
+      "unlockId": "2008",
+      "unlockReward": ""
+    },
+    "14": {
+      "areaLimit": "",
+      "id": "14",
+      "parentFunction": "",
+      "showId": "2006",
+      "unlockId": "2006",
+      "unlockReward": ""
+    },
+    "15": {
+      "areaLimit": "",
+      "id": "15",
+      "parentFunction": "",
+      "showId": "2005",
+      "unlockId": "2005",
+      "unlockReward": ""
+    },
+    "16": {
+      "areaLimit": "",
+      "id": "16",
+      "parentFunction": "",
+      "showId": "2003",
+      "unlockId": "2003",
+      "unlockReward": ""
+    },
+    "17": {
+      "areaLimit": "",
+      "id": "17",
+      "parentFunction": "",
+      "showId": "2005",
+      "unlockId": "2005",
+      "unlockReward": ""
+    },
+    "18": {
+      "areaLimit": "",
+      "id": "18",
+      "parentFunction": "",
+      "showId": "2010",
+      "unlockId": "2010",
+      "unlockReward": ""
+    },
+    "19": {
+      "areaLimit": "",
+      "id": "19",
+      "parentFunction": "",
+      "showId": "2005",
+      "unlockId": "2005",
+      "unlockReward": ""
+    },
+    "2": {
+      "areaLimit": "",
+      "id": "2",
+      "parentFunction": "",
+      "showId": "2003",
+      "unlockId": "2003",
+      "unlockReward": ""
+    },
+    "3": {
+      "areaLimit": "",
+      "id": "3",
+      "parentFunction": "",
+      "showId": "",
+      "unlockId": "2005",
+      "unlockReward": ""
+    },
+    "301": {
+      "areaLimit": "",
+      "id": "301",
+      "parentFunction": "3",
+      "showId": "15200",
+      "unlockId": "15200",
+      "unlockReward": "1~20"
+    },
+    "302": {
+      "areaLimit": "",
+      "id": "302",
+      "parentFunction": "3",
+      "showId": "15101",
+      "unlockId": "15101",
+      "unlockReward": "1~20"
+    },
+    "303": {
+      "areaLimit": "",
+      "id": "303",
+      "parentFunction": "3",
+      "showId": "2016",
+      "unlockId": "2016",
+      "unlockReward": "1~20"
+    },
+    "304": {
+      "areaLimit": "",
+      "id": "304",
+      "parentFunction": "3",
+      "showId": "2023",
+      "unlockId": "2023",
+      "unlockReward": "1~20"
+    },
+    "305": {
+      "areaLimit": "",
+      "id": "305",
+      "parentFunction": "3",
+      "showId": "2016",
+      "unlockId": "2016",
+      "unlockReward": "1~20"
+    },
+    "306": {
+      "areaLimit": "",
+      "id": "306",
+      "parentFunction": "3",
+      "showId": "410111|130102",
+      "unlockId": "410111|130102",
+      "unlockReward": "1~20"
+    },
+    "307": {
+      "areaLimit": "",
+      "id": "307",
+      "parentFunction": "3",
+      "showId": "2030",
+      "unlockId": "2030",
+      "unlockReward": "1~20"
+    },
+    "4": {
+      "areaLimit": "",
+      "id": "4",
+      "parentFunction": "",
+      "showId": "2004",
+      "unlockId": "2004",
+      "unlockReward": "1~20"
+    },
+    "5": {
+      "areaLimit": "",
+      "id": "5",
+      "parentFunction": "",
+      "showId": "2008",
+      "unlockId": "2008",
+      "unlockReward": ""
+    },
+    "6": {
+      "areaLimit": "",
+      "id": "6",
+      "parentFunction": "",
+      "showId": "",
+      "unlockId": "",
+      "unlockReward": ""
+    },
+    "601": {
+      "areaLimit": "",
+      "id": "601",
+      "parentFunction": "6",
+      "showId": "",
+      "unlockId": "",
+      "unlockReward": ""
+    },
+    "602": {
+      "areaLimit": "",
+      "id": "602",
+      "parentFunction": "6",
+      "showId": "2017",
+      "unlockId": "2017",
+      "unlockReward": "1~20"
+    },
+    "603": {
+      "areaLimit": "",
+      "id": "603",
+      "parentFunction": "6",
+      "showId": "2017",
+      "unlockId": "2017",
+      "unlockReward": ""
+    },
+    "7": {
+      "areaLimit": "",
+      "id": "7",
+      "parentFunction": "",
+      "showId": "2010",
+      "unlockId": "2010",
+      "unlockReward": "1~20"
+    },
+    "701": {
+      "areaLimit": "",
+      "id": "701",
+      "parentFunction": "7",
+      "showId": "410102",
+      "unlockId": "410102",
+      "unlockReward": "1~20"
+    },
+    "702": {
+      "areaLimit": "",
+      "id": "702",
+      "parentFunction": "7",
+      "showId": "410111|130102",
+      "unlockId": "410111|130102",
+      "unlockReward": "1~20"
+    },
+    "703": {
+      "areaLimit": "",
+      "id": "703",
+      "parentFunction": "7",
+      "showId": "410116|130103",
+      "unlockId": "410116|130103",
+      "unlockReward": "1~20"
+    },
+    "704": {
+      "areaLimit": "",
+      "id": "704",
+      "parentFunction": "7",
+      "showId": "410104",
+      "unlockId": "410106",
+      "unlockReward": "1~20"
+    },
+    "705": {
+      "areaLimit": "",
+      "id": "705",
+      "parentFunction": "7",
+      "showId": "410106",
+      "unlockId": "410106",
+      "unlockReward": "1~20"
+    },
+    "706": {
+      "areaLimit": "",
+      "id": "706",
+      "parentFunction": "7",
+      "showId": "410101",
+      "unlockId": "410101",
+      "unlockReward": "1~20"
+    },
+    "8": {
+      "areaLimit": "",
+      "id": "8",
+      "parentFunction": "",
+      "showId": "15031",
+      "unlockId": "15031",
+      "unlockReward": ""
+    },
+    "801": {
+      "areaLimit": "",
+      "id": "801",
+      "parentFunction": "8",
+      "showId": "2006",
+      "unlockId": "2006",
+      "unlockReward": "1~20"
+    },
+    "802": {
+      "areaLimit": "",
+      "id": "802",
+      "parentFunction": "8",
+      "showId": "15031",
+      "unlockId": "15031",
+      "unlockReward": "1~20"
+    },
+    "9": {
+      "areaLimit": "",
+      "id": "9",
+      "parentFunction": "",
+      "showId": "15093",
+      "unlockId": "15093",
+      "unlockReward": "1~20"
+    }
+  }
+}

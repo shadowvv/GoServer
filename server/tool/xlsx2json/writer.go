@@ -8,14 +8,10 @@ import (
 	"strings"
 )
 
-// 合并 SheetData
-func mergeSheetData(dst *SheetData, src SheetData) {
-	// 字段只取第一份（假定所有 Excel 格式一致）
-	if len(dst.Fields) == 0 {
-		dst.Fields = src.Fields
-	}
-	// 合并 Rows
-	dst.Rows = append(dst.Rows, src.Rows...)
+func panicDuplicateID(id, oldTable, newTable string) {
+	msg := fmt.Sprintf("重复id: %s, 表名: %s -> %s", id, oldTable, newTable)
+	fmt.Println("⚠️", msg)
+	panic(msg)
 }
 
 // MergeAndWriteJSONByDash 合并同前缀的 Excel 文件（如 drop-*）并导出结构化 JSON
@@ -30,6 +26,7 @@ func MergeAndWriteJSONByDash(files []string, outPath string) error {
 
 	final := make(map[string]map[string]map[string]string)
 	final[prefix] = make(map[string]map[string]string)
+	idSource := make(map[string]string)
 
 	for _, f := range files {
 		data, err := ParseExcel(f)
@@ -38,12 +35,16 @@ func MergeAndWriteJSONByDash(files []string, outPath string) error {
 			continue
 		}
 
-		for _, sheetData := range data {
+		for sheetName, sheetData := range data {
 			for _, row := range sheetData.Rows {
 				idVal, ok := row["id"]
 				if !ok {
 					fmt.Println("⚠️ 找不到 id 字段:", f)
 					continue
+				}
+				currentTable := fmt.Sprintf("%s(%s)", sheetName, filepath.Base(f))
+				if oldTable, exists := idSource[idVal]; exists {
+					panicDuplicateID(idVal, oldTable, currentTable)
 				}
 				// row 是 map[string]string（或 interface{}→string）
 
@@ -53,6 +54,7 @@ func MergeAndWriteJSONByDash(files []string, outPath string) error {
 					cleanRow[k] = v
 				}
 
+				idSource[idVal] = currentTable
 				final[prefix][idVal] = cleanRow
 			}
 		}
@@ -91,13 +93,19 @@ func MergeAndWriteJSONByUnderscore(files []string, outPath string) error {
 
 		// 解析多个 sheet
 		childMap := make(map[string]map[string]string)
+		idSource := make(map[string]string)
 
-		for _, sheetData := range data {
+		for sheetName, sheetData := range data {
 			for _, row := range sheetData.Rows {
 				id := row["id"]
 				if id == "" {
 					continue
 				}
+				currentTable := fmt.Sprintf("%s(%s)", sheetName, filepath.Base(file))
+				if oldTable, exists := idSource[id]; exists {
+					panicDuplicateID(id, oldTable, currentTable)
+				}
+				idSource[id] = currentTable
 				childMap[id] = row
 			}
 		}

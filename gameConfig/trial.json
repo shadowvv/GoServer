@@ -1,0 +1,504 @@
+{
+  "Foremost": {
+    "1": {
+      "actID": "601",
+      "id": "1",
+      "taskGroup": "1|2|3|4|5|6|7",
+      "value": "9320000"
+    }
+  },
+  "Reward": {
+    "1": {
+      "actID": "601",
+      "id": "1",
+      "reward": "1170001~5",
+      "value": "120"
+    },
+    "2": {
+      "actID": "601",
+      "id": "2",
+      "reward": "1~5000",
+      "value": "240"
+    },
+    "3": {
+      "actID": "601",
+      "id": "3",
+      "reward": "1110023~5",
+      "value": "360"
+    },
+    "4": {
+      "actID": "601",
+      "id": "4",
+      "reward": "1150007~1",
+      "value": "480"
+    },
+    "5": {
+      "actID": "601",
+      "id": "5",
+      "reward": "1120007~1",
+      "value": "620"
+    },
+    "6": {
+      "actID": "601",
+      "id": "6",
+      "reward": "1260013~15",
+      "value": "820"
+    },
+    "7": {
+      "actID": "601",
+      "id": "7",
+      "reward": "1330247~1",
+      "value": "1050"
+    }
+  },
+  "Task": {
+    "1": {
+      "id": "1",
+      "order": "",
+      "taskGroup": "1",
+      "taskId": "80040",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "10": {
+      "id": "10",
+      "order": "",
+      "taskGroup": "2",
+      "taskId": "80070",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "11": {
+      "id": "11",
+      "order": "",
+      "taskGroup": "2",
+      "taskId": "210140",
+      "taskReward": "1170001~1|9320000~20"
+    },
+    "12": {
+      "id": "12",
+      "order": "",
+      "taskGroup": "2",
+      "taskId": "150001",
+      "taskReward": "1110023~1|9320000~20"
+    },
+    "13": {
+      "id": "13",
+      "order": "",
+      "taskGroup": "2",
+      "taskId": "270204",
+      "taskReward": "1230002~11|9320000~20"
+    },
+    "14": {
+      "id": "14",
+      "order": "",
+      "taskGroup": "2",
+      "taskId": "270115",
+      "taskReward": "1~1000|9320000~20"
+    },
+    "15": {
+      "id": "15",
+      "order": "",
+      "taskGroup": "2",
+      "taskId": "360101",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "16": {
+      "id": "16",
+      "order": "",
+      "taskGroup": "2",
+      "taskId": "230161",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "17": {
+      "id": "17",
+      "order": "",
+      "taskGroup": "2",
+      "taskId": "140005",
+      "taskReward": "1110046~2|9320000~20"
+    },
+    "18": {
+      "id": "18",
+      "order": "",
+      "taskGroup": "2",
+      "taskId": "371002",
+      "taskReward": "1310001~75|9320000~20"
+    },
+    "19": {
+      "id": "19",
+      "order": "",
+      "taskGroup": "2",
+      "taskId": "381001",
+      "taskReward": "1110051~10|9320000~20"
+    },
+    "2": {
+      "id": "2",
+      "order": "",
+      "taskGroup": "1",
+      "taskId": "216080",
+      "taskReward": "1170001~1|9320000~20"
+    },
+    "20": {
+      "id": "20",
+      "order": "",
+      "taskGroup": "2",
+      "taskId": "280005",
+      "taskReward": "1310001~75|9320000~20"
+    },
+    "21": {
+      "id": "21",
+      "order": "",
+      "taskGroup": "3",
+      "taskId": "80095",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "22": {
+      "id": "22",
+      "order": "",
+      "taskGroup": "3",
+      "taskId": "220012",
+      "taskReward": "1120005~1|9320000~20"
+    },
+    "23": {
+      "id": "23",
+      "order": "",
+      "taskGroup": "3",
+      "taskId": "390001",
+      "taskReward": "1110023~1|9320000~20"
+    },
+    "24": {
+      "id": "24",
+      "order": "",
+      "taskGroup": "3",
+      "taskId": "400001",
+      "taskReward": "1310001~75|9320000~20"
+    },
+    "25": {
+      "id": "25",
+      "order": "",
+      "taskGroup": "3",
+      "taskId": "230251",
+      "taskReward": "1110023~1|9320000~20"
+    },
+    "26": {
+      "id": "26",
+      "order": "",
+      "taskGroup": "3",
+      "taskId": "140005",
+      "taskReward": "1110046~2|9320000~20"
+    },
+    "27": {
+      "id": "27",
+      "order": "",
+      "taskGroup": "3",
+      "taskId": "371005",
+      "taskReward": "1310001~25|9320000~20"
+    },
+    "28": {
+      "id": "28",
+      "order": "",
+      "taskGroup": "3",
+      "taskId": "410701",
+      "taskReward": "1110051~30|9320000~20"
+    },
+    "29": {
+      "id": "29",
+      "order": "",
+      "taskGroup": "3",
+      "taskId": "280008",
+      "taskReward": "1310001~75|9320000~20"
+    },
+    "3": {
+      "id": "3",
+      "order": "",
+      "taskGroup": "1",
+      "taskId": "140005",
+      "taskReward": "1110046~2|9320000~20"
+    },
+    "30": {
+      "id": "30",
+      "order": "",
+      "taskGroup": "3",
+      "taskId": "420001",
+      "taskReward": "1310001~75|9320000~20"
+    },
+    "31": {
+      "id": "31",
+      "order": "",
+      "taskGroup": "3",
+      "taskId": "430406",
+      "taskReward": "1310001~75|9320000~20"
+    },
+    "32": {
+      "id": "32",
+      "order": "",
+      "taskGroup": "4",
+      "taskId": "80117",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "33": {
+      "id": "33",
+      "order": "",
+      "taskGroup": "4",
+      "taskId": "222080",
+      "taskReward": "1170003~2|9320000~20"
+    },
+    "34": {
+      "id": "34",
+      "order": "",
+      "taskGroup": "4",
+      "taskId": "480004",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "35": {
+      "id": "35",
+      "order": "",
+      "taskGroup": "4",
+      "taskId": "350004",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "36": {
+      "id": "36",
+      "order": "",
+      "taskGroup": "4",
+      "taskId": "490001",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "37": {
+      "id": "37",
+      "order": "",
+      "taskGroup": "4",
+      "taskId": "301000001",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "38": {
+      "id": "38",
+      "order": "",
+      "taskGroup": "4",
+      "taskId": "410801",
+      "taskReward": "1110051~30|9320000~20"
+    },
+    "39": {
+      "id": "39",
+      "order": "",
+      "taskGroup": "4",
+      "taskId": "220013",
+      "taskReward": "1120005~1|9320000~20"
+    },
+    "4": {
+      "id": "4",
+      "order": "",
+      "taskGroup": "1",
+      "taskId": "480002",
+      "taskReward": "1170001~1|9320000~20"
+    },
+    "40": {
+      "id": "40",
+      "order": "",
+      "taskGroup": "4",
+      "taskId": "280008",
+      "taskReward": "1310001~75|9320000~20"
+    },
+    "41": {
+      "id": "41",
+      "order": "",
+      "taskGroup": "4",
+      "taskId": "420001",
+      "taskReward": "1310001~75|9320000~20"
+    },
+    "42": {
+      "id": "42",
+      "order": "",
+      "taskGroup": "4",
+      "taskId": "270121",
+      "taskReward": "1230002~33|9320000~20"
+    },
+    "43": {
+      "id": "43",
+      "order": "",
+      "taskGroup": "5",
+      "taskId": "80135",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "44": {
+      "id": "44",
+      "order": "",
+      "taskGroup": "5",
+      "taskId": "220015",
+      "taskReward": "1120005~1|9320000~20"
+    },
+    "45": {
+      "id": "45",
+      "order": "",
+      "taskGroup": "5",
+      "taskId": "411001",
+      "taskReward": "1110051~30|9320000~20"
+    },
+    "46": {
+      "id": "46",
+      "order": "",
+      "taskGroup": "5",
+      "taskId": "420001",
+      "taskReward": "1310001~75|9320000~20"
+    },
+    "47": {
+      "id": "47",
+      "order": "",
+      "taskGroup": "5",
+      "taskId": "372001",
+      "taskReward": "1310002~8|9320000~20"
+    },
+    "48": {
+      "id": "48",
+      "order": "",
+      "taskGroup": "5",
+      "taskId": "230541",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "49": {
+      "id": "49",
+      "order": "",
+      "taskGroup": "5",
+      "taskId": "140005",
+      "taskReward": "1110046~2|9320000~20"
+    },
+    "5": {
+      "id": "5",
+      "order": "",
+      "taskGroup": "1",
+      "taskId": "350002",
+      "taskReward": "1~1000|9320000~20"
+    },
+    "50": {
+      "id": "50",
+      "order": "",
+      "taskGroup": "5",
+      "taskId": "270125",
+      "taskReward": "1230002~33|9320000~20"
+    },
+    "51": {
+      "id": "51",
+      "order": "",
+      "taskGroup": "6",
+      "taskId": "80152",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "52": {
+      "id": "52",
+      "order": "",
+      "taskGroup": "6",
+      "taskId": "430501",
+      "taskReward": "1310002~25|9320000~20"
+    },
+    "53": {
+      "id": "53",
+      "order": "",
+      "taskGroup": "6",
+      "taskId": "280008",
+      "taskReward": "1310001~75|9320000~20"
+    },
+    "54": {
+      "id": "54",
+      "order": "",
+      "taskGroup": "6",
+      "taskId": "350004",
+      "taskReward": "1~2500|9320000~20"
+    },
+    "55": {
+      "id": "55",
+      "order": "",
+      "taskGroup": "6",
+      "taskId": "441400",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "56": {
+      "id": "56",
+      "order": "",
+      "taskGroup": "6",
+      "taskId": "451001",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "57": {
+      "id": "57",
+      "order": "",
+      "taskGroup": "6",
+      "taskId": "226006",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "58": {
+      "id": "58",
+      "order": "",
+      "taskGroup": "7",
+      "taskId": "80168",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "59": {
+      "id": "59",
+      "order": "",
+      "taskGroup": "7",
+      "taskId": "470050",
+      "taskReward": "1170001~3|9320000~20"
+    },
+    "6": {
+      "id": "6",
+      "order": "",
+      "taskGroup": "1",
+      "taskId": "223006",
+      "taskReward": "1110005~1|9320000~20"
+    },
+    "60": {
+      "id": "60",
+      "order": "",
+      "taskGroup": "7",
+      "taskId": "120100",
+      "taskReward": "1~2500|9320000~20"
+    },
+    "61": {
+      "id": "61",
+      "order": "",
+      "taskGroup": "7",
+      "taskId": "460200",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "62": {
+      "id": "62",
+      "order": "",
+      "taskGroup": "7",
+      "taskId": "270130",
+      "taskReward": "1230002~33|9320000~20"
+    },
+    "63": {
+      "id": "63",
+      "order": "",
+      "taskGroup": "7",
+      "taskId": "372006",
+      "taskReward": "1310002~25|9320000~20"
+    },
+    "64": {
+      "id": "64",
+      "order": "",
+      "taskGroup": "7",
+      "taskId": "280008",
+      "taskReward": "1310001~75|9320000~20"
+    },
+    "7": {
+      "id": "7",
+      "order": "",
+      "taskGroup": "1",
+      "taskId": "230101",
+      "taskReward": "1110024~2|9320000~20"
+    },
+    "8": {
+      "id": "8",
+      "order": "",
+      "taskGroup": "1",
+      "taskId": "300015001",
+      "taskReward": "1110023~3|9320000~20"
+    },
+    "9": {
+      "id": "9",
+      "order": "",
+      "taskGroup": "1",
+      "taskId": "280003",
+      "taskReward": "1310001~75|9320000~20"
+    }
+  }
+}

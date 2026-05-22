@@ -1,0 +1,30 @@
+syntax = "proto3";
+package rpcPb;
+option go_package = "github.com/drop/GoServer/server/logic/rpcPb;rpcPb";
+import "common.proto";
+
+service GameService {
+  rpc SayHello(HelloReq) returns (HelloResp);
+  rpc ForwardGameMessageHandler(stream ForwardGameMessage) returns (stream BackwardClientMessage);
+  rpc NotifyServerOperationHandler(NotifyOperationMessage) returns (EmptyResp);
+  rpc DeliverRechargeItem(DeliverRechargeItemReq) returns (EmptyResp);
+}
+
+message ForwardGameMessage {
+  int64 sessionId = 1;
+  int64 playerId = 2;
+  bytes payload = 3;         // 原始pb二进制
+}
+
+message BackwardClientMessage {
+  int64 sessionId = 1; // sessionId
+  int32 msgId = 2; // msgId
+  bytes payload = 3; // 原始pb二进制
+  int32 broadcastType = 4; // 广播类型
+  int32 broadcastId = 5; // 广播id
+  bool closeSession = 6; // 关闭session
+}
+
+
+
+

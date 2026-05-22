@@ -1,0 +1,155 @@
+syntax = "proto3";
+package rpcPb;
+option go_package = "github.com/drop/GoServer/server/logic/rpcPb;rpcPb";
+import "common.proto";
+
+service SocialService {
+  rpc SayHello(HelloReq) returns (HelloResp);
+  rpc ForwardSocialMessageHandler(stream ForwardSocialMessage) returns (stream BackwardSocialMessage);
+}
+
+message ForwardSocialMessage {
+  int64 userId = 1;
+  RPC_MESSAGE_ID msgId = 2;
+  int32 backMessageId = 3;
+  int64 allianceId = 4;
+  bytes payload = 5;
+}
+
+message BackwardSocialMessage {
+  int64 userId = 1;
+  RPC_MESSAGE_ID msgId = 2;
+  int32 backMessageId = 3;
+  int32 errorCode = 4;
+  bytes payload = 5;
+}
+
+message AllianceInfo {
+  int64 allianceId = 1;
+  int32 serverId = 2;
+  string name = 3;
+  int64 leaderUserId = 4;
+  string notice = 5;
+  int32 memberCount = 6;
+  int32 maxMember = 7;
+  int64 createTime = 8;
+  string announce = 9;
+  int32 badgeId = 10;
+  int32 level = 11;
+  int32 exp = 12;
+  int32 applyType = 13;
+  int64 powerApplyCondition = 14;
+  int32 cityLevel = 15;
+  int64 allianceTotalPower = 16;
+}
+
+message AllianceMember {
+  int64 userId = 1;
+  int32 role = 2;
+  string nickName = 3;// 昵称
+  int32 head = 4;// 头像
+  int64 power = 5;// 战力
+  int32 cityLevel = 6;// 主城等级
+  int32 contribute = 7;// 贡献
+  int64 offlineTime = 8;// 离线时间
+  int32 headFrame = 9;// 头像框
+}
+
+message CreateAllianceReq {
+  int64 userId = 1;
+  int32 serverId = 2;
+  string name = 3;
+  string announce = 4;
+  int32 badgeId = 5;
+}
+
+message CreateAllianceResp {
+  AllianceInfo alliance = 1;
+  int32 errorCode = 2;
+}
+
+message ChangeAllianceBasicInfoReq {
+  int64 operatorUserId = 1;
+  int64 allianceId = 2;
+
+  bool updateName = 3;
+  string name = 4;
+
+  bool updateAnnounce = 5;
+  string announce = 6;
+
+  bool updateBadgeId = 7;
+  int32 badgeId = 8;
+
+  int32 applyType = 9;
+  int64 powerApplyCondition = 10;
+  int32 cityLevel = 11;
+
+  bool updateNotice = 12;
+  string notice = 13;
+}
+
+message ChangeAllianceBasicInfoResp {
+  int32 errorCode = 1;
+}
+
+message GetAllianceInfoReq {
+  int64 userId = 1;
+  int64 allianceId = 2;
+  bool includeApply = 3;
+}
+
+message GetAllianceInfoResp {
+  AllianceInfo alliance = 1;
+  repeated AllianceMember members = 2;
+}
+
+message ApplyAllianceReq {
+  int64 userId = 1;
+  int32 serverId = 2;
+  int64 allianceId = 3;
+}
+
+message ApplyAllianceResp {
+  AllianceInfo alliance = 1;
+  int32 errorCode = 2;
+}
+
+message ApproveAllianceApplyReq {
+  int64 operatorUserId = 1;
+  int64 allianceId = 2;
+  int64 applyUserId = 3;
+  bool approveApply = 4;
+}
+
+message ApproveAllianceApplyResp {}
+
+message KickAllianceMemberReq {
+  int64 operatorUserId = 1;
+  int64 allianceId = 2;
+  int64 targetUserId = 3;
+}
+
+message KickAllianceMemberResp {}
+
+message QuitAllianceReq {
+  int64 userId = 1;
+  int64 allianceId = 2;
+}
+
+message QuitAllianceResp {}
+
+message ChangeMemberPositionReq {
+  int64 operatorUserId = 1;
+  int64 allianceId = 2;
+  int64 targetUserId = 3;
+  int32 targetRole = 4;
+}
+
+message ChangeMemberPositionResp {}
+
+message PushAllianceChanged {
+  int64 userId = 1;
+  int64 allianceId = 2;
+  string allianceName = 3;
+}

@@ -1,5 +1,0 @@
-serverId: 1
-# gate:网关服 game:游戏服
-serverType: game
-# dev:开发环境 test:测试环境 stage:预发布环境 prod:正式环境
-environment: dev

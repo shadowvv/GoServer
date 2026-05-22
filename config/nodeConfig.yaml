@@ -1,0 +1,10 @@
+# 最大值为9
+nodeId: 1
+# http:前置web服务器 gateway:网关服 game:游戏服 social:社交服务器 rankBoard:排行服服务器
+nodeType: game
+# local:本地环境 dev:开发环境 test:测试环境 stage:预发布环境 prod:正式环境
+environment: local
+# platformConfig中读取的配置名
+configName: local
+# 渠道ID
+channelId: 1

@@ -3,18 +3,21 @@ package netService
 import (
 	"context"
 	"encoding/binary"
-	"errors"
-	"fmt"
+	"sync"
+	"sync/atomic"
+	"time"
+
 	"github.com/drop/GoServer/server/service/logger"
 	"github.com/drop/GoServer/server/service/serviceInterface"
+	"github.com/drop/GoServer/server/tool"
 	"google.golang.org/protobuf/proto"
-	"sync"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
 
-// Session 包装 websocket.Session
+var pongWait = 30 * time.Second
+
+// ------------------ Session ------------------
 type Session struct {
 	id   int64
 	conn *websocket.Conn
@@ -26,13 +29,21 @@ type Session struct {
 
 	ctx       context.Context
 	cancel    context.CancelFunc
-	wg        sync.WaitGroup
+	closeOnce sync.Once
 	sendQueue chan []byte
+
+	lastActiveTime atomic.Int64
+	active         atomic.Bool
+
+	// Flood control
+	lastMsgSec int64
+	msgCount   int32
+	msgBytes   int32
 }
 
 var _ serviceInterface.SessionInterface = (*Session)(nil)
 
-// newSession
+// ------------------ NewSession ------------------
 func newSession(ws *websocket.Conn, router serviceInterface.RouterInterface, codec serviceInterface.CodecInterface, id int64, acceptor serviceInterface.AcceptorInterface) *Session {
 	ctx, cancel := context.WithCancel(context.Background())
 	s := &Session{
@@ -45,66 +56,93 @@ func newSession(ws *websocket.Conn, router serviceInterface.RouterInterface, cod
 		cancel:    cancel,
 		sendQueue: make(chan []byte, sendQueueSize),
 	}
-	// pong handler updates deadline
-	//err := ws.SetReadDeadline(time.Now().Add(time.Duration(pongTimeout)))
-	//if err != nil {
-	//	logger.Error(fmt.Sprintf("[net] ws set read deadline connectionId:%d, error: %v", id, err))
-	//	return nil
-	//}
-	//ws.SetPongHandler(func(appData string) error {
-	//	err := ws.SetReadDeadline(time.Now().Add(time.Duration(pongTimeout)))
-	//	if err != nil {
-	//		logger.Error(fmt.Sprintf("[net] ws set pong read deadline connectionId:%d, error: %v", id, err))
-	//		return err
-	//	}
-	//	return nil
-	//})
+	s.lastActiveTime.Store(tool.UnixNowMilli())
+	s.active.Store(true)
+	logger.InfoWithSprintf("[net] create new sessionId:%d", s.id)
 	return s
 }
 
-// Start 启动 read/write pump 与 heartbeat
+// ------------------ Start ------------------
 func (s *Session) Start() {
-	s.wg.Add(3)
+	s.conn.SetReadLimit(int64(maxMsgSize))
+	_ = s.conn.SetReadDeadline(time.Now().Add(pongWait))
+	s.conn.SetPongHandler(func(string) error {
+		return s.conn.SetReadDeadline(time.Now().Add(pongWait))
+	})
+
 	go s.readPump()
 	go s.writePump()
 	go s.heartbeat()
 }
 
-// Close 关闭连接（可并发调用）
 func (s *Session) Close() {
-	s.cancel()
-	err := s.conn.Close()
-	if err != nil {
-		logger.Error(fmt.Sprintf("[net] ws close connectionId:%d, error: %v", s.GetID(), err))
+	s.closeOnce.Do(func() {
+		s.cancel()
+		s.active.Store(false)
+		s.acceptor.OnConnectionTimeout(s)
+		_ = s.conn.Close()
+	})
+}
+
+// ------------------ Send 非阻塞 ------------------
+// 改进 Send 方法中的缓冲区处理
+func (s *Session) Send(msgId int32, message proto.Message) {
+	if !s.IsActive() {
+		logger.ErrorBySprintf("[net] send message sessionId:%d is closed. msgId:%d", s.id, msgId)
 		return
 	}
-	s.wg.Wait()
-}
 
-// Send 安全发送（非阻塞，队列满时返回 ErrConnClosed 或错误）
-func (s *Session) Send(msgId int32, message proto.Message) error {
 	frame, err := s.codec.Marshal(msgId, message)
 	if err != nil {
-		return err
+		logger.ErrorBySprintf("[net] send messageId:%d sessionId:%d marshal error: %v", msgId, s.id, err)
+		return
 	}
-	select {
-	case <-s.ctx.Done():
-		return errors.New(fmt.Sprintf("[net] connectionId:%d closed", s.GetID()))
-	default:
+	if int32(len(frame)) > maxMsgSize {
+		logger.ErrorBySprintf("[net] sessionId:%d send messageId:%d msg too large: %d", s.id, msgId, len(frame))
+		return
 	}
+
 	select {
 	case s.sendQueue <- frame:
-		return nil
-	case <-s.ctx.Done():
-		return errors.New(fmt.Sprintf("[net] connectionId:%d closed", s.GetID()))
+		return
+	default:
+		logger.ErrorBySprintf("[net] sessionId:%d send messageId:%d queue full", s.id, msgId)
 	}
 }
 
-// readPump: 持续读，解帧后交给 Router 处理
+// ------------------ Send 非阻塞 ------------------
+// 改进 Send 方法中的缓冲区处理
+func (s *Session) SendAndClose(msgId int32, message proto.Message) {
+	if !s.IsActive() {
+		logger.ErrorBySprintf("[net] send message sessionId:%d is closed. msgId:%d", s.id, msgId)
+		return
+	}
+
+	frame, err := s.codec.Marshal(msgId, message)
+	if err != nil {
+		logger.ErrorBySprintf("[net] send messageId:%d sessionId:%d marshal error: %v", msgId, s.id, err)
+		return
+	}
+	if int32(len(frame)) > maxMsgSize {
+		logger.ErrorBySprintf("[net] sessionId:%d send messageId:%d msg too large: %d", s.id, msgId, len(frame))
+		return
+	}
+
+	select {
+	case s.sendQueue <- frame:
+		s.SetMeta("close", true)
+		return
+	default:
+		logger.ErrorBySprintf("[net] sessionId:%d send messageId:%d queue full", s.id, msgId)
+	}
+}
+
+// ------------------ readPump（含洪水检测） ------------------
 func (s *Session) readPump() {
 	defer func() {
-		s.cancel()
-		s.wg.Done()
+		if r := recover(); r != nil {
+			logger.ErrorBySprintf("[net] readPump panic: %v,sessionId:%d", r, s.id)
+		}
 	}()
 
 	for {
@@ -116,69 +154,101 @@ func (s *Session) readPump() {
 
 		typ, data, err := s.conn.ReadMessage()
 		if err != nil {
-			// log.Printf("read message error: %v", err)
+			logger.ErrorBySprintf("[net] ws read message sessionId:%d, error: %v", s.GetID(), err)
+			s.Close()
 			return
 		}
-		if typ != websocket.BinaryMessage && typ != websocket.TextMessage {
+		if typ != websocket.BinaryMessage {
+			logger.ErrorBySprintf("[net] non-binary message type=%d sessionId=%d", typ, s.id)
+			continue
+		}
+		if len(data) < 4 {
+			logger.ErrorBySprintf("[net] msg too short sessionId:%d", s.id)
 			continue
 		}
 
-		// 解析帧（简单格式：4字节msgID + payload）
-		if len(data) < 4 {
-			// invalid frame, ignore
-			continue
+		// Flood control
+		nowSec := tool.UnixNow()
+		if s.lastMsgSec != nowSec {
+			s.lastMsgSec = nowSec
+			s.msgCount = 0
+			s.msgBytes = 0
 		}
+		s.msgCount++
+		s.msgBytes += int32(len(data))
+		if s.msgCount > maxMsgPerSecond || s.msgBytes > maxBytePerSecond {
+			logger.ErrorBySprintf("[net] sessionId:%d flood detect cnt=%d bytes=%d", s.id, s.msgCount, s.msgBytes)
+			s.Close()
+			return
+		}
+
 		msgID := binary.BigEndian.Uint32(data[:4])
-		payload := data[4:]
+		//payload := data[4:]
 
 		msg := s.router.GetMessage(int32(msgID))
 		if msg == nil {
-			logger.Error(fmt.Sprintf("[net] connectionId:%d unknown message type: %d", s.GetID(), msgID))
+			logger.ErrorBySprintf("[net] read msg sessionId:%d unknown msgId:%d", s.id, msgID)
 			continue
 		}
-		err = s.codec.Unmarshal(payload, msg)
-		if err != nil {
-			logger.Error(fmt.Sprintf("[net] connectionId:%d unmarshal error: %v", s.GetID(), err))
+		//if !s.router.IsEmpty(int32(msgID)) && len(payload) <= 0 {
+		//	logger.ErrorBySprintf("[net] read msg sessionId:%d empty msgId:%d", s.id, msgID)
+		//	continue
+		//}
+
+		if err = s.codec.Unmarshal(data, msg); err != nil {
+			logger.ErrorBySprintf("[net] read msg sessionId:%d msgId:%d unmarshal error: %v", s.id, msgID, err)
 			continue
 		}
 		s.router.Dispatch(s, int32(msgID), msg)
+		s.lastActiveTime.Store(tool.UnixNowMilli())
 	}
 }
 
-// writePump: 持续写，合并控制写超时等
+// ------------------ writePump（批量写 + pool + panic recovery） ------------------
 func (s *Session) writePump() {
 	defer func() {
-		s.cancel()
-		s.wg.Done()
+		if r := recover(); r != nil {
+			logger.ErrorBySprintf("[net] writePump panic: %v,sessionId:%d", r, s.id)
+		}
 	}()
+
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
 
 	for {
 		select {
 		case <-s.ctx.Done():
-			// flush remaining? 忽略
 			return
 		case data := <-s.sendQueue:
-			err := s.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+			err := s.conn.SetWriteDeadline(time.Now().Add(writeTimeout))
 			if err != nil {
-				logger.Error(fmt.Sprintf("[net] ws set write deadline connectionId:%d, error: %v", s.GetID(), err))
+				logger.ErrorBySprintf("[net] ws set write deadline sessionId:%d, error: %v", s.GetID(), err)
 				return
 			}
-			if err := s.conn.WriteMessage(websocket.BinaryMessage, data); err != nil {
-				// log.Printf("write message error: %v", err)
+			if err = s.conn.WriteMessage(websocket.BinaryMessage, data); err != nil {
+				logger.ErrorBySprintf("[net] ws write message sessionId:%d, error: %v", s.GetID(), err)
 				return
 			}
+			if meta, ok := s.GetMeta("close"); ok && meta.(bool) {
+				logger.InfoWithSprintf("[net] sessionId:%d close", s.id)
+				s.Close()
+				return
+			}
+		case <-ticker.C:
+			_ = s.conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(writeTimeout))
 		}
 	}
 }
 
-// heartbeat: 定期发送 Ping，检查 Pong 更新的 read deadline
+// ------------------ heartbeat ------------------
 func (s *Session) heartbeat() {
 	defer func() {
-		s.cancel()
-		s.wg.Done()
+		if r := recover(); r != nil {
+			logger.ErrorBySprintf("[net] heartbeat panic: %v, sessionId:%d", r, s.id)
+		}
 	}()
 
-	ticker := time.NewTicker(time.Duration(pingInterval))
+	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
 	for {
@@ -186,25 +256,21 @@ func (s *Session) heartbeat() {
 		case <-s.ctx.Done():
 			return
 		case <-ticker.C:
-			//err := s.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-			//if err != nil {
-			//	logger.Error(fmt.Sprintf("[net] ws set write deadline connectionId:%d, error: %v", s.GetID(), err))
-			//	s.acceptor.OnConnectionTimeout(s)
-			//	return
-			//}
-			//if err := s.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-			//	return
-			//}
-			// 如果对端没有 pong，会在 read deadline 超时导致 readPump 退出
+			if tool.UnixNowMilli()-s.lastActiveTime.Load() > int64(heartbeatTimeout) {
+				logger.InfoWithSprintf("[net] sessionId:%d timeout", s.id)
+				s.Close()
+				return
+			}
 		}
 	}
 }
 
-func (s *Session) GetID() int64 {
-	return s.id
-}
+func (s *Session) IsActive() bool { return s.active.Load() }
 
-// Meta 操作
-func (s *Session) SetMeta(k string, v interface{})      { s.meta.Store(k, v) }
+func (s *Session) GetID() int64 { return s.id }
+
+func (s *Session) SetMeta(k string, v interface{}) { s.meta.Store(k, v) }
+
 func (s *Session) GetMeta(k string) (interface{}, bool) { return s.meta.Load(k) }
-func (s *Session) DelMeta(k string)                     { s.meta.Delete(k) }
+
+func (s *Session) DelMeta(k string) { s.meta.Delete(k) }

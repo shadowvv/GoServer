@@ -1,0 +1,156 @@
+{
+  "constant": {
+    "1": {
+      "id": "1",
+      "name": "privilegesAveragePrice30Time",
+      "value": "7"
+    },
+    "2": {
+      "id": "2",
+      "name": "privilegesAveragePrice68Time",
+      "value": "30"
+    },
+    "3": {
+      "id": "3",
+      "name": "privilegesAveragePrice168Time",
+      "value": "0"
+    },
+    "4": {
+      "id": "4",
+      "name": "privilegesVipPrice98Time",
+      "value": "30"
+    },
+    "5": {
+      "id": "5",
+      "name": "privilegesVipPrice198Time",
+      "value": "0"
+    },
+    "6": {
+      "id": "6",
+      "name": "privilegesRecruitment",
+      "value": "1110023|10"
+    }
+  },
+  "privileges": {
+    "1": {
+      "bubbleLab": "30030",
+      "data": "",
+      "des": "",
+      "id": "1",
+      "privId": "101",
+      "privType": "1"
+    },
+    "10": {
+      "bubbleLab": "",
+      "data": "7",
+      "des": "",
+      "id": "10",
+      "privId": "101",
+      "privType": "10"
+    },
+    "11": {
+      "bubbleLab": "",
+      "data": "30",
+      "des": "",
+      "id": "11",
+      "privId": "101",
+      "privType": "10"
+    },
+    "12": {
+      "bubbleLab": "",
+      "data": "99999",
+      "des": "",
+      "id": "12",
+      "privId": "101",
+      "privType": "10"
+    },
+    "13": {
+      "bubbleLab": "",
+      "data": "30",
+      "des": "",
+      "id": "13",
+      "privId": "102",
+      "privType": "10"
+    },
+    "14": {
+      "bubbleLab": "",
+      "data": "1",
+      "des": "",
+      "id": "14",
+      "privId": "101",
+      "privType": "14"
+    },
+    "15": {
+      "bubbleLab": "",
+      "data": "1",
+      "des": "",
+      "id": "15",
+      "privId": "102",
+      "privType": "15"
+    },
+    "2": {
+      "bubbleLab": "",
+      "data": "3000",
+      "des": "",
+      "id": "2",
+      "privId": "101",
+      "privType": "2"
+    },
+    "3": {
+      "bubbleLab": "30031",
+      "data": "21600",
+      "des": "",
+      "id": "3",
+      "privId": "101",
+      "privType": "3"
+    },
+    "4": {
+      "bubbleLab": "30032",
+      "data": "2",
+      "des": "",
+      "id": "4",
+      "privId": "101",
+      "privType": "4"
+    },
+    "5": {
+      "bubbleLab": "",
+      "data": "1",
+      "des": "",
+      "id": "5",
+      "privId": "101",
+      "privType": "5"
+    },
+    "6": {
+      "bubbleLab": "30033",
+      "data": "10",
+      "des": "",
+      "id": "6",
+      "privId": "102",
+      "privType": "6"
+    },
+    "8": {
+      "bubbleLab": "30035",
+      "data": "1",
+      "des": "",
+      "id": "8",
+      "privId": "102",
+      "privType": "8"
+    },
+    "9": {
+      "bubbleLab": "30036",
+      "data": "2",
+      "des": "",
+      "id": "9",
+      "privId": "102",
+      "privType": "9"
+    }
+  },
+  "recruitment": {
+    "1": {
+      "data": "1110023|10",
+      "id": "1",
+      "privType": "10",
+      "refreshTime": "1"
+    }
+  }
+}

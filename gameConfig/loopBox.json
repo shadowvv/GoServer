@@ -1,0 +1,148 @@
+{
+  "boxProp": {
+    "1": {
+      "id": "1",
+      "loopBoxExp": "1",
+      "loopBoxPoint": "1"
+    },
+    "2": {
+      "id": "2",
+      "loopBoxExp": "10",
+      "loopBoxPoint": "10"
+    },
+    "3": {
+      "id": "3",
+      "loopBoxExp": "20",
+      "loopBoxPoint": "20"
+    },
+    "4": {
+      "id": "4",
+      "loopBoxExp": "50",
+      "loopBoxPoint": "50"
+    },
+    "5": {
+      "id": "5",
+      "loopBoxExp": "100",
+      "loopBoxPoint": ""
+    }
+  },
+  "level": {
+    "1": {
+      "dropGroupId": "100047|100037|100027|100017|100007",
+      "id": "1",
+      "levelUpExp": "872",
+      "loopBoxLevel": "1",
+      "unlock": "410103"
+    },
+    "10": {
+      "dropGroupId": "100056|100046|100036|100026|100016",
+      "id": "10",
+      "levelUpExp": "",
+      "loopBoxLevel": "10",
+      "unlock": ""
+    },
+    "2": {
+      "dropGroupId": "100048|100038|100028|100018|100008",
+      "id": "2",
+      "levelUpExp": "1744",
+      "loopBoxLevel": "2",
+      "unlock": "410111"
+    },
+    "3": {
+      "dropGroupId": "100049|100039|100029|100019|100009",
+      "id": "3",
+      "levelUpExp": "2442",
+      "loopBoxLevel": "3",
+      "unlock": "410121"
+    },
+    "4": {
+      "dropGroupId": "100050|100040|100030|100020|100010",
+      "id": "4",
+      "levelUpExp": "3174",
+      "loopBoxLevel": "4",
+      "unlock": "410131"
+    },
+    "5": {
+      "dropGroupId": "100051|100041|100031|100021|100011",
+      "id": "5",
+      "levelUpExp": "4126",
+      "loopBoxLevel": "5",
+      "unlock": "410141"
+    },
+    "6": {
+      "dropGroupId": "100052|100042|100032|100022|100012",
+      "id": "6",
+      "levelUpExp": "5364",
+      "loopBoxLevel": "6",
+      "unlock": "410151"
+    },
+    "7": {
+      "dropGroupId": "100053|100043|100033|100023|100013",
+      "id": "7",
+      "levelUpExp": "6973",
+      "loopBoxLevel": "7",
+      "unlock": "410161"
+    },
+    "8": {
+      "dropGroupId": "100054|100044|100034|100024|100014",
+      "id": "8",
+      "levelUpExp": "9065",
+      "loopBoxLevel": "8",
+      "unlock": "410171"
+    },
+    "9": {
+      "dropGroupId": "100055|100045|100035|100025|100015",
+      "id": "9",
+      "levelUpExp": "11785",
+      "loopBoxLevel": "9",
+      "unlock": "410181"
+    }
+  },
+  "progressReward": {
+    "1": {
+      "boxLoopPoint": "10",
+      "boxLoopUnlock": "2",
+      "id": "1"
+    },
+    "2": {
+      "boxLoopPoint": "20",
+      "boxLoopUnlock": "2",
+      "id": "2"
+    },
+    "3": {
+      "boxLoopPoint": "30",
+      "boxLoopUnlock": "3",
+      "id": "3"
+    },
+    "4": {
+      "boxLoopPoint": "40",
+      "boxLoopUnlock": "3",
+      "id": "4"
+    },
+    "5": {
+      "boxLoopPoint": "80",
+      "boxLoopUnlock": "4",
+      "id": "5"
+    },
+    "6": {
+      "boxLoopPoint": "100",
+      "boxLoopUnlock": "4",
+      "id": "6"
+    },
+    "7": {
+      "boxLoopPoint": "70",
+      "boxLoopUnlock": "3",
+      "id": "7"
+    },
+    "8": {
+      "boxLoopPoint": "50",
+      "boxLoopUnlock": "4",
+      "id": "8"
+    },
+    "9": {
+      "boxLoopPoint": "100",
+      "boxLoopUnlock": "5",
+      "id": "9"
+    }
+  }
+}

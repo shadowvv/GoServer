@@ -1,0 +1,81 @@
+syntax = "proto3";
+package rpcPb;
+option go_package = "github.com/drop/GoServer/server/logic/rpcPb;rpcPb";
+import "common.proto";
+
+service RankService {
+  rpc SayHello(HelloReq) returns (HelloResp);
+  rpc ForwardRankBoardMessageHandler(stream ForwardRankBoardMessage) returns (stream BackwardRankBoardMessage);
+}
+
+message ForwardRankBoardMessage {
+  int64 userId = 1; // 发送协议的玩家id，不需要可以填0
+  RPC_MESSAGE_ID msgId = 2;// 发送的rpc协议id
+  RPC_MESSAGE_ID respMsgId = 3; // 回复的rpc协议id，这样可以相同请求不同的回复
+  int32 backMessageId = 4; // 请求rpc的客户端协议，用来返回协议的错误码
+  string rankId = 5;// 排行榜id
+  bytes payload = 6;
+}
+
+message BackwardRankBoardMessage{
+  int64 userId = 1;
+  RPC_MESSAGE_ID msgId = 2;
+  int32 backMessageId = 3;
+  int32 errorCode = 4;
+  bytes payload = 5;
+}
+
+message GetRankInfoReq {
+
+}
+
+message GetRankInfoResp {
+  repeated RankInfo rankInfos = 1;
+  int32 commonId = 2;
+  int32 activityId = 3;
+  int32 actRankId = 4;
+  int32 myRank = 5;
+  string rankId = 6;
+}
+
+message RankInfo {
+  string rankId = 1;
+  int64 id = 2;          // id:当前有可能时玩家id或者联盟id
+  int64 score = 3;
+  int32 rank = 4;
+  int32 thumbUpCount = 5;
+  int64 enterRankTime = 6;
+}
+
+message NotifyUpdateRankInfo {
+  int64 id = 1;          // id:当前有可能时玩家id或者联盟id
+  int64 score = 2;           // 分数
+  bool incrementalUpdate = 3; // 增量更新
+}
+
+message ThumbUpRankInfo {
+  int64 id = 1;          // id:当前有可能时玩家id或者联盟id
+  int32 thumbUp = 2;  // 点赞数
+}
+
+message CheckRankIsFullReq {
+  int64 userId = 1;
+}
+
+message CheckRankIsFullResp{
+  int64 userId = 1;
+  string rankId = 2; // 排行榜ID
+}
+
+message GetMyRankReq {
+}
+
+message GetMyRankResp {
+  string rankId = 1;
+  MyRankData rank = 2;
+}
+
+message MyRankData {
+  int64 score = 1;
+  int32 rank = 2;
+}

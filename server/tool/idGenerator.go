@@ -1,7 +1,16 @@
 package tool
 
 import (
+	"fmt"
 	"sync"
+)
+
+const (
+	EPOCH            = 1767225600000 // 2026-01-01
+	TIME_STAMP_BITS  = 36
+	FUNCTION_ID_BITS = 6
+	WORKER_ID_BITS   = 6
+	SEQUENCE_BITS    = 5
 )
 
 type IdGenerator struct {
@@ -12,12 +21,22 @@ type IdGenerator struct {
 	lock          sync.Mutex
 }
 
-func NewIdGenerator(workerId, functionId int64) *IdGenerator {
+func NewIdGenerator(workerId int64, functionId int64) *IdGenerator {
+	if workerId == 0 {
+		panic("[system] workerId must be greater than 0")
+	}
+	if workerId < 0 || workerId > 63 {
+		panic(fmt.Sprintf("[system] workerId must be between 0 and 63 currentWorkerId:%d", workerId))
+	}
+	if functionId < 0 || functionId > 63 {
+		panic(fmt.Sprintf("[system] functionId must be between 0 and 63 currentFunctionId:%d", functionId))
+	}
 	return &IdGenerator{
 		lastTimestamp: 0,
 		sequence:      0,
 		workerId:      workerId,
 		functionId:    functionId,
+		lock:          sync.Mutex{},
 	}
 }
 
@@ -25,7 +44,7 @@ func (g *IdGenerator) NextId() int64 {
 	g.lock.Lock()
 	defer g.lock.Unlock()
 
-	timestamp := GetCurrentTimeMillis()
+	timestamp := UnixNowMilli()
 
 	// 处理时间回拨
 	if timestamp < g.lastTimestamp {
@@ -35,7 +54,7 @@ func (g *IdGenerator) NextId() int64 {
 
 	// 同一毫秒内增加序列号
 	if timestamp == g.lastTimestamp {
-		g.sequence = (g.sequence + 1) & 4095
+		g.sequence = (g.sequence + 1) & (int64(1<<SEQUENCE_BITS) - 1)
 		if g.sequence == 0 {
 			// 序列号用完，等待下一毫秒
 			timestamp = waitUntilNextMillis(g.lastTimestamp)
@@ -45,18 +64,31 @@ func (g *IdGenerator) NextId() int64 {
 	}
 
 	g.lastTimestamp = timestamp
-	return generateIdWithTime(g.workerId, g.functionId, timestamp)
+	return generateIdWithTime(g.workerId, g.functionId, timestamp, g.sequence)
 }
 
 // waitUntilNextMillis 等待到下一毫秒
 func waitUntilNextMillis(lastTimestamp int64) int64 {
-	timestamp := GetCurrentTimeMillis()
+	timestamp := UnixNowMilli()
 	for timestamp <= lastTimestamp {
-		timestamp = GetCurrentTimeMillis()
+		timestamp = UnixNowMilli()
 	}
 	return timestamp
 }
 
-func generateIdWithTime(workerId, functionId, timestamp int64) int64 {
-	return ((timestamp - 1288834974657) << 22) | (functionId << 17) | (workerId << 12) | (timestamp % 4096)
+func generateIdWithTime(workerId, functionId, timestamp, sequence int64) int64 {
+	// 限制范围
+	functionId &= (1<<FUNCTION_ID_BITS - 1)
+	workerId &= (1<<WORKER_ID_BITS - 1)
+	sequence &= (1<<SEQUENCE_BITS - 1)
+
+	elapsed := timestamp - EPOCH
+	elapsed &= (1<<TIME_STAMP_BITS - 1)
+
+	id := (uint64(elapsed) << (FUNCTION_ID_BITS + WORKER_ID_BITS + SEQUENCE_BITS)) |
+		(uint64(functionId) << (WORKER_ID_BITS + SEQUENCE_BITS)) |
+		(uint64(workerId) << SEQUENCE_BITS) |
+		uint64(sequence)
+
+	return int64(id)
 }

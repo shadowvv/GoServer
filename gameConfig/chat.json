@@ -1,0 +1,64 @@
+{
+  "emoji": {
+    "1": {
+      "defUnlock": "1",
+      "id": "1",
+      "repeat": "1~25"
+    },
+    "10": {
+      "defUnlock": "1",
+      "id": "10",
+      "repeat": "1~25"
+    },
+    "11": {
+      "defUnlock": "1",
+      "id": "11",
+      "repeat": "1~25"
+    },
+    "12": {
+      "defUnlock": "1",
+      "id": "12",
+      "repeat": "1~25"
+    },
+    "2": {
+      "defUnlock": "1",
+      "id": "2",
+      "repeat": "1~25"
+    },
+    "3": {
+      "defUnlock": "1",
+      "id": "3",
+      "repeat": "1~25"
+    },
+    "4": {
+      "defUnlock": "1",
+      "id": "4",
+      "repeat": "1~25"
+    },
+    "5": {
+      "defUnlock": "1",
+      "id": "5",
+      "repeat": "1~25"
+    },
+    "6": {
+      "defUnlock": "1",
+      "id": "6",
+      "repeat": "1~25"
+    },
+    "7": {
+      "defUnlock": "1",
+      "id": "7",
+      "repeat": "1~25"
+    },
+    "8": {
+      "defUnlock": "1",
+      "id": "8",
+      "repeat": "1~25"
+    },
+    "9": {
+      "defUnlock": "1",
+      "id": "9",
+      "repeat": "1~25"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "scene": {
+    "10003": {
+      "disableItem": "",
+      "id": "10003",
+      "isPlayerHide": "",
+      "sceneType": "1"
+    },
+    "10004": {
+      "disableItem": "",
+      "id": "10004",
+      "isPlayerHide": "",
+      "sceneType": "1"
+    },
+    "10005": {
+      "disableItem": "",
+      "id": "10005",
+      "isPlayerHide": "",
+      "sceneType": "1"
+    },
+    "10006": {
+      "disableItem": "",
+      "id": "10006",
+      "isPlayerHide": "",
+      "sceneType": "1"
+    },
+    "101": {
+      "disableItem": "",
+      "id": "101",
+      "isPlayerHide": "",
+      "sceneType": "1"
+    }
+  }
+}

@@ -1,0 +1,37 @@
+loggerConfig:
+  infoFilename: "logs/robot"
+  errorFilename: "logs/robot"
+  maxsize: 1024 # MB
+  maxBackups: 30 # 文件数
+  onlyConsole: true
+
+main:
+  login:
+    account: "60001"
+    serverID: 0
+    loginURL: "http://127.0.0.1:8081/login"
+    channel: 1
+    version: "1.0.2"
+    language: 0
+    deviceID: "robot_device"
+    appID: "robot"
+    sign: ""
+  runConfig:
+    count: 1
+    mode: "custom"
+    interval: 1000
+    duration: 60
+  modules:
+    - "equipment"
+    - "mail"
+
+operations:
+  equipment:
+    - messageId: MESSAGE_ID_EQUIPMENT_LIST_REQ
+  mail:
+    - messageId: MESSAGE_ID_MAIL_LIST_REQ
+      params:
+        mail_type: 0
+        status: 0
+        page: 1
+        pageSize: 10

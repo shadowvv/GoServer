@@ -1,0 +1,46 @@
+{
+  "attrAge": {
+    "1": {
+      "id": "1",
+      "standardCrit": "2000",
+      "standardDodge": "2000",
+      "standardPenetration": "2000"
+    },
+    "2": {
+      "id": "2",
+      "standardCrit": "2500",
+      "standardDodge": "2500",
+      "standardPenetration": "2500"
+    },
+    "3": {
+      "id": "3",
+      "standardCrit": "3000",
+      "standardDodge": "3000",
+      "standardPenetration": "3000"
+    },
+    "4": {
+      "id": "4",
+      "standardCrit": "3500",
+      "standardDodge": "3500",
+      "standardPenetration": "3500"
+    },
+    "5": {
+      "id": "5",
+      "standardCrit": "4000",
+      "standardDodge": "4000",
+      "standardPenetration": "4000"
+    },
+    "6": {
+      "id": "6",
+      "standardCrit": "4500",
+      "standardDodge": "4500",
+      "standardPenetration": "4500"
+    },
+    "7": {
+      "id": "7",
+      "standardCrit": "5000",
+      "standardDodge": "5000",
+      "standardPenetration": "5000"
+    }
+  }
+}

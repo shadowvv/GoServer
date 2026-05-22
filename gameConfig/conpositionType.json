@@ -1,0 +1,44 @@
+{
+  "conpositionType": {
+    "1": {
+      "id": "1",
+      "unlock1": "",
+      "unlock2": "2002",
+      "unlock3": "2004",
+      "unlock4": "2030",
+      "unlock5": "2060"
+    },
+    "2": {
+      "id": "2",
+      "unlock1": "",
+      "unlock2": "2002",
+      "unlock3": "2004",
+      "unlock4": "2030",
+      "unlock5": "2060"
+    },
+    "3": {
+      "id": "3",
+      "unlock1": "",
+      "unlock2": "2002",
+      "unlock3": "2004",
+      "unlock4": "2030",
+      "unlock5": "2060"
+    },
+    "4": {
+      "id": "4",
+      "unlock1": "",
+      "unlock2": "2002",
+      "unlock3": "2004",
+      "unlock4": "2030",
+      "unlock5": "2060"
+    },
+    "5": {
+      "id": "5",
+      "unlock1": "",
+      "unlock2": "",
+      "unlock3": "2005",
+      "unlock4": "2006",
+      "unlock5": "2007"
+    }
+  }
+}

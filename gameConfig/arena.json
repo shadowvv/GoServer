@@ -1,0 +1,1195 @@
+{
+  "bot": {
+    "1": {
+      "arenaLineup": "501|502|503",
+      "arenaPoints": "1",
+      "head": "",
+      "id": "1",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "10": {
+      "arenaLineup": "502|503|504",
+      "arenaPoints": "280",
+      "head": "",
+      "id": "10",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "100": {
+      "arenaLineup": "535|539|533|538|532",
+      "arenaPoints": "1120",
+      "head": "",
+      "id": "100",
+      "name": "45363",
+      "power": "4562",
+      "type": "1100-1150"
+    },
+    "101": {
+      "arenaLineup": "535|540|534|538|532",
+      "arenaPoints": "1120",
+      "head": "",
+      "id": "101",
+      "name": "45363",
+      "power": "4562",
+      "type": "1100-1150"
+    },
+    "102": {
+      "arenaLineup": "535|540|534|539|533",
+      "arenaPoints": "1130",
+      "head": "",
+      "id": "102",
+      "name": "45363",
+      "power": "4562",
+      "type": "1100-1150"
+    },
+    "103": {
+      "arenaLineup": "531|540|534|536|533",
+      "arenaPoints": "1140",
+      "head": "",
+      "id": "103",
+      "name": "45363",
+      "power": "4562",
+      "type": "1100-1150"
+    },
+    "104": {
+      "arenaLineup": "531|539|535|536|533",
+      "arenaPoints": "1140",
+      "head": "",
+      "id": "104",
+      "name": "45363",
+      "power": "4562",
+      "type": "1100-1150"
+    },
+    "105": {
+      "arenaLineup": "531|539|535|537|534",
+      "arenaPoints": "1150",
+      "head": "",
+      "id": "105",
+      "name": "45363",
+      "power": "4562",
+      "type": "1100-1150"
+    },
+    "106": {
+      "arenaLineup": "543|547|542|546|541",
+      "arenaPoints": "1150",
+      "head": "",
+      "id": "106",
+      "name": "45363",
+      "power": "5436",
+      "type": "1150-1200"
+    },
+    "107": {
+      "arenaLineup": "544|548|542|546|541",
+      "arenaPoints": "1160",
+      "head": "",
+      "id": "107",
+      "name": "45363",
+      "power": "5436",
+      "type": "1150-1200"
+    },
+    "108": {
+      "arenaLineup": "544|548|543|547|541",
+      "arenaPoints": "1160",
+      "head": "",
+      "id": "108",
+      "name": "45363",
+      "power": "5436",
+      "type": "1150-1200"
+    },
+    "109": {
+      "arenaLineup": "544|549|543|547|542",
+      "arenaPoints": "1170",
+      "head": "",
+      "id": "109",
+      "name": "45363",
+      "power": "5436",
+      "type": "1150-1200"
+    },
+    "11": {
+      "arenaLineup": "502|503|504",
+      "arenaPoints": "320",
+      "head": "",
+      "id": "11",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "110": {
+      "arenaLineup": "545|549|543|548|542",
+      "arenaPoints": "1170",
+      "head": "",
+      "id": "110",
+      "name": "45363",
+      "power": "5436",
+      "type": "1150-1200"
+    },
+    "111": {
+      "arenaLineup": "545|550|544|548|542",
+      "arenaPoints": "1180",
+      "head": "",
+      "id": "111",
+      "name": "45363",
+      "power": "5436",
+      "type": "1150-1200"
+    },
+    "112": {
+      "arenaLineup": "545|550|544|549|543",
+      "arenaPoints": "1180",
+      "head": "",
+      "id": "112",
+      "name": "45363",
+      "power": "5436",
+      "type": "1150-1200"
+    },
+    "113": {
+      "arenaLineup": "541|550|544|546|543",
+      "arenaPoints": "1190",
+      "head": "",
+      "id": "113",
+      "name": "45363",
+      "power": "5436",
+      "type": "1150-1200"
+    },
+    "114": {
+      "arenaLineup": "541|549|545|546|543",
+      "arenaPoints": "1190",
+      "head": "",
+      "id": "114",
+      "name": "45363",
+      "power": "5436",
+      "type": "1150-1200"
+    },
+    "115": {
+      "arenaLineup": "541|549|545|547|544",
+      "arenaPoints": "1120",
+      "head": "",
+      "id": "115",
+      "name": "45363",
+      "power": "5436",
+      "type": "1150-1200"
+    },
+    "116": {
+      "arenaLineup": "550|551|552|553|554",
+      "arenaPoints": "1200",
+      "head": "",
+      "id": "116",
+      "name": "45363",
+      "power": "5882",
+      "type": "1200-1250"
+    },
+    "117": {
+      "arenaLineup": "550|551|552|553|554",
+      "arenaPoints": "1210",
+      "head": "",
+      "id": "117",
+      "name": "45363",
+      "power": "5882",
+      "type": "1200-1250"
+    },
+    "118": {
+      "arenaLineup": "550|551|552|553|554",
+      "arenaPoints": "1210",
+      "head": "",
+      "id": "118",
+      "name": "45363",
+      "power": "5882",
+      "type": "1200-1250"
+    },
+    "119": {
+      "arenaLineup": "550|551|552|553|554",
+      "arenaPoints": "1220",
+      "head": "",
+      "id": "119",
+      "name": "45363",
+      "power": "5882",
+      "type": "1200-1250"
+    },
+    "12": {
+      "arenaLineup": "502|503|504",
+      "arenaPoints": "360",
+      "head": "",
+      "id": "12",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "120": {
+      "arenaLineup": "555|556|557|558|559",
+      "arenaPoints": "1220",
+      "head": "",
+      "id": "120",
+      "name": "45363",
+      "power": "5882",
+      "type": "1200-1250"
+    },
+    "121": {
+      "arenaLineup": "555|556|557|558|559",
+      "arenaPoints": "1230",
+      "head": "",
+      "id": "121",
+      "name": "45363",
+      "power": "5882",
+      "type": "1200-1250"
+    },
+    "122": {
+      "arenaLineup": "555|556|557|558|559",
+      "arenaPoints": "1230",
+      "head": "",
+      "id": "122",
+      "name": "45363",
+      "power": "5882",
+      "type": "1200-1250"
+    },
+    "123": {
+      "arenaLineup": "555|556|557|558|560",
+      "arenaPoints": "1240",
+      "head": "",
+      "id": "123",
+      "name": "45363",
+      "power": "5882",
+      "type": "1200-1250"
+    },
+    "124": {
+      "arenaLineup": "555|556|557|558|560",
+      "arenaPoints": "1240",
+      "head": "",
+      "id": "124",
+      "name": "45363",
+      "power": "5882",
+      "type": "1200-1250"
+    },
+    "125": {
+      "arenaLineup": "555|556|557|558|560",
+      "arenaPoints": "1245",
+      "head": "",
+      "id": "125",
+      "name": "45363",
+      "power": "5882",
+      "type": "1200-1250"
+    },
+    "13": {
+      "arenaLineup": "502|503|504",
+      "arenaPoints": "400",
+      "head": "",
+      "id": "13",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "14": {
+      "arenaLineup": "503|504|505",
+      "arenaPoints": "430",
+      "head": "",
+      "id": "14",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "15": {
+      "arenaLineup": "503|504|505",
+      "arenaPoints": "460",
+      "head": "",
+      "id": "15",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "16": {
+      "arenaLineup": "503|504|505",
+      "arenaPoints": "490",
+      "head": "",
+      "id": "16",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "17": {
+      "arenaLineup": "503|504|505",
+      "arenaPoints": "520",
+      "head": "",
+      "id": "17",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "18": {
+      "arenaLineup": "503|504|505",
+      "arenaPoints": "550",
+      "head": "",
+      "id": "18",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "19": {
+      "arenaLineup": "501|503|505",
+      "arenaPoints": "580",
+      "head": "",
+      "id": "19",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "2": {
+      "arenaLineup": "501|502|503",
+      "arenaPoints": "38",
+      "head": "",
+      "id": "2",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "20": {
+      "arenaLineup": "501|503|505",
+      "arenaPoints": "600",
+      "head": "",
+      "id": "20",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "21": {
+      "arenaLineup": "501|503|505",
+      "arenaPoints": "630",
+      "head": "",
+      "id": "21",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "22": {
+      "arenaLineup": "501|503|505",
+      "arenaPoints": "660",
+      "head": "",
+      "id": "22",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "23": {
+      "arenaLineup": "501|503|505",
+      "arenaPoints": "700",
+      "head": "",
+      "id": "23",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "24": {
+      "arenaLineup": "502|503|505",
+      "arenaPoints": "740",
+      "head": "",
+      "id": "24",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "25": {
+      "arenaLineup": "502|503|505",
+      "arenaPoints": "780",
+      "head": "",
+      "id": "25",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "26": {
+      "arenaLineup": "502|503|505",
+      "arenaPoints": "810",
+      "head": "",
+      "id": "26",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "27": {
+      "arenaLineup": "502|503|505",
+      "arenaPoints": "830",
+      "head": "",
+      "id": "27",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "28": {
+      "arenaLineup": "502|503|505",
+      "arenaPoints": "850",
+      "head": "",
+      "id": "28",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "29": {
+      "arenaLineup": "502|503|505",
+      "arenaPoints": "870",
+      "head": "",
+      "id": "29",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "3": {
+      "arenaLineup": "501|502|503",
+      "arenaPoints": "56",
+      "head": "",
+      "id": "3",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "30": {
+      "arenaLineup": "501|502|505",
+      "arenaPoints": "890",
+      "head": "",
+      "id": "30",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "31": {
+      "arenaLineup": "501|502|505",
+      "arenaPoints": "900",
+      "head": "",
+      "id": "31",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "32": {
+      "arenaLineup": "501|502|505",
+      "arenaPoints": "900",
+      "head": "",
+      "id": "32",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "33": {
+      "arenaLineup": "501|502|505",
+      "arenaPoints": "900",
+      "head": "",
+      "id": "33",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "34": {
+      "arenaLineup": "501|502|505",
+      "arenaPoints": "910",
+      "head": "",
+      "id": "34",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "35": {
+      "arenaLineup": "501|502|506",
+      "arenaPoints": "910",
+      "head": "",
+      "id": "35",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "36": {
+      "arenaLineup": "501|505|508",
+      "arenaPoints": "910",
+      "head": "",
+      "id": "36",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "37": {
+      "arenaLineup": "501|502|506",
+      "arenaPoints": "920",
+      "head": "",
+      "id": "37",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "38": {
+      "arenaLineup": "505|501|510",
+      "arenaPoints": "920",
+      "head": "",
+      "id": "38",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "39": {
+      "arenaLineup": "505|504|507",
+      "arenaPoints": "920",
+      "head": "",
+      "id": "39",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "4": {
+      "arenaLineup": "501|502|503",
+      "arenaPoints": "95",
+      "head": "",
+      "id": "4",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "40": {
+      "arenaLineup": "505|504|507",
+      "arenaPoints": "930",
+      "head": "",
+      "id": "40",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "41": {
+      "arenaLineup": "501|502|506",
+      "arenaPoints": "930",
+      "head": "",
+      "id": "41",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "42": {
+      "arenaLineup": "503|502|509",
+      "arenaPoints": "930",
+      "head": "",
+      "id": "42",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "43": {
+      "arenaLineup": "505|501|510",
+      "arenaPoints": "940",
+      "head": "",
+      "id": "43",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "44": {
+      "arenaLineup": "509|504|503",
+      "arenaPoints": "940",
+      "head": "",
+      "id": "44",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "45": {
+      "arenaLineup": "501|505|508",
+      "arenaPoints": "940",
+      "head": "",
+      "id": "45",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "46": {
+      "arenaLineup": "501|502|506",
+      "arenaPoints": "950",
+      "head": "",
+      "id": "46",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "47": {
+      "arenaLineup": "505|504|507",
+      "arenaPoints": "950",
+      "head": "",
+      "id": "47",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "48": {
+      "arenaLineup": "509|504|503",
+      "arenaPoints": "950",
+      "head": "",
+      "id": "48",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "49": {
+      "arenaLineup": "505|504|507",
+      "arenaPoints": "950",
+      "head": "",
+      "id": "49",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "5": {
+      "arenaLineup": "501|502|503",
+      "arenaPoints": "125",
+      "head": "",
+      "id": "5",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "50": {
+      "arenaLineup": "501|502|506",
+      "arenaPoints": "940",
+      "head": "",
+      "id": "50",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "51": {
+      "arenaLineup": "501|505|508",
+      "arenaPoints": "940",
+      "head": "",
+      "id": "51",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "52": {
+      "arenaLineup": "503|502|509",
+      "arenaPoints": "950",
+      "head": "",
+      "id": "52",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "53": {
+      "arenaLineup": "505|501|510",
+      "arenaPoints": "950",
+      "head": "",
+      "id": "53",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "54": {
+      "arenaLineup": "505|504|507",
+      "arenaPoints": "950",
+      "head": "",
+      "id": "54",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "55": {
+      "arenaLineup": "501|502|506",
+      "arenaPoints": "950",
+      "head": "",
+      "id": "55",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "56": {
+      "arenaLineup": "509|504|503",
+      "arenaPoints": "970",
+      "head": "",
+      "id": "56",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "57": {
+      "arenaLineup": "509|504|503",
+      "arenaPoints": "970",
+      "head": "",
+      "id": "57",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "58": {
+      "arenaLineup": "505|504|507",
+      "arenaPoints": "980",
+      "head": "",
+      "id": "58",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "59": {
+      "arenaLineup": "501|505|508",
+      "arenaPoints": "980",
+      "head": "",
+      "id": "59",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "6": {
+      "arenaLineup": "501|502|503",
+      "arenaPoints": "148",
+      "head": "",
+      "id": "6",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "60": {
+      "arenaLineup": "501|502|506",
+      "arenaPoints": "980",
+      "head": "",
+      "id": "60",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "61": {
+      "arenaLineup": "505|501|510",
+      "arenaPoints": "990",
+      "head": "",
+      "id": "61",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "62": {
+      "arenaLineup": "503|502|509",
+      "arenaPoints": "990",
+      "head": "",
+      "id": "62",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "63": {
+      "arenaLineup": "509|504|503",
+      "arenaPoints": "990",
+      "head": "",
+      "id": "63",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "64": {
+      "arenaLineup": "505|504|507",
+      "arenaPoints": "990",
+      "head": "",
+      "id": "64",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "65": {
+      "arenaLineup": "509|504|503",
+      "arenaPoints": "1000",
+      "head": "",
+      "id": "65",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "66": {
+      "arenaLineup": "505|501|510",
+      "arenaPoints": "1000",
+      "head": "",
+      "id": "66",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "67": {
+      "arenaLineup": "505|504|507",
+      "arenaPoints": "1000",
+      "head": "",
+      "id": "67",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "68": {
+      "arenaLineup": "501|505|508",
+      "arenaPoints": "1000",
+      "head": "",
+      "id": "68",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "69": {
+      "arenaLineup": "501|505|508",
+      "arenaPoints": "1000",
+      "head": "",
+      "id": "69",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "7": {
+      "arenaLineup": "501|502|503",
+      "arenaPoints": "183",
+      "head": "",
+      "id": "7",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "70": {
+      "arenaLineup": "501|502|506",
+      "arenaPoints": "1000",
+      "head": "",
+      "id": "70",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "71": {
+      "arenaLineup": "509|504|503",
+      "arenaPoints": "1000",
+      "head": "",
+      "id": "71",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "72": {
+      "arenaLineup": "509|504|503",
+      "arenaPoints": "1000",
+      "head": "",
+      "id": "72",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "73": {
+      "arenaLineup": "505|504|507",
+      "arenaPoints": "1000",
+      "head": "",
+      "id": "73",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "74": {
+      "arenaLineup": "501|505|508",
+      "arenaPoints": "1000",
+      "head": "",
+      "id": "74",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "75": {
+      "arenaLineup": "501|502|506",
+      "arenaPoints": "1000",
+      "head": "",
+      "id": "75",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "76": {
+      "arenaLineup": "511|512|513|516|517",
+      "arenaPoints": "1005",
+      "head": "",
+      "id": "76",
+      "name": "45363",
+      "power": "3746",
+      "type": "1000-1050"
+    },
+    "77": {
+      "arenaLineup": "511|512|513|518|519",
+      "arenaPoints": "1005",
+      "head": "",
+      "id": "77",
+      "name": "45363",
+      "power": "3746",
+      "type": "1000-1050"
+    },
+    "78": {
+      "arenaLineup": "511|512|513|517|520",
+      "arenaPoints": "1010",
+      "head": "",
+      "id": "78",
+      "name": "45363",
+      "power": "3746",
+      "type": "1000-1050"
+    },
+    "79": {
+      "arenaLineup": "514|515|513|518|519",
+      "arenaPoints": "1015",
+      "head": "",
+      "id": "79",
+      "name": "45363",
+      "power": "3746",
+      "type": "1000-1050"
+    },
+    "8": {
+      "arenaLineup": "501|502|503",
+      "arenaPoints": "210",
+      "head": "",
+      "id": "8",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "80": {
+      "arenaLineup": "515|518|512|516|511",
+      "arenaPoints": "1020",
+      "head": "",
+      "id": "80",
+      "name": "45363",
+      "power": "3746",
+      "type": "1000-1050"
+    },
+    "81": {
+      "arenaLineup": "514|515|513|516|520",
+      "arenaPoints": "1020",
+      "head": "",
+      "id": "81",
+      "name": "45363",
+      "power": "3746",
+      "type": "1000-1050"
+    },
+    "82": {
+      "arenaLineup": "515|518|513|517|511",
+      "arenaPoints": "1030",
+      "head": "",
+      "id": "82",
+      "name": "45363",
+      "power": "3746",
+      "type": "1000-1050"
+    },
+    "83": {
+      "arenaLineup": "514|515|512|517|519",
+      "arenaPoints": "1030",
+      "head": "",
+      "id": "83",
+      "name": "45363",
+      "power": "3746",
+      "type": "1000-1050"
+    },
+    "84": {
+      "arenaLineup": "514|515|512|518|513",
+      "arenaPoints": "1040",
+      "head": "",
+      "id": "84",
+      "name": "45363",
+      "power": "3746",
+      "type": "1000-1050"
+    },
+    "85": {
+      "arenaLineup": "515|517|512|518|511",
+      "arenaPoints": "1040",
+      "head": "",
+      "id": "85",
+      "name": "45363",
+      "power": "3746",
+      "type": "1000-1050"
+    },
+    "86": {
+      "arenaLineup": "523|527|522|526|521",
+      "arenaPoints": "1050",
+      "head": "",
+      "id": "86",
+      "name": "45363",
+      "power": "4141",
+      "type": "1050-1100"
+    },
+    "87": {
+      "arenaLineup": "524|528|522|526|521",
+      "arenaPoints": "1050",
+      "head": "",
+      "id": "87",
+      "name": "45363",
+      "power": "4141",
+      "type": "1050-1100"
+    },
+    "88": {
+      "arenaLineup": "524|528|523|527|521",
+      "arenaPoints": "1060",
+      "head": "",
+      "id": "88",
+      "name": "45363",
+      "power": "4141",
+      "type": "1050-1100"
+    },
+    "89": {
+      "arenaLineup": "524|529|523|527|522",
+      "arenaPoints": "1060",
+      "head": "",
+      "id": "89",
+      "name": "45363",
+      "power": "4141",
+      "type": "1050-1100"
+    },
+    "9": {
+      "arenaLineup": "502|503|504",
+      "arenaPoints": "250",
+      "head": "",
+      "id": "9",
+      "name": "45363",
+      "power": "2561",
+      "type": "0-1000"
+    },
+    "90": {
+      "arenaLineup": "525|529|523|528|522",
+      "arenaPoints": "1070",
+      "head": "",
+      "id": "90",
+      "name": "45363",
+      "power": "4141",
+      "type": "1050-1100"
+    },
+    "91": {
+      "arenaLineup": "525|530|524|528|522",
+      "arenaPoints": "1070",
+      "head": "",
+      "id": "91",
+      "name": "45363",
+      "power": "4141",
+      "type": "1050-1100"
+    },
+    "92": {
+      "arenaLineup": "525|530|524|529|523",
+      "arenaPoints": "1080",
+      "head": "",
+      "id": "92",
+      "name": "45363",
+      "power": "4141",
+      "type": "1050-1100"
+    },
+    "93": {
+      "arenaLineup": "521|530|524|526|523",
+      "arenaPoints": "1080",
+      "head": "",
+      "id": "93",
+      "name": "45363",
+      "power": "4141",
+      "type": "1050-1100"
+    },
+    "94": {
+      "arenaLineup": "521|529|525|526|523",
+      "arenaPoints": "1090",
+      "head": "",
+      "id": "94",
+      "name": "45363",
+      "power": "4141",
+      "type": "1050-1100"
+    },
+    "95": {
+      "arenaLineup": "521|529|525|527|524",
+      "arenaPoints": "1090",
+      "head": "",
+      "id": "95",
+      "name": "45363",
+      "power": "4141",
+      "type": "1050-1100"
+    },
+    "96": {
+      "arenaLineup": "533|537|532|536|531",
+      "arenaPoints": "1100",
+      "head": "",
+      "id": "96",
+      "name": "45363",
+      "power": "4562",
+      "type": "1100-1150"
+    },
+    "97": {
+      "arenaLineup": "534|538|532|536|531",
+      "arenaPoints": "1100",
+      "head": "",
+      "id": "97",
+      "name": "45363",
+      "power": "4562",
+      "type": "1100-1150"
+    },
+    "98": {
+      "arenaLineup": "534|538|533|537|531",
+      "arenaPoints": "1110",
+      "head": "",
+      "id": "98",
+      "name": "45363",
+      "power": "4562",
+      "type": "1100-1150"
+    },
+    "99": {
+      "arenaLineup": "534|539|533|537|532",
+      "arenaPoints": "1110",
+      "head": "",
+      "id": "99",
+      "name": "45363",
+      "power": "4562",
+      "type": "1100-1150"
+    }
+  },
+  "pointsParameters": {
+    "1": {
+      "coeff1": "800",
+      "coeff2": "500",
+      "id": "1",
+      "loseBase": "10",
+      "pointsRange": "900-999",
+      "winBase": "18"
+    },
+    "2": {
+      "coeff1": "700",
+      "coeff2": "500",
+      "id": "2",
+      "loseBase": "12",
+      "pointsRange": "1000-1099",
+      "winBase": "16"
+    },
+    "3": {
+      "coeff1": "600",
+      "coeff2": "500",
+      "id": "3",
+      "loseBase": "14",
+      "pointsRange": "1100-1199",
+      "winBase": "14"
+    },
+    "4": {
+      "coeff1": "500",
+      "coeff2": "500",
+      "id": "4",
+      "loseBase": "16",
+      "pointsRange": "1200-1299",
+      "winBase": "12"
+    },
+    "5": {
+      "coeff1": "400",
+      "coeff2": "500",
+      "id": "5",
+      "loseBase": "18",
+      "pointsRange": "1300-1399",
+      "winBase": "10"
+    },
+    "6": {
+      "coeff1": "300",
+      "coeff2": "500",
+      "id": "6",
+      "loseBase": "20",
+      "pointsRange": "1400-1499",
+      "winBase": "6"
+    },
+    "7": {
+      "coeff1": "200",
+      "coeff2": "500",
+      "id": "7",
+      "loseBase": "22",
+      "pointsRange": "1500-1599",
+      "winBase": "4"
+    },
+    "8": {
+      "coeff1": "100",
+      "coeff2": "500",
+      "id": "8",
+      "loseBase": "24",
+      "pointsRange": "1600",
+      "winBase": "2"
+    }
+  }
+}

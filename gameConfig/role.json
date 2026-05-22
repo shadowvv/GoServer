@@ -1,0 +1,666 @@
+{
+  "roleLevel": {
+    "1": {
+      "age": "1",
+      "exp": "100",
+      "heroLevel": "140",
+      "id": "1",
+      "period": "1",
+      "unlock": ""
+    },
+    "10": {
+      "age": "2",
+      "exp": "43200",
+      "heroLevel": "280",
+      "id": "10",
+      "period": "2",
+      "unlock": ""
+    },
+    "11": {
+      "age": "3",
+      "exp": "47520",
+      "heroLevel": "280",
+      "id": "11",
+      "period": "1",
+      "unlock": ""
+    },
+    "12": {
+      "age": "3",
+      "exp": "57024",
+      "heroLevel": "300",
+      "id": "12",
+      "period": "1",
+      "unlock": ""
+    },
+    "13": {
+      "age": "3",
+      "exp": "68428",
+      "heroLevel": "300",
+      "id": "13",
+      "period": "2",
+      "unlock": ""
+    },
+    "14": {
+      "age": "3",
+      "exp": "82113",
+      "heroLevel": "300",
+      "id": "14",
+      "period": "2",
+      "unlock": ""
+    },
+    "15": {
+      "age": "3",
+      "exp": "205282",
+      "heroLevel": "320",
+      "id": "15",
+      "period": "2",
+      "unlock": ""
+    },
+    "16": {
+      "age": "4",
+      "exp": "266866",
+      "heroLevel": "320",
+      "id": "16",
+      "period": "1",
+      "unlock": ""
+    },
+    "17": {
+      "age": "4",
+      "exp": "346925",
+      "heroLevel": "320",
+      "id": "17",
+      "period": "1",
+      "unlock": ""
+    },
+    "18": {
+      "age": "4",
+      "exp": "451002",
+      "heroLevel": "320",
+      "id": "18",
+      "period": "1",
+      "unlock": ""
+    },
+    "19": {
+      "age": "4",
+      "exp": "586302",
+      "heroLevel": "320",
+      "id": "19",
+      "period": "2",
+      "unlock": ""
+    },
+    "2": {
+      "age": "1",
+      "exp": "500",
+      "heroLevel": "160",
+      "id": "2",
+      "period": "1",
+      "unlock": ""
+    },
+    "20": {
+      "age": "4",
+      "exp": "762192",
+      "heroLevel": "380",
+      "id": "20",
+      "period": "2",
+      "unlock": ""
+    },
+    "21": {
+      "age": "4",
+      "exp": "990849",
+      "heroLevel": "380",
+      "id": "21",
+      "period": "2",
+      "unlock": ""
+    },
+    "22": {
+      "age": "4",
+      "exp": "1288103",
+      "heroLevel": "450",
+      "id": "22",
+      "period": "3",
+      "unlock": ""
+    },
+    "23": {
+      "age": "4",
+      "exp": "1674533",
+      "heroLevel": "450",
+      "id": "23",
+      "period": "3",
+      "unlock": ""
+    },
+    "24": {
+      "age": "4",
+      "exp": "2176892",
+      "heroLevel": "450",
+      "id": "24",
+      "period": "3",
+      "unlock": ""
+    },
+    "25": {
+      "age": "4",
+      "exp": "5442230",
+      "heroLevel": "510",
+      "id": "25",
+      "period": "3",
+      "unlock": ""
+    },
+    "26": {
+      "age": "5",
+      "exp": "6258564",
+      "heroLevel": "510",
+      "id": "26",
+      "period": "1",
+      "unlock": ""
+    },
+    "27": {
+      "age": "5",
+      "exp": "7197348",
+      "heroLevel": "580",
+      "id": "27",
+      "period": "1",
+      "unlock": ""
+    },
+    "28": {
+      "age": "5",
+      "exp": "8276950",
+      "heroLevel": "580",
+      "id": "28",
+      "period": "1",
+      "unlock": ""
+    },
+    "29": {
+      "age": "5",
+      "exp": "9518492",
+      "heroLevel": "580",
+      "id": "29",
+      "period": "1",
+      "unlock": ""
+    },
+    "3": {
+      "age": "1",
+      "exp": "800",
+      "heroLevel": "160",
+      "id": "3",
+      "period": "2",
+      "unlock": ""
+    },
+    "30": {
+      "age": "5",
+      "exp": "10946265",
+      "heroLevel": "640",
+      "id": "30",
+      "period": "1",
+      "unlock": ""
+    },
+    "31": {
+      "age": "5",
+      "exp": "12588204",
+      "heroLevel": "640",
+      "id": "31",
+      "period": "2",
+      "unlock": ""
+    },
+    "32": {
+      "age": "5",
+      "exp": "14476434",
+      "heroLevel": "700",
+      "id": "32",
+      "period": "2",
+      "unlock": ""
+    },
+    "33": {
+      "age": "5",
+      "exp": "16647899",
+      "heroLevel": "700",
+      "id": "33",
+      "period": "2",
+      "unlock": ""
+    },
+    "34": {
+      "age": "5",
+      "exp": "19145083",
+      "heroLevel": "700",
+      "id": "34",
+      "period": "2",
+      "unlock": ""
+    },
+    "35": {
+      "age": "5",
+      "exp": "22016845",
+      "heroLevel": "860",
+      "id": "35",
+      "period": "2",
+      "unlock": ""
+    },
+    "36": {
+      "age": "5",
+      "exp": "25319371",
+      "heroLevel": "860",
+      "id": "36",
+      "period": "3",
+      "unlock": ""
+    },
+    "37": {
+      "age": "5",
+      "exp": "29117276",
+      "heroLevel": "960",
+      "id": "37",
+      "period": "3",
+      "unlock": ""
+    },
+    "38": {
+      "age": "5",
+      "exp": "33484867",
+      "heroLevel": "960",
+      "id": "38",
+      "period": "3",
+      "unlock": ""
+    },
+    "39": {
+      "age": "5",
+      "exp": "38507597",
+      "heroLevel": "960",
+      "id": "39",
+      "period": "3",
+      "unlock": ""
+    },
+    "4": {
+      "age": "1",
+      "exp": "1200",
+      "heroLevel": "160",
+      "id": "4",
+      "period": "2",
+      "unlock": ""
+    },
+    "40": {
+      "age": "5",
+      "exp": "96268992",
+      "heroLevel": "1200",
+      "id": "40",
+      "period": "3",
+      "unlock": ""
+    },
+    "41": {
+      "age": "6",
+      "exp": "110709340",
+      "heroLevel": "1200",
+      "id": "41",
+      "period": "1",
+      "unlock": ""
+    },
+    "42": {
+      "age": "6",
+      "exp": "127315741",
+      "heroLevel": "1380",
+      "id": "42",
+      "period": "2",
+      "unlock": ""
+    },
+    "43": {
+      "age": "6",
+      "exp": "146413102",
+      "heroLevel": "1380",
+      "id": "43",
+      "period": "2",
+      "unlock": ""
+    },
+    "44": {
+      "age": "6",
+      "exp": "168375067",
+      "heroLevel": "1380",
+      "id": "44",
+      "period": "3",
+      "unlock": ""
+    },
+    "45": {
+      "age": "6",
+      "exp": "193631327",
+      "heroLevel": "1640",
+      "id": "45",
+      "period": "3",
+      "unlock": ""
+    },
+    "46": {
+      "age": "6",
+      "exp": "222676026",
+      "heroLevel": "1640",
+      "id": "46",
+      "period": "4",
+      "unlock": ""
+    },
+    "47": {
+      "age": "6",
+      "exp": "256077429",
+      "heroLevel": "1750",
+      "id": "47",
+      "period": "5",
+      "unlock": ""
+    },
+    "48": {
+      "age": "6",
+      "exp": "294489043",
+      "heroLevel": "1750",
+      "id": "48",
+      "period": "5",
+      "unlock": ""
+    },
+    "49": {
+      "age": "6",
+      "exp": "338662399",
+      "heroLevel": "1750",
+      "id": "49",
+      "period": "6",
+      "unlock": ""
+    },
+    "5": {
+      "age": "1",
+      "exp": "2400",
+      "heroLevel": "200",
+      "id": "5",
+      "period": "2",
+      "unlock": ""
+    },
+    "50": {
+      "age": "6",
+      "exp": "389461758",
+      "heroLevel": "1900",
+      "id": "50",
+      "period": "6",
+      "unlock": ""
+    },
+    "51": {
+      "age": "6",
+      "exp": "447881021",
+      "heroLevel": "1900",
+      "id": "51",
+      "period": "7",
+      "unlock": ""
+    },
+    "52": {
+      "age": "6",
+      "exp": "515063174",
+      "heroLevel": "1990",
+      "id": "52",
+      "period": "8",
+      "unlock": ""
+    },
+    "53": {
+      "age": "6",
+      "exp": "592322650",
+      "heroLevel": "1990",
+      "id": "53",
+      "period": "8",
+      "unlock": ""
+    },
+    "54": {
+      "age": "6",
+      "exp": "681171047",
+      "heroLevel": "1990",
+      "id": "54",
+      "period": "9",
+      "unlock": ""
+    },
+    "55": {
+      "age": "6",
+      "exp": "1702927617",
+      "heroLevel": "2000",
+      "id": "55",
+      "period": "9",
+      "unlock": ""
+    },
+    "56": {
+      "age": "7",
+      "exp": "1958366759",
+      "heroLevel": "2000",
+      "id": "56",
+      "period": "1",
+      "unlock": ""
+    },
+    "57": {
+      "age": "7",
+      "exp": "2252121772",
+      "heroLevel": "2000",
+      "id": "57",
+      "period": "2",
+      "unlock": ""
+    },
+    "58": {
+      "age": "7",
+      "exp": "2589940037",
+      "heroLevel": "2000",
+      "id": "58",
+      "period": "2",
+      "unlock": ""
+    },
+    "59": {
+      "age": "7",
+      "exp": "2978431042",
+      "heroLevel": "2000",
+      "id": "59",
+      "period": "3",
+      "unlock": ""
+    },
+    "6": {
+      "age": "2",
+      "exp": "4800",
+      "heroLevel": "200",
+      "id": "6",
+      "period": "1",
+      "unlock": ""
+    },
+    "60": {
+      "age": "7",
+      "exp": "3425195698",
+      "heroLevel": "2000",
+      "id": "60",
+      "period": "3",
+      "unlock": ""
+    },
+    "61": {
+      "age": "7",
+      "exp": "3938975052",
+      "heroLevel": "2000",
+      "id": "61",
+      "period": "4",
+      "unlock": ""
+    },
+    "62": {
+      "age": "7",
+      "exp": "4529821309",
+      "heroLevel": "2000",
+      "id": "62",
+      "period": "5",
+      "unlock": ""
+    },
+    "63": {
+      "age": "7",
+      "exp": "5209294505",
+      "heroLevel": "2000",
+      "id": "63",
+      "period": "5",
+      "unlock": ""
+    },
+    "64": {
+      "age": "7",
+      "exp": "5990688680",
+      "heroLevel": "2000",
+      "id": "64",
+      "period": "6",
+      "unlock": ""
+    },
+    "65": {
+      "age": "7",
+      "exp": "6889291982",
+      "heroLevel": "2000",
+      "id": "65",
+      "period": "6",
+      "unlock": ""
+    },
+    "66": {
+      "age": "7",
+      "exp": "7922685779",
+      "heroLevel": "2000",
+      "id": "66",
+      "period": "7",
+      "unlock": ""
+    },
+    "67": {
+      "age": "7",
+      "exp": "9111088645",
+      "heroLevel": "2000",
+      "id": "67",
+      "period": "8",
+      "unlock": ""
+    },
+    "68": {
+      "age": "7",
+      "exp": "10477751941",
+      "heroLevel": "2000",
+      "id": "68",
+      "period": "8",
+      "unlock": ""
+    },
+    "69": {
+      "age": "7",
+      "exp": "12049414732",
+      "heroLevel": "2000",
+      "id": "69",
+      "period": "9",
+      "unlock": ""
+    },
+    "7": {
+      "age": "2",
+      "exp": "9600",
+      "heroLevel": "240",
+      "id": "7",
+      "period": "1",
+      "unlock": ""
+    },
+    "70": {
+      "age": "7",
+      "exp": "30123536830",
+      "heroLevel": "2000",
+      "id": "70",
+      "period": "9",
+      "unlock": ""
+    },
+    "8": {
+      "age": "2",
+      "exp": "14400",
+      "heroLevel": "240",
+      "id": "8",
+      "period": "2",
+      "unlock": ""
+    },
+    "9": {
+      "age": "2",
+      "exp": "17280",
+      "heroLevel": "240",
+      "id": "9",
+      "period": "2",
+      "unlock": ""
+    }
+  },
+  "roleName": {
+    "1": {
+      "id": "1",
+      "name": "勇敢的",
+      "nameOrder": "0"
+    },
+    "10": {
+      "id": "10",
+      "name": "狂暴的",
+      "nameOrder": "0"
+    },
+    "11": {
+      "id": "11",
+      "name": "哥布林",
+      "nameOrder": "1"
+    },
+    "12": {
+      "id": "12",
+      "name": "史萊姆",
+      "nameOrder": "1"
+    },
+    "13": {
+      "id": "13",
+      "name": "牛頭人",
+      "nameOrder": "1"
+    },
+    "14": {
+      "id": "14",
+      "name": "殭屍",
+      "nameOrder": "1"
+    },
+    "15": {
+      "id": "15",
+      "name": "嘔吐怪",
+      "nameOrder": "1"
+    },
+    "16": {
+      "id": "16",
+      "name": "巨魔",
+      "nameOrder": "1"
+    },
+    "17": {
+      "id": "17",
+      "name": "巨龍",
+      "nameOrder": "1"
+    },
+    "18": {
+      "id": "18",
+      "name": "幽靈",
+      "nameOrder": "1"
+    },
+    "19": {
+      "id": "19",
+      "name": "吸血鬼",
+      "nameOrder": "1"
+    },
+    "2": {
+      "id": "2",
+      "name": "機智的",
+      "nameOrder": "0"
+    },
+    "20": {
+      "id": "20",
+      "name": "寶箱怪",
+      "nameOrder": "1"
+    },
+    "3": {
+      "id": "3",
+      "name": "勤勞的",
+      "nameOrder": "0"
+    },
+    "4": {
+      "id": "4",
+      "name": "強壯的",
+      "nameOrder": "0"
+    },
+    "5": {
+      "id": "5",
+      "name": "飛馳的",
+      "nameOrder": "0"
+    },
+    "6": {
+      "id": "6",
+      "name": "賢惠的",
+      "nameOrder": "0"
+    },
+    "7": {
+      "id": "7",
+      "name": "美味的",
+      "nameOrder": "0"
+    },
+    "8": {
+      "id": "8",
+      "name": "苦命的",
+      "nameOrder": "0"
+    },
+    "9": {
+      "id": "9",
+      "name": "痴情的",
+      "nameOrder": "0"
+    }
+  }
+}

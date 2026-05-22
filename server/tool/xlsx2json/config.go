@@ -3,6 +3,7 @@ package xlsx2json
 import (
 	"bufio"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -11,6 +12,12 @@ type Config struct {
 	JsonDir  string
 	GoDir    string
 	Field    string
+}
+
+// normalizePath 规范化路径，统一处理 Windows(.\\) 和 Unix(./) 写法，跨平台兼容
+func normalizePath(s string) string {
+	s = strings.ReplaceAll(s, "\\", "/")
+	return filepath.Clean(s)
 }
 
 // LoadConfig 读取 cfg.conf
@@ -35,11 +42,11 @@ func LoadConfig(path string) (*Config, error) {
 		value := strings.TrimSpace(kv[1])
 		switch key {
 		case "excel":
-			cfg.ExcelDir = value
+			cfg.ExcelDir = normalizePath(value)
 		case "json":
-			cfg.JsonDir = value
+			cfg.JsonDir = normalizePath(value)
 		case "go":
-			cfg.GoDir = value
+			cfg.GoDir = normalizePath(value)
 		case "field":
 			cfg.Field = value
 		}

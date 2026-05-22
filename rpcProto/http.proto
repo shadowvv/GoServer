@@ -1,0 +1,8 @@
+syntax = "proto3";
+package rpcPb;
+option go_package = "github.com/drop/GoServer/server/logic/rpcPb;rpcPb";
+import "common.proto";
+
+service httpService {
+  rpc SayHello(HelloReq) returns (HelloResp);
+}

@@ -1,0 +1,80 @@
+{
+  "sectlevel": {
+    "1": {
+      "contribValue": "100",
+      "id": "1",
+      "num": "23"
+    },
+    "10": {
+      "contribValue": "",
+      "id": "10",
+      "num": "50"
+    },
+    "2": {
+      "contribValue": "9300",
+      "id": "2",
+      "num": "26"
+    },
+    "3": {
+      "contribValue": "17500",
+      "id": "3",
+      "num": "29"
+    },
+    "4": {
+      "contribValue": "30400",
+      "id": "4",
+      "num": "32"
+    },
+    "5": {
+      "contribValue": "48700",
+      "id": "5",
+      "num": "35"
+    },
+    "6": {
+      "contribValue": "72700",
+      "id": "6",
+      "num": "38"
+    },
+    "7": {
+      "contribValue": "102900",
+      "id": "7",
+      "num": "41"
+    },
+    "8": {
+      "contribValue": "145200",
+      "id": "8",
+      "num": "44"
+    },
+    "9": {
+      "contribValue": "200400",
+      "id": "9",
+      "num": "47"
+    }
+  },
+  "sectposition": {
+    "1": {
+      "id": "1",
+      "minContribute": "500",
+      "permit": "1|2|3|4",
+      "playerNum": "1"
+    },
+    "2": {
+      "id": "2",
+      "minContribute": "200",
+      "permit": "3|4",
+      "playerNum": "1"
+    },
+    "3": {
+      "id": "3",
+      "minContribute": "50",
+      "permit": "4",
+      "playerNum": "8"
+    },
+    "4": {
+      "id": "4",
+      "minContribute": "0",
+      "permit": "4",
+      "playerNum": "-1"
+    }
+  }
+}

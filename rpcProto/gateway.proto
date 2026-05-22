@@ -1,0 +1,23 @@
+syntax = "proto3";
+package rpcPb;
+option go_package = "github.com/drop/GoServer/server/logic/rpcPb;rpcPb";
+import "common.proto";
+
+service GateService {
+  rpc SayHello(HelloReq) returns (HelloResp);
+  rpc DeliverRechargeItem(DeliverRechargeItemReq) returns (EmptyResp);
+  rpc NotifyServerOperationHandler(NotifyOperationMessage) returns (EmptyResp);
+  rpc NotifyAllianceChange(NotifyAllianceChangeReq) returns (EmptyResp);
+  rpc GmKickPlayer(GmKickPlayerReq) returns (EmptyResp);
+}
+
+message GmKickPlayerReq {
+  int64 userId = 1; // 玩家id
+  int32 serverId = 2; // 服务器id
+}
+
+message NotifyAllianceChangeReq {
+  int64 userId = 1; // 玩家id
+  int32 changeOper = 2;// 联盟操作
+  int64 allianceId = 3;// 联盟id
+}

@@ -1,0 +1,37 @@
+{
+  "mailSender": {
+    "4": {
+      "bornDay": "1",
+      "cron": "",
+      "date": "",
+      "dateLimitTime": "",
+      "id": "4",
+      "mailId": "4001",
+      "serverDay": "",
+      "unlock": "",
+      "unlockStop": ""
+    },
+    "5": {
+      "bornDay": "2",
+      "cron": "",
+      "date": "",
+      "dateLimitTime": "",
+      "id": "5",
+      "mailId": "4002",
+      "serverDay": "",
+      "unlock": "",
+      "unlockStop": ""
+    },
+    "7": {
+      "bornDay": "",
+      "cron": "",
+      "date": "1/2/36 15:04",
+      "dateLimitTime": "86400",
+      "id": "7",
+      "mailId": "6001",
+      "serverDay": "",
+      "unlock": "",
+      "unlockStop": ""
+    }
+  }
+}

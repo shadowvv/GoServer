@@ -1,0 +1,44 @@
+{
+  "summonPool": {
+    "1": {
+      "actModID": "",
+      "drawNum": "40",
+      "dropGroupId1": "100057|100058|100059|100060|100061",
+      "dropGroupId2": "100057|100058|100059|100060|100061",
+      "dropToken": "1110023",
+      "firstDropFree": "1",
+      "gashatype": "1",
+      "guarantees": "50~100057|100058",
+      "guarantees1": "10~100072;30~100074",
+      "guarantees1Weight": "10000;10000",
+      "guarantees2": "100~100057",
+      "guarantees2Type": "1",
+      "guarantees2Weight": "10000",
+      "guaranteesWeight": "500|9500",
+      "id": "1",
+      "unlockID": "",
+      "weight1": "10|100|1400|4140|4350",
+      "weight2": "10|200|1000|4140|4250"
+    },
+    "2": {
+      "actModID": "",
+      "drawNum": "",
+      "dropGroupId1": "100165|100166|100167|100168|100169|100170|100171",
+      "dropGroupId2": "",
+      "dropToken": "1110084",
+      "firstDropFree": "1",
+      "gashatype": "2",
+      "guarantees": "20~100169|100170",
+      "guarantees1": "",
+      "guarantees1Weight": "",
+      "guarantees2": "",
+      "guarantees2Type": "",
+      "guarantees2Weight": "",
+      "guaranteesWeight": "7200|2800",
+      "id": "2",
+      "unlockID": "",
+      "weight1": "1100|1200|540|800|400|150|5810",
+      "weight2": ""
+    }
+  }
+}

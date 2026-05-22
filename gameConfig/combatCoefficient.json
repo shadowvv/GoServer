@@ -1,0 +1,346 @@
+{
+  "combatCoefficient": {
+    "1": {
+      "id": "1",
+      "powerMultiplier1": "1000",
+      "powerMultiplier2": "1000",
+      "powerMultiplier3": "1000",
+      "powerMultiplier4": "1000",
+      "powerMultiplier5": "1000",
+      "powerMultiplier6": "1000"
+    },
+    "10": {
+      "id": "10",
+      "powerMultiplier1": "15000",
+      "powerMultiplier2": "15000",
+      "powerMultiplier3": "15000",
+      "powerMultiplier4": "15000",
+      "powerMultiplier5": "15000",
+      "powerMultiplier6": "15000"
+    },
+    "13": {
+      "id": "13",
+      "powerMultiplier1": "15000",
+      "powerMultiplier2": "15000",
+      "powerMultiplier3": "15000",
+      "powerMultiplier4": "15000",
+      "powerMultiplier5": "15000",
+      "powerMultiplier6": "15000"
+    },
+    "18": {
+      "id": "18",
+      "powerMultiplier1": "1",
+      "powerMultiplier2": "1",
+      "powerMultiplier3": "1",
+      "powerMultiplier4": "1",
+      "powerMultiplier5": "1",
+      "powerMultiplier6": "1"
+    },
+    "19": {
+      "id": "19",
+      "powerMultiplier1": "100",
+      "powerMultiplier2": "100",
+      "powerMultiplier3": "100",
+      "powerMultiplier4": "100",
+      "powerMultiplier5": "100",
+      "powerMultiplier6": "100"
+    },
+    "20": {
+      "id": "20",
+      "powerMultiplier1": "100",
+      "powerMultiplier2": "100",
+      "powerMultiplier3": "100",
+      "powerMultiplier4": "100",
+      "powerMultiplier5": "100",
+      "powerMultiplier6": "100"
+    },
+    "21": {
+      "id": "21",
+      "powerMultiplier1": "7181",
+      "powerMultiplier2": "10130",
+      "powerMultiplier3": "24350",
+      "powerMultiplier4": "35132",
+      "powerMultiplier5": "43084",
+      "powerMultiplier6": "47936"
+    },
+    "22": {
+      "id": "22",
+      "powerMultiplier1": "1",
+      "powerMultiplier2": "1",
+      "powerMultiplier3": "1",
+      "powerMultiplier4": "1",
+      "powerMultiplier5": "1",
+      "powerMultiplier6": "1"
+    },
+    "23": {
+      "id": "23",
+      "powerMultiplier1": "49367",
+      "powerMultiplier2": "75972",
+      "powerMultiplier3": "81025",
+      "powerMultiplier4": "137461",
+      "powerMultiplier5": "143218",
+      "powerMultiplier6": "250504"
+    },
+    "24": {
+      "id": "24",
+      "powerMultiplier1": "49367",
+      "powerMultiplier2": "75972",
+      "powerMultiplier3": "81025",
+      "powerMultiplier4": "137461",
+      "powerMultiplier5": "143218",
+      "powerMultiplier6": "250504"
+    },
+    "25": {
+      "id": "25",
+      "powerMultiplier1": "7181",
+      "powerMultiplier2": "10130",
+      "powerMultiplier3": "24350",
+      "powerMultiplier4": "35132",
+      "powerMultiplier5": "40101",
+      "powerMultiplier6": "60232"
+    },
+    "26": {
+      "id": "26",
+      "powerMultiplier1": "7181",
+      "powerMultiplier2": "10130",
+      "powerMultiplier3": "24350",
+      "powerMultiplier4": "35132",
+      "powerMultiplier5": "40101",
+      "powerMultiplier6": "60232"
+    },
+    "27": {
+      "id": "27",
+      "powerMultiplier1": "49367",
+      "powerMultiplier2": "75972",
+      "powerMultiplier3": "81025",
+      "powerMultiplier4": "137461",
+      "powerMultiplier5": "143218",
+      "powerMultiplier6": "250504"
+    },
+    "28": {
+      "id": "28",
+      "powerMultiplier1": "49367",
+      "powerMultiplier2": "75972",
+      "powerMultiplier3": "81025",
+      "powerMultiplier4": "137461",
+      "powerMultiplier5": "143218",
+      "powerMultiplier6": "250504"
+    },
+    "29": {
+      "id": "29",
+      "powerMultiplier1": "7181",
+      "powerMultiplier2": "10130",
+      "powerMultiplier3": "24350",
+      "powerMultiplier4": "35132",
+      "powerMultiplier5": "40101",
+      "powerMultiplier6": "60232"
+    },
+    "30": {
+      "id": "30",
+      "powerMultiplier1": "7181",
+      "powerMultiplier2": "10130",
+      "powerMultiplier3": "24350",
+      "powerMultiplier4": "35132",
+      "powerMultiplier5": "40101",
+      "powerMultiplier6": "60232"
+    },
+    "31": {
+      "id": "31",
+      "powerMultiplier1": "39983",
+      "powerMultiplier2": "58085",
+      "powerMultiplier3": "79964",
+      "powerMultiplier4": "137376",
+      "powerMultiplier5": "160457",
+      "powerMultiplier6": "266588"
+    },
+    "32": {
+      "id": "32",
+      "powerMultiplier1": "39983",
+      "powerMultiplier2": "58085",
+      "powerMultiplier3": "79964",
+      "powerMultiplier4": "137376",
+      "powerMultiplier5": "160457",
+      "powerMultiplier6": "266588"
+    },
+    "33": {
+      "id": "33",
+      "powerMultiplier1": "39983",
+      "powerMultiplier2": "58085",
+      "powerMultiplier3": "79964",
+      "powerMultiplier4": "137376",
+      "powerMultiplier5": "160457",
+      "powerMultiplier6": "266588"
+    },
+    "34": {
+      "id": "34",
+      "powerMultiplier1": "39983",
+      "powerMultiplier2": "58085",
+      "powerMultiplier3": "79964",
+      "powerMultiplier4": "137376",
+      "powerMultiplier5": "160457",
+      "powerMultiplier6": "266588"
+    },
+    "35": {
+      "id": "35",
+      "powerMultiplier1": "37879",
+      "powerMultiplier2": "54212",
+      "powerMultiplier3": "77934",
+      "powerMultiplier4": "138397",
+      "powerMultiplier5": "160457",
+      "powerMultiplier6": "213395"
+    },
+    "36": {
+      "id": "36",
+      "powerMultiplier1": "37879",
+      "powerMultiplier2": "54212",
+      "powerMultiplier3": "77934",
+      "powerMultiplier4": "138397",
+      "powerMultiplier5": "160457",
+      "powerMultiplier6": "213395"
+    },
+    "37": {
+      "id": "37",
+      "powerMultiplier1": "37879",
+      "powerMultiplier2": "54212",
+      "powerMultiplier3": "77934",
+      "powerMultiplier4": "138397",
+      "powerMultiplier5": "160457",
+      "powerMultiplier6": "213395"
+    },
+    "38": {
+      "id": "38",
+      "powerMultiplier1": "37879",
+      "powerMultiplier2": "54212",
+      "powerMultiplier3": "77934",
+      "powerMultiplier4": "138397",
+      "powerMultiplier5": "160457",
+      "powerMultiplier6": "213395"
+    },
+    "39": {
+      "id": "39",
+      "powerMultiplier1": "7181",
+      "powerMultiplier2": "10130",
+      "powerMultiplier3": "24350",
+      "powerMultiplier4": "35132",
+      "powerMultiplier5": "40101",
+      "powerMultiplier6": "60232"
+    },
+    "4": {
+      "id": "4",
+      "powerMultiplier1": "30000",
+      "powerMultiplier2": "30000",
+      "powerMultiplier3": "30000",
+      "powerMultiplier4": "30000",
+      "powerMultiplier5": "30000",
+      "powerMultiplier6": "30000"
+    },
+    "40": {
+      "id": "40",
+      "powerMultiplier1": "7181",
+      "powerMultiplier2": "10130",
+      "powerMultiplier3": "24350",
+      "powerMultiplier4": "35132",
+      "powerMultiplier5": "40101",
+      "powerMultiplier6": "60232"
+    },
+    "41": {
+      "id": "41",
+      "powerMultiplier1": "7181",
+      "powerMultiplier2": "10130",
+      "powerMultiplier3": "24350",
+      "powerMultiplier4": "35132",
+      "powerMultiplier5": "40101",
+      "powerMultiplier6": "60232"
+    },
+    "42": {
+      "id": "42",
+      "powerMultiplier1": "7181",
+      "powerMultiplier2": "10130",
+      "powerMultiplier3": "24350",
+      "powerMultiplier4": "35132",
+      "powerMultiplier5": "40101",
+      "powerMultiplier6": "60232"
+    },
+    "43": {
+      "id": "43",
+      "powerMultiplier1": "7181",
+      "powerMultiplier2": "10130",
+      "powerMultiplier3": "24350",
+      "powerMultiplier4": "35132",
+      "powerMultiplier5": "40101",
+      "powerMultiplier6": "60232"
+    },
+    "44": {
+      "id": "44",
+      "powerMultiplier1": "7181",
+      "powerMultiplier2": "10130",
+      "powerMultiplier3": "24350",
+      "powerMultiplier4": "35132",
+      "powerMultiplier5": "40101",
+      "powerMultiplier6": "60232"
+    },
+    "45": {
+      "id": "45",
+      "powerMultiplier1": "7181",
+      "powerMultiplier2": "10130",
+      "powerMultiplier3": "24350",
+      "powerMultiplier4": "35132",
+      "powerMultiplier5": "40101",
+      "powerMultiplier6": "60232"
+    },
+    "46": {
+      "id": "46",
+      "powerMultiplier1": "7181",
+      "powerMultiplier2": "10130",
+      "powerMultiplier3": "24350",
+      "powerMultiplier4": "35132",
+      "powerMultiplier5": "40101",
+      "powerMultiplier6": "60232"
+    },
+    "47": {
+      "id": "47",
+      "powerMultiplier1": "100",
+      "powerMultiplier2": "100",
+      "powerMultiplier3": "100",
+      "powerMultiplier4": "100",
+      "powerMultiplier5": "100",
+      "powerMultiplier6": "100"
+    },
+    "49": {
+      "id": "49",
+      "powerMultiplier1": "2000",
+      "powerMultiplier2": "2500",
+      "powerMultiplier3": "3000",
+      "powerMultiplier4": "3500",
+      "powerMultiplier5": "4000",
+      "powerMultiplier6": "4500"
+    },
+    "50": {
+      "id": "50",
+      "powerMultiplier1": "2000",
+      "powerMultiplier2": "2500",
+      "powerMultiplier3": "3000",
+      "powerMultiplier4": "3500",
+      "powerMultiplier5": "4000",
+      "powerMultiplier6": "4500"
+    },
+    "51": {
+      "id": "51",
+      "powerMultiplier1": "2000",
+      "powerMultiplier2": "2500",
+      "powerMultiplier3": "3000",
+      "powerMultiplier4": "3500",
+      "powerMultiplier5": "4000",
+      "powerMultiplier6": "4500"
+    },
+    "7": {
+      "id": "7",
+      "powerMultiplier1": "30000",
+      "powerMultiplier2": "30000",
+      "powerMultiplier3": "30000",
+      "powerMultiplier4": "30000",
+      "powerMultiplier5": "30000",
+      "powerMultiplier6": "30000"
+    }
+  }
+}

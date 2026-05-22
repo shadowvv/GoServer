@@ -1,0 +1,306 @@
+{"level":"INFO","time":"2026-05-18T10:19:30.509+0800","msg":"[platform] Init node nodeId:1,nodeType:backend,environment:local,channelId:1"}
+{"level":"INFO","time":"2026-05-18T10:19:30.510+0800","msg":"[platform] Boot http platform config:{\n  \"Address\": \":8082\",\n  \"ReadTimeoutMs\": 10000000000,\n  \"WriteTimeoutMs\": 10000000000,\n  \"IdleTimeoutMs\": 10000000000,\n  \"MaxBodySize\": 1048576\n}"}
+{"level":"INFO","time":"2026-05-18T10:19:30.510+0800","msg":"[platform] Init server db config:{\n  \"Dsn\": \"root:123456@tcp(127.0.0.1:3306)/server?charset=utf8mb4\\u0026parseTime=True\\u0026loc=Local\",\n  \"MaxIdleConnections\": 10,\n  \"MaxOpenConnections\": 100,\n  \"MaxLifetime\": 10000000000\n}"}
+{"level":"INFO","time":"2026-05-18T10:19:30.666+0800","msg":"[platform] Init game db config:{\n  \"Dsn\": \"root:123456@tcp(127.0.0.1:3306)/game?charset=utf8mb4\\u0026parseTime=True\\u0026loc=Local\",\n  \"MaxIdleConnections\": 10,\n  \"MaxOpenConnections\": 100,\n  \"MaxLifetime\": 10000000000\n}"}
+{"level":"INFO","time":"2026-05-18T10:19:30.700+0800","msg":"[platform] Init redis db config:{\n  \"Addr\": \"127.0.0.1:6379\",\n  \"DB\": 0,\n  \"PoolSize\": 10,\n  \"Password\": \"\"\n}"}
+{"level":"INFO","time":"2026-05-18T10:19:30.706+0800","msg":"[gameConfig] load config: arena"}
+{"level":"INFO","time":"2026-05-18T10:19:30.708+0800","msg":"[gameConfig] load config: drop"}
+{"level":"INFO","time":"2026-05-18T10:19:30.741+0800","msg":"[gameConfig] load config: pet"}
+{"level":"INFO","time":"2026-05-18T10:19:30.781+0800","msg":"[gameConfig] load config: role"}
+{"level":"INFO","time":"2026-05-18T10:19:30.782+0800","msg":"[gameConfig] load config: trial"}
+{"level":"INFO","time":"2026-05-18T10:19:30.783+0800","msg":"[gameConfig] load config: cityAgeUp"}
+{"level":"INFO","time":"2026-05-18T10:19:30.784+0800","msg":"[gameConfig] load config: constant"}
+{"level":"INFO","time":"2026-05-18T10:19:30.785+0800","msg":"[gameConfig] load config: gloryArena"}
+{"level":"INFO","time":"2026-05-18T10:19:30.785+0800","msg":"[gameConfig] load config: instance"}
+{"level":"INFO","time":"2026-05-18T10:19:30.785+0800","msg":"[gameConfig] load config: productReflect"}
+{"level":"INFO","time":"2026-05-18T10:19:30.786+0800","msg":"[gameConfig] load config: scene"}
+{"level":"INFO","time":"2026-05-18T10:19:30.786+0800","msg":"[gameConfig] load config: bounty"}
+{"level":"INFO","time":"2026-05-18T10:19:30.786+0800","msg":"[gameConfig] load config: daySign"}
+{"level":"INFO","time":"2026-05-18T10:19:30.786+0800","msg":"[gameConfig] load config: dropGroup"}
+{"level":"INFO","time":"2026-05-18T10:19:30.790+0800","msg":"[gameConfig] load config: dungeon"}
+{"level":"INFO","time":"2026-05-18T10:19:30.804+0800","msg":"[gameConfig] load config: guide"}
+{"level":"INFO","time":"2026-05-18T10:19:30.805+0800","msg":"[gameConfig] load config: product"}
+{"level":"INFO","time":"2026-05-18T10:19:30.807+0800","msg":"[gameConfig] load config: sect"}
+{"level":"INFO","time":"2026-05-18T10:19:30.807+0800","msg":"[gameConfig] load config: unlock"}
+{"level":"INFO","time":"2026-05-18T10:19:30.811+0800","msg":"[gameConfig] load config: activity"}
+{"level":"INFO","time":"2026-05-18T10:19:30.812+0800","msg":"[gameConfig] load config: avatar"}
+{"level":"INFO","time":"2026-05-18T10:19:30.815+0800","msg":"[gameConfig] load config: city"}
+{"level":"INFO","time":"2026-05-18T10:19:30.830+0800","msg":"[gameConfig] load config: equipment"}
+{"level":"INFO","time":"2026-05-18T10:19:30.952+0800","msg":"[gameConfig] load config: pass"}
+{"level":"INFO","time":"2026-05-18T10:19:30.963+0800","msg":"[gameConfig] load config: rank"}
+{"level":"INFO","time":"2026-05-18T10:19:30.964+0800","msg":"[gameConfig] load config: stage"}
+{"level":"INFO","time":"2026-05-18T10:19:31.072+0800","msg":"[gameConfig] load config: task"}
+{"level":"INFO","time":"2026-05-18T10:19:31.081+0800","msg":"[gameConfig] load config: act"}
+{"level":"INFO","time":"2026-05-18T10:19:31.083+0800","msg":"[gameConfig] load config: cityMonster"}
+{"level":"INFO","time":"2026-05-18T10:19:31.083+0800","msg":"[gameConfig] load config: collection"}
+{"level":"INFO","time":"2026-05-18T10:19:31.092+0800","msg":"[gameConfig] load config: compositionType"}
+{"level":"INFO","time":"2026-05-18T10:19:31.092+0800","msg":"[gameConfig] load config: exchange"}
+{"level":"INFO","time":"2026-05-18T10:19:31.093+0800","msg":"[gameConfig] load config: hero"}
+{"level":"INFO","time":"2026-05-18T10:19:31.170+0800","msg":"[gameConfig] load config: lottery"}
+{"level":"INFO","time":"2026-05-18T10:19:31.171+0800","msg":"[gameConfig] load config: shop"}
+{"level":"INFO","time":"2026-05-18T10:19:31.171+0800","msg":"[gameConfig] load config: attrBuff"}
+{"level":"INFO","time":"2026-05-18T10:19:31.171+0800","msg":"[gameConfig] load config: idle"}
+{"level":"INFO","time":"2026-05-18T10:19:31.172+0800","msg":"[gameConfig] load config: item"}
+{"level":"INFO","time":"2026-05-18T10:19:31.207+0800","msg":"[gameConfig] load config: limitedAdChest"}
+{"level":"INFO","time":"2026-05-18T10:19:31.208+0800","msg":"[gameConfig] load config: loopBox"}
+{"level":"INFO","time":"2026-05-18T10:19:31.208+0800","msg":"[gameConfig] load config: stillShop"}
+{"level":"INFO","time":"2026-05-18T10:19:31.212+0800","msg":"[gameConfig] load config: vipCard"}
+{"level":"INFO","time":"2026-05-18T10:19:31.213+0800","msg":"[gameConfig] load config: base"}
+{"level":"INFO","time":"2026-05-18T10:19:31.213+0800","msg":"[gameConfig] load config: monster"}
+{"level":"INFO","time":"2026-05-18T10:19:31.339+0800","msg":"[gameConfig] load config: tokenShop"}
+{"level":"INFO","time":"2026-05-18T10:19:31.340+0800","msg":"[gameConfig] load config: adventure"}
+{"level":"INFO","time":"2026-05-18T10:19:31.340+0800","msg":"[gameConfig] load config: adventureProgress"}
+{"level":"INFO","time":"2026-05-18T10:19:31.341+0800","msg":"[gameConfig] load config: cityDispatch"}
+{"level":"INFO","time":"2026-05-18T10:19:31.341+0800","msg":"[gameConfig] load config: combatCoefficient"}
+{"level":"INFO","time":"2026-05-18T10:19:31.341+0800","msg":"[gameConfig] load config: mailContent"}
+{"level":"INFO","time":"2026-05-18T10:19:31.342+0800","msg":"[gameConfig] load config: mailSender"}
+{"level":"INFO","time":"2026-05-18T10:19:31.342+0800","msg":"[gameConfig] load config: privilegeReward"}
+{"level":"INFO","time":"2026-05-18T10:19:31.342+0800","msg":"[gameConfig] load config: systemUnlock"}
+{"level":"INFO","time":"2026-05-18T10:19:31.343+0800","msg":"[gameConfig] load config: accessory"}
+{"level":"INFO","time":"2026-05-18T10:19:31.346+0800","msg":"[gameConfig] load config: city success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.346+0800","msg":"[gameConfig] load config: equipment success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.346+0800","msg":"[gameConfig] load config: pass success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.347+0800","msg":"[gameConfig] load config: rank success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.349+0800","msg":"[gameConfig] load config: stage success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.349+0800","msg":"[gameConfig] load config: task success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.349+0800","msg":"[gameConfig] load config: act success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.349+0800","msg":"[gameConfig] load config: cityMonster success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.349+0800","msg":"[gameConfig] load config: collection success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.349+0800","msg":"[gameConfig] load config: compositionType success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.349+0800","msg":"[gameConfig] load config: exchange success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: hero success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: lottery success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: shop success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: attrBuff success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: idle success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: item success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: limitedAdChest success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: loopBox success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: stillShop success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: vipCard success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: base success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: monster success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: tokenShop success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: adventure success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: adventureProgress success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: cityDispatch success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: combatCoefficient success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: mailContent success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: mailSender success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: privilegeReward success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: systemUnlock success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: accessory success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.350+0800","msg":"[gameConfig] load config: arena success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.352+0800","msg":"[gameConfig] load config: drop success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.353+0800","msg":"[gameConfig] load config: pet success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.353+0800","msg":"[gameConfig] load config: role success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.353+0800","msg":"[gameConfig] load config: trial success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.353+0800","msg":"[gameConfig] load config: cityAgeUp success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.353+0800","msg":"[gameConfig] load config: constant success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.353+0800","msg":"[gameConfig] load config: gloryArena success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.353+0800","msg":"[gameConfig] load config: instance success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.353+0800","msg":"[gameConfig] load config: productReflect success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.353+0800","msg":"[gameConfig] load config: scene success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.353+0800","msg":"[gameConfig] load config: bounty success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.353+0800","msg":"[gameConfig] load config: daySign success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.353+0800","msg":"[gameConfig] load config: dropGroup success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.354+0800","msg":"[gameConfig] load config: dungeon success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.354+0800","msg":"[gameConfig] load config: guide success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.354+0800","msg":"[gameConfig] load config: product success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.354+0800","msg":"[gameConfig] load config: sect success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.354+0800","msg":"[gameConfig] load config: unlock success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.354+0800","msg":"[gameConfig] load config: activity success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.354+0800","msg":"[gameConfig] load config: avatar success"}
+{"level":"INFO","time":"2026-05-18T10:19:31.354+0800","msg":"[platform] load all config success !!!"}
+{"level":"WARN","time":"2026-05-18T10:19:31.359+0800","msg":"Slow SQL","sql":"SELECT * FROM `server_info`","rows":4,"elapsed":0.00571,"caller":"E:/dhsServer/server/logic/platform/easyDB/serverEasyDB.go:53"}
+{"level":"INFO","time":"2026-05-18T10:19:31.364+0800","msg":"SQL","sql":"SELECT * FROM `announce_info` WHERE end_time > 1779070771359","rows":6,"elapsed":0.004733,"caller":"E:/dhsServer/server/logic/platform/easyDB/serverEasyDB.go:80"}
+{"level":"WARN","time":"2026-05-18T10:19:31.371+0800","msg":"Slow SQL","sql":"SELECT * FROM `account` WHERE `account`.`server_id` = 1","rows":95,"elapsed":0.0062455,"caller":"E:/dhsServer/server/logic/platform/easyDB/easyDB.go:33"}
+{"level":"INFO","time":"2026-05-18T10:19:31.378+0800","msg":"SQL","sql":"SELECT * FROM `account` WHERE `account`.`server_id` = 2","rows":86,"elapsed":0.0041838,"caller":"E:/dhsServer/server/logic/platform/easyDB/easyDB.go:33"}
+{"level":"INFO","time":"2026-05-18T10:19:31.382+0800","msg":"SQL","sql":"SELECT * FROM `account` WHERE `account`.`server_id` = 3","rows":0,"elapsed":0.0032232,"caller":"E:/dhsServer/server/logic/platform/easyDB/easyDB.go:33"}
+{"level":"INFO","time":"2026-05-18T10:19:31.387+0800","msg":"SQL","sql":"SELECT * FROM `account` WHERE `account`.`server_id` = 4","rows":0,"elapsed":0.0027613,"caller":"E:/dhsServer/server/logic/platform/easyDB/easyDB.go:33"}
+{"level":"INFO","time":"2026-05-18T10:19:31.388+0800","msg":"[platform] init server info service"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] init activity info service"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] Boot platform success !!!"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/login"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/gmuser"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/editgmuser"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/userInfo"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/getformation"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/getaccessory"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/usermail"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/sendmail"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/serverlist"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/editserver"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] pprof enabled env:local addr::16001"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/useritemchg"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/userorder"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/getRankList"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/getRank"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/gamepubilc"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/editgamepubilc"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/getTalk"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/editclientversion"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/getclientversion"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/getuserinventory"}
+{"level":"INFO","time":"2026-05-18T10:19:31.437+0800","msg":"[platform] register http message: /manage/getServerActivityConfig"}
+{"level":"INFO","time":"2026-05-18T10:19:31.438+0800","msg":"[platform] register http message: /manage/editServerActivityConfig"}
+{"level":"INFO","time":"2026-05-18T10:19:31.438+0800","msg":"[platform] register http message: /manage/editBanUser"}
+{"level":"INFO","time":"2026-05-18T10:19:31.438+0800","msg":"[platform] register http message: /manage/editMuteUser"}
+{"level":"INFO","time":"2026-05-18T10:19:31.438+0800","msg":"[platform] register http message: /manage/getUserLogList"}
+{"level":"INFO","time":"2026-05-18T10:19:31.438+0800","msg":"[platform] register http message: /manage/exportPlayer"}
+{"level":"INFO","time":"2026-05-18T10:19:31.438+0800","msg":"[platform] register http message: /manage/importPlayer"}
+{"level":"INFO","time":"2026-05-18T10:19:31.438+0800","msg":"[platform] register http message: /manage/getThroughput"}
+{"level":"INFO","time":"2026-05-18T10:19:31.438+0800","msg":"[platform] start http service"}
+{"level":"INFO","time":"2026-05-18T12:29:15.638+0800","msg":"[platform] Init node nodeId:1,nodeType:backend,environment:local,channelId:1"}
+{"level":"INFO","time":"2026-05-18T12:29:15.638+0800","msg":"[platform] Boot http platform config:{\n  \"Address\": \":8082\",\n  \"ReadTimeoutMs\": 10000000000,\n  \"WriteTimeoutMs\": 10000000000,\n  \"IdleTimeoutMs\": 10000000000,\n  \"MaxBodySize\": 1048576\n}"}
+{"level":"INFO","time":"2026-05-18T12:29:15.638+0800","msg":"[platform] Init server db config:{\n  \"Dsn\": \"root:123456@tcp(127.0.0.1:3306)/server?charset=utf8mb4\\u0026parseTime=True\\u0026loc=Local\",\n  \"MaxIdleConnections\": 10,\n  \"MaxOpenConnections\": 100,\n  \"MaxLifetime\": 10000000000\n}"}
+{"level":"INFO","time":"2026-05-18T12:29:15.656+0800","msg":"[platform] Init game db config:{\n  \"Dsn\": \"root:123456@tcp(127.0.0.1:3306)/game?charset=utf8mb4\\u0026parseTime=True\\u0026loc=Local\",\n  \"MaxIdleConnections\": 10,\n  \"MaxOpenConnections\": 100,\n  \"MaxLifetime\": 10000000000\n}"}
+{"level":"INFO","time":"2026-05-18T12:29:15.671+0800","msg":"[platform] Init redis db config:{\n  \"Addr\": \"127.0.0.1:6379\",\n  \"DB\": 0,\n  \"PoolSize\": 10,\n  \"Password\": \"\"\n}"}
+{"level":"INFO","time":"2026-05-18T12:29:15.673+0800","msg":"[gameConfig] load config: item"}
+{"level":"INFO","time":"2026-05-18T12:29:15.705+0800","msg":"[gameConfig] load config: mailSender"}
+{"level":"INFO","time":"2026-05-18T12:29:15.705+0800","msg":"[gameConfig] load config: privilegeReward"}
+{"level":"INFO","time":"2026-05-18T12:29:15.705+0800","msg":"[gameConfig] load config: scene"}
+{"level":"INFO","time":"2026-05-18T12:29:15.705+0800","msg":"[gameConfig] load config: sect"}
+{"level":"INFO","time":"2026-05-18T12:29:15.705+0800","msg":"[gameConfig] load config: cityAgeUp"}
+{"level":"INFO","time":"2026-05-18T12:29:15.706+0800","msg":"[gameConfig] load config: combatCoefficient"}
+{"level":"INFO","time":"2026-05-18T12:29:15.706+0800","msg":"[gameConfig] load config: lottery"}
+{"level":"INFO","time":"2026-05-18T12:29:15.706+0800","msg":"[gameConfig] load config: shop"}
+{"level":"INFO","time":"2026-05-18T12:29:15.706+0800","msg":"[gameConfig] load config: stage"}
+{"level":"INFO","time":"2026-05-18T12:29:15.789+0800","msg":"[gameConfig] load config: systemUnlock"}
+{"level":"INFO","time":"2026-05-18T12:29:15.790+0800","msg":"[gameConfig] load config: tokenShop"}
+{"level":"INFO","time":"2026-05-18T12:29:15.793+0800","msg":"[gameConfig] load config: drop"}
+{"level":"INFO","time":"2026-05-18T12:29:15.814+0800","msg":"[gameConfig] load config: idle"}
+{"level":"INFO","time":"2026-05-18T12:29:15.814+0800","msg":"[gameConfig] load config: instance"}
+{"level":"INFO","time":"2026-05-18T12:29:15.815+0800","msg":"[gameConfig] load config: pet"}
+{"level":"INFO","time":"2026-05-18T12:29:15.842+0800","msg":"[gameConfig] load config: productReflect"}
+{"level":"INFO","time":"2026-05-18T12:29:15.842+0800","msg":"[gameConfig] load config: vipCard"}
+{"level":"INFO","time":"2026-05-18T12:29:15.843+0800","msg":"[gameConfig] load config: avatar"}
+{"level":"INFO","time":"2026-05-18T12:29:15.846+0800","msg":"[gameConfig] load config: daySign"}
+{"level":"INFO","time":"2026-05-18T12:29:15.846+0800","msg":"[gameConfig] load config: gloryArena"}
+{"level":"INFO","time":"2026-05-18T12:29:15.846+0800","msg":"[gameConfig] load config: loopBox"}
+{"level":"INFO","time":"2026-05-18T12:29:15.846+0800","msg":"[gameConfig] load config: stillShop"}
+{"level":"INFO","time":"2026-05-18T12:29:15.851+0800","msg":"[gameConfig] load config: adventureProgress"}
+{"level":"INFO","time":"2026-05-18T12:29:15.851+0800","msg":"[gameConfig] load config: cityDispatch"}
+{"level":"INFO","time":"2026-05-18T12:29:15.852+0800","msg":"[gameConfig] load config: collection"}
+{"level":"INFO","time":"2026-05-18T12:29:15.862+0800","msg":"[gameConfig] load config: equipment"}
+{"level":"INFO","time":"2026-05-18T12:29:15.962+0800","msg":"[gameConfig] load config: limitedAdChest"}
+{"level":"INFO","time":"2026-05-18T12:29:15.962+0800","msg":"[gameConfig] load config: pass"}
+{"level":"INFO","time":"2026-05-18T12:29:15.967+0800","msg":"[gameConfig] load config: rank"}
+{"level":"INFO","time":"2026-05-18T12:29:15.967+0800","msg":"[gameConfig] load config: trial"}
+{"level":"INFO","time":"2026-05-18T12:29:15.968+0800","msg":"[gameConfig] load config: base"}
+{"level":"INFO","time":"2026-05-18T12:29:15.968+0800","msg":"[gameConfig] load config: bounty"}
+{"level":"INFO","time":"2026-05-18T12:29:15.968+0800","msg":"[gameConfig] load config: cityMonster"}
+{"level":"INFO","time":"2026-05-18T12:29:15.969+0800","msg":"[gameConfig] load config: hero"}
+{"level":"INFO","time":"2026-05-18T12:29:16.032+0800","msg":"[gameConfig] load config: mailContent"}
+{"level":"INFO","time":"2026-05-18T12:29:16.032+0800","msg":"[gameConfig] load config: product"}
+{"level":"INFO","time":"2026-05-18T12:29:16.033+0800","msg":"[gameConfig] load config: role"}
+{"level":"INFO","time":"2026-05-18T12:29:16.034+0800","msg":"[gameConfig] load config: activity"}
+{"level":"INFO","time":"2026-05-18T12:29:16.035+0800","msg":"[gameConfig] load config: attrBuff"}
+{"level":"INFO","time":"2026-05-18T12:29:16.035+0800","msg":"[gameConfig] load config: city"}
+{"level":"INFO","time":"2026-05-18T12:29:16.047+0800","msg":"[gameConfig] load config: dropGroup"}
+{"level":"INFO","time":"2026-05-18T12:29:16.051+0800","msg":"[gameConfig] load config: guide"}
+{"level":"INFO","time":"2026-05-18T12:29:16.051+0800","msg":"[gameConfig] load config: accessory"}
+{"level":"INFO","time":"2026-05-18T12:29:16.054+0800","msg":"[gameConfig] load config: arena"}
+{"level":"INFO","time":"2026-05-18T12:29:16.058+0800","msg":"[gameConfig] load config: constant"}
+{"level":"INFO","time":"2026-05-18T12:29:16.058+0800","msg":"[gameConfig] load config: dungeon"}
+{"level":"INFO","time":"2026-05-18T12:29:16.069+0800","msg":"[gameConfig] load config: exchange"}
+{"level":"INFO","time":"2026-05-18T12:29:16.071+0800","msg":"[gameConfig] load config: monster"}
+{"level":"INFO","time":"2026-05-18T12:29:16.181+0800","msg":"[gameConfig] load config: task"}
+{"level":"INFO","time":"2026-05-18T12:29:16.190+0800","msg":"[gameConfig] load config: unlock"}
+{"level":"INFO","time":"2026-05-18T12:29:16.193+0800","msg":"[gameConfig] load config: act"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: adventure"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: compositionType"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: adventureProgress success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: cityDispatch success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: collection success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: equipment success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: limitedAdChest success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: pass success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: rank success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: trial success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: base success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: bounty success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: cityMonster success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: hero success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: mailContent success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: product success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: role success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: activity success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: attrBuff success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.195+0800","msg":"[gameConfig] load config: city success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.196+0800","msg":"[gameConfig] load config: dropGroup success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.196+0800","msg":"[gameConfig] load config: guide success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.196+0800","msg":"[gameConfig] load config: accessory success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.196+0800","msg":"[gameConfig] load config: arena success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.196+0800","msg":"[gameConfig] load config: constant success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.196+0800","msg":"[gameConfig] load config: dungeon success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.196+0800","msg":"[gameConfig] load config: exchange success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: monster success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: task success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: unlock success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: act success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: adventure success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: compositionType success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: item success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: mailSender success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: privilegeReward success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: scene success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: sect success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: cityAgeUp success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: combatCoefficient success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: lottery success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.197+0800","msg":"[gameConfig] load config: shop success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.199+0800","msg":"[gameConfig] load config: stage success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.199+0800","msg":"[gameConfig] load config: systemUnlock success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.199+0800","msg":"[gameConfig] load config: tokenShop success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.200+0800","msg":"[gameConfig] load config: drop success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.200+0800","msg":"[gameConfig] load config: idle success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.200+0800","msg":"[gameConfig] load config: instance success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.200+0800","msg":"[gameConfig] load config: pet success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.200+0800","msg":"[gameConfig] load config: productReflect success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.200+0800","msg":"[gameConfig] load config: vipCard success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.200+0800","msg":"[gameConfig] load config: avatar success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.200+0800","msg":"[gameConfig] load config: daySign success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.200+0800","msg":"[gameConfig] load config: gloryArena success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.200+0800","msg":"[gameConfig] load config: loopBox success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.200+0800","msg":"[gameConfig] load config: stillShop success"}
+{"level":"INFO","time":"2026-05-18T12:29:16.200+0800","msg":"[platform] load all config success !!!"}
+{"level":"INFO","time":"2026-05-18T12:29:16.202+0800","msg":"SQL","sql":"SELECT * FROM `server_info`","rows":4,"elapsed":0.0015363,"caller":"E:/dhsServer/server/logic/platform/easyDB/serverEasyDB.go:53"}
+{"level":"INFO","time":"2026-05-18T12:29:16.205+0800","msg":"SQL","sql":"SELECT * FROM `announce_info` WHERE end_time > 1779078556202","rows":6,"elapsed":0.0031567,"caller":"E:/dhsServer/server/logic/platform/easyDB/serverEasyDB.go:80"}
+{"level":"INFO","time":"2026-05-18T12:29:16.208+0800","msg":"SQL","sql":"SELECT * FROM `account` WHERE `account`.`server_id` = 1","rows":95,"elapsed":0.0031137,"caller":"E:/dhsServer/server/logic/platform/easyDB/easyDB.go:33"}
+{"level":"INFO","time":"2026-05-18T12:29:16.212+0800","msg":"SQL","sql":"SELECT * FROM `account` WHERE `account`.`server_id` = 2","rows":86,"elapsed":0.0021686,"caller":"E:/dhsServer/server/logic/platform/easyDB/easyDB.go:33"}
+{"level":"INFO","time":"2026-05-18T12:29:16.214+0800","msg":"SQL","sql":"SELECT * FROM `account` WHERE `account`.`server_id` = 3","rows":0,"elapsed":0.0010587,"caller":"E:/dhsServer/server/logic/platform/easyDB/easyDB.go:33"}
+{"level":"INFO","time":"2026-05-18T12:29:16.217+0800","msg":"SQL","sql":"SELECT * FROM `account` WHERE `account`.`server_id` = 4","rows":0,"elapsed":0.0026313,"caller":"E:/dhsServer/server/logic/platform/easyDB/easyDB.go:33"}
+{"level":"INFO","time":"2026-05-18T12:29:16.219+0800","msg":"[platform] init server info service"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] init activity info service"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] Boot platform success !!!"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/login"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/gmuser"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/editgmuser"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/userInfo"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/getformation"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/getaccessory"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/usermail"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/sendmail"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/serverlist"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] pprof enabled env:local addr::16001"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/editserver"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/useritemchg"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/userorder"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/getRankList"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/getRank"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/gamepubilc"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/editgamepubilc"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/getTalk"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/editclientversion"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/getclientversion"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/getuserinventory"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/getServerActivityConfig"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/editServerActivityConfig"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/editBanUser"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/editMuteUser"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/getUserLogList"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/exportPlayer"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/importPlayer"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] register http message: /manage/getThroughput"}
+{"level":"INFO","time":"2026-05-18T12:29:16.261+0800","msg":"[platform] start http service"}

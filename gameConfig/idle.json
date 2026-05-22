@@ -1,0 +1,275 @@
+{
+  "level": {
+    "1": {
+      "dropGroupId": "100075",
+      "dropId": "10276",
+      "id": "1",
+      "unlockId": ""
+    },
+    "10": {
+      "dropGroupId": "100084",
+      "dropId": "10280",
+      "id": "10",
+      "unlockId": "2050"
+    },
+    "11": {
+      "dropGroupId": "100085",
+      "dropId": "11419",
+      "id": "11",
+      "unlockId": "2055"
+    },
+    "12": {
+      "dropGroupId": "100086",
+      "dropId": "10281",
+      "id": "12",
+      "unlockId": "2060"
+    },
+    "13": {
+      "dropGroupId": "100087",
+      "dropId": "10282",
+      "id": "13",
+      "unlockId": "2070"
+    },
+    "14": {
+      "dropGroupId": "100088",
+      "dropId": "11420",
+      "id": "14",
+      "unlockId": "2080"
+    },
+    "15": {
+      "dropGroupId": "100089",
+      "dropId": "10283",
+      "id": "15",
+      "unlockId": "2100"
+    },
+    "16": {
+      "dropGroupId": "100090",
+      "dropId": "11421",
+      "id": "16",
+      "unlockId": "2117"
+    },
+    "17": {
+      "dropGroupId": "100091",
+      "dropId": "10284",
+      "id": "17",
+      "unlockId": "2135"
+    },
+    "18": {
+      "dropGroupId": "100092",
+      "dropId": "10285",
+      "id": "18",
+      "unlockId": "2152"
+    },
+    "19": {
+      "dropGroupId": "100093",
+      "dropId": "11422",
+      "id": "19",
+      "unlockId": "2168"
+    },
+    "2": {
+      "dropGroupId": "100076",
+      "dropId": "11414",
+      "id": "2",
+      "unlockId": "2010"
+    },
+    "20": {
+      "dropGroupId": "100094",
+      "dropId": "10286",
+      "id": "20",
+      "unlockId": "2195"
+    },
+    "21": {
+      "dropGroupId": "100095",
+      "dropId": "11227",
+      "id": "21",
+      "unlockId": "2222"
+    },
+    "22": {
+      "dropGroupId": "100096",
+      "dropId": "11228",
+      "id": "22",
+      "unlockId": "2278"
+    },
+    "23": {
+      "dropGroupId": "100097",
+      "dropId": "11229",
+      "id": "23",
+      "unlockId": "2300"
+    },
+    "24": {
+      "dropGroupId": "100097",
+      "dropId": "11230",
+      "id": "24",
+      "unlockId": "2300"
+    },
+    "25": {
+      "dropGroupId": "100097",
+      "dropId": "11231",
+      "id": "25",
+      "unlockId": "2300"
+    },
+    "26": {
+      "dropGroupId": "100097",
+      "dropId": "11232",
+      "id": "26",
+      "unlockId": "2300"
+    },
+    "27": {
+      "dropGroupId": "100097",
+      "dropId": "11233",
+      "id": "27",
+      "unlockId": "2300"
+    },
+    "28": {
+      "dropGroupId": "100097",
+      "dropId": "11234",
+      "id": "28",
+      "unlockId": "2300"
+    },
+    "29": {
+      "dropGroupId": "100097",
+      "dropId": "11235",
+      "id": "29",
+      "unlockId": "2300"
+    },
+    "3": {
+      "dropGroupId": "100077",
+      "dropId": "10277",
+      "id": "3",
+      "unlockId": "2015"
+    },
+    "30": {
+      "dropGroupId": "100097",
+      "dropId": "11236",
+      "id": "30",
+      "unlockId": "2300"
+    },
+    "31": {
+      "dropGroupId": "100097",
+      "dropId": "11237",
+      "id": "31",
+      "unlockId": "2300"
+    },
+    "32": {
+      "dropGroupId": "100097",
+      "dropId": "11238",
+      "id": "32",
+      "unlockId": "2300"
+    },
+    "33": {
+      "dropGroupId": "100097",
+      "dropId": "11239",
+      "id": "33",
+      "unlockId": "2300"
+    },
+    "34": {
+      "dropGroupId": "100097",
+      "dropId": "11240",
+      "id": "34",
+      "unlockId": "2300"
+    },
+    "35": {
+      "dropGroupId": "100097",
+      "dropId": "11241",
+      "id": "35",
+      "unlockId": "2300"
+    },
+    "36": {
+      "dropGroupId": "100097",
+      "dropId": "11242",
+      "id": "36",
+      "unlockId": "2300"
+    },
+    "37": {
+      "dropGroupId": "100097",
+      "dropId": "11243",
+      "id": "37",
+      "unlockId": "2300"
+    },
+    "38": {
+      "dropGroupId": "100097",
+      "dropId": "11244",
+      "id": "38",
+      "unlockId": "2300"
+    },
+    "39": {
+      "dropGroupId": "100097",
+      "dropId": "11245",
+      "id": "39",
+      "unlockId": "2300"
+    },
+    "4": {
+      "dropGroupId": "100078",
+      "dropId": "11415",
+      "id": "4",
+      "unlockId": "2020"
+    },
+    "5": {
+      "dropGroupId": "100079",
+      "dropId": "10278",
+      "id": "5",
+      "unlockId": "2025"
+    },
+    "6": {
+      "dropGroupId": "100080",
+      "dropId": "11416",
+      "id": "6",
+      "unlockId": "2030"
+    },
+    "7": {
+      "dropGroupId": "100081",
+      "dropId": "10279",
+      "id": "7",
+      "unlockId": "2035"
+    },
+    "8": {
+      "dropGroupId": "100082",
+      "dropId": "11417",
+      "id": "8",
+      "unlockId": "2040"
+    },
+    "9": {
+      "dropGroupId": "100083",
+      "dropId": "11418",
+      "id": "9",
+      "unlockId": "2045"
+    }
+  },
+  "quickClaim": {
+    "1": {
+      "cost": "150",
+      "id": "1",
+      "unlockId": ""
+    },
+    "2": {
+      "cost": "400",
+      "id": "2",
+      "unlockId": ""
+    },
+    "3": {
+      "cost": "800",
+      "id": "3",
+      "unlockId": ""
+    },
+    "4": {
+      "cost": "1200",
+      "id": "4",
+      "unlockId": ""
+    },
+    "5": {
+      "cost": "1600",
+      "id": "5",
+      "unlockId": ""
+    },
+    "6": {
+      "cost": "2000",
+      "id": "6",
+      "unlockId": "220101"
+    },
+    "7": {
+      "cost": "2000",
+      "id": "7",
+      "unlockId": "220101"
+    }
+  }
+}

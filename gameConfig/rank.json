@@ -1,0 +1,231 @@
+{
+  "rank": {
+    "10": {
+      "id": "10",
+      "mailId": "11004",
+      "pN": "10",
+      "pNMax": "10",
+      "pointType": "7",
+      "rankRewardsId": "1011",
+      "rankThreshold": "9",
+      "rankType": "2",
+      "sendRewardType": "2",
+      "settlementType": "3"
+    },
+    "11": {
+      "id": "11",
+      "mailId": "11005",
+      "pN": "10",
+      "pNMax": "10",
+      "pointType": "7",
+      "rankRewardsId": "1012",
+      "rankThreshold": "12",
+      "rankType": "2",
+      "sendRewardType": "2",
+      "settlementType": "3"
+    },
+    "2": {
+      "id": "2",
+      "mailId": "",
+      "pN": "100",
+      "pNMax": "300",
+      "pointType": "2",
+      "rankRewardsId": "",
+      "rankThreshold": "",
+      "rankType": "1",
+      "sendRewardType": "1",
+      "settlementType": ""
+    },
+    "3": {
+      "id": "3",
+      "mailId": "",
+      "pN": "100",
+      "pNMax": "300",
+      "pointType": "3",
+      "rankRewardsId": "",
+      "rankThreshold": "",
+      "rankType": "1",
+      "sendRewardType": "1",
+      "settlementType": ""
+    },
+    "4": {
+      "id": "4",
+      "mailId": "",
+      "pN": "100",
+      "pNMax": "300",
+      "pointType": "4",
+      "rankRewardsId": "",
+      "rankThreshold": "",
+      "rankType": "1",
+      "sendRewardType": "1",
+      "settlementType": ""
+    },
+    "6": {
+      "id": "6",
+      "mailId": "9001|9002",
+      "pN": "100",
+      "pNMax": "300",
+      "pointType": "6",
+      "rankRewardsId": "1006|1007",
+      "rankThreshold": "",
+      "rankType": "1",
+      "sendRewardType": "1",
+      "settlementType": "1|2"
+    },
+    "7": {
+      "id": "7",
+      "mailId": "11001",
+      "pN": "100",
+      "pNMax": "300",
+      "pointType": "7",
+      "rankRewardsId": "1008",
+      "rankThreshold": "",
+      "rankType": "1",
+      "sendRewardType": "1",
+      "settlementType": "3"
+    },
+    "8": {
+      "id": "8",
+      "mailId": "11002",
+      "pN": "100",
+      "pNMax": "300",
+      "pointType": "8",
+      "rankRewardsId": "1009",
+      "rankThreshold": "",
+      "rankType": "1",
+      "sendRewardType": "1",
+      "settlementType": "4"
+    }
+  },
+  "rankAct": {
+    "1": {
+      "actId": "101",
+      "allDropId": "10317",
+      "id": "1",
+      "likeDropId": "10318",
+      "mailId": "8002",
+      "pN": "10",
+      "pNMax": "10",
+      "pointType": "2",
+      "rankRewardsId": "1001",
+      "rankThreshold": "40",
+      "rankType": "2",
+      "sendRewardType": "2",
+      "settlementType": "5"
+    },
+    "2": {
+      "actId": "101",
+      "allDropId": "10317",
+      "id": "2",
+      "likeDropId": "10318",
+      "mailId": "8003",
+      "pN": "10",
+      "pNMax": "10",
+      "pointType": "2",
+      "rankRewardsId": "1002",
+      "rankThreshold": "70",
+      "rankType": "2",
+      "sendRewardType": "2",
+      "settlementType": "5"
+    },
+    "3": {
+      "actId": "101",
+      "allDropId": "10317",
+      "id": "3",
+      "likeDropId": "10318",
+      "mailId": "8004",
+      "pN": "8",
+      "pNMax": "8",
+      "pointType": "2",
+      "rankRewardsId": "1003",
+      "rankThreshold": "117",
+      "rankType": "2",
+      "sendRewardType": "2",
+      "settlementType": "5"
+    },
+    "4": {
+      "actId": "101",
+      "allDropId": "10317",
+      "id": "4",
+      "likeDropId": "10318",
+      "mailId": "8005",
+      "pN": "7",
+      "pNMax": "7",
+      "pointType": "2",
+      "rankRewardsId": "1004",
+      "rankThreshold": "150",
+      "rankType": "2",
+      "sendRewardType": "2",
+      "settlementType": "5"
+    },
+    "5": {
+      "actId": "101",
+      "allDropId": "10317",
+      "id": "5",
+      "likeDropId": "10318",
+      "mailId": "8006",
+      "pN": "6",
+      "pNMax": "6",
+      "pointType": "2",
+      "rankRewardsId": "1005",
+      "rankThreshold": "200",
+      "rankType": "2",
+      "sendRewardType": "2",
+      "settlementType": "5"
+    }
+  },
+  "rankReward": {
+    "1001": {
+      "id": "1001",
+      "rankRewards": "1~1|10290;2~2|10291;3~3|10292;4~6|10293;7~10|10294;11~15|10295"
+    },
+    "1002": {
+      "id": "1002",
+      "rankRewards": "1~1|10296;2~2|10297;3~3|10298;4~6|10299;7~10|10300;11~15|10301"
+    },
+    "1003": {
+      "id": "1003",
+      "rankRewards": "1~1|10302;2~2|10303;3~3|10304;4~6|10305;7~10|10306"
+    },
+    "1004": {
+      "id": "1004",
+      "rankRewards": "1~1|10307;2~2|10308;3~3|10309;4~6|10310;7~10|10311"
+    },
+    "1005": {
+      "id": "1005",
+      "rankRewards": "1~1|10312;2~2|10313;3~3|10314;4~5|10315;6~8|10316"
+    },
+    "1006": {
+      "id": "1006",
+      "rankRewards": "1~1|11201;2~2|11202;3~3|11203;4~5|11204;6~10|11205;11~20|11206;21~50|11207;51~100|11208;101~500|11209;501~1000|11210;1001~9999|11211"
+    },
+    "1007": {
+      "id": "1007",
+      "rankRewards": "1~1|11212;2~2|11213;3~3|11214;4~5|11215;6~10|11216;11~20|11217;21~50|11218;51~100|11219;101~500|11220;501~1000|11221;1001~9999|11222"
+    },
+    "1008": {
+      "id": "1008",
+      "rankRewards": "1~1|19009;2~2|19010;3~3|19011;4~6|19012;7~10|19013;11~20|19014;21~50|19015;51~100|19016"
+    },
+    "1009": {
+      "id": "1009",
+      "rankRewards": "1~1|19017;2~2|19018;3~3|19019;4~6|19020;7~10|19021;11~20|19022;21~50|19023;51~100|19024"
+    },
+    "1010": {
+      "id": "1010",
+      "rankRewards": "1~1|19025;2~2|19026;3~3|19027;4~6|19028;7~10|19029"
+    },
+    "1011": {
+      "id": "1011",
+      "rankRewards": "1~10|19007"
+    },
+    "1012": {
+      "id": "1012",
+      "rankRewards": "1~10|19008"
+    },
+    "1013": {
+      "id": "1013",
+      "rankRewards": "1~1|11212;2~2|11213;3~3|11214;4~5|11215;6~10|11216"
+    }
+  }
+}
