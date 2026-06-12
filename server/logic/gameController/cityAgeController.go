@@ -101,6 +101,7 @@ func CityAgeUpHandle(message proto.Message, player *model.PlayerModel) {
 		IsSuccess: true,
 		Info:      info,
 	})
+	eventBusService.SubmitCityAgeChangeEvent(player.GetUserId(), info.CityAgeId)
 }
 
 func CityAgeDailyRewardHandle(message proto.Message, player *model.PlayerModel) {

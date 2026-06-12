@@ -49,6 +49,7 @@ func (s *SocialController) RegisterLogicMessage() {
 	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_KICK_MEMBER_OUT_ALLIANCE_REQ, &pb.KickMemberOutAllianceReq{}, KickMemberOutAllianceHandler, enum.FUNCTION_ID_LOCK_SYSTEM)
 	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_CHANGE_MEMBER_POSITION_REQ, &pb.ChangeMemberPositionReq{}, ChangeMemberPositionHandler, enum.FUNCTION_ID_LOCK_SYSTEM)
 	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_LEAVE_ALLIANCE_REQ, &pb.LeaveAllianceReq{}, LeaveAllianceHandler, enum.FUNCTION_ID_LOCK_SYSTEM)
+	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_ALLIANCE_SIGN_IN_REQ, &pb.AllianceSignInReq{}, AllianceSignInHandler, enum.FUNCTION_ID_LOCK_SYSTEM)
 
 	RegisterRpcPlayerMessageHandler(enum.MSG_TYPE_PLAYER, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_CREATE_ALLIANCE_RESP, &rpcPb.CreateAllianceResp{}, BackCreateAllianceFromSocialNode)
 	RegisterRpcPlayerMessageHandler(enum.MSG_TYPE_PLAYER, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_CHANGE_ALLIANCE_BASIC_INFO_RESP, &rpcPb.ChangeAllianceBasicInfoResp{}, BackChangeAllianceBasicInfoFromSocialNode)
@@ -59,6 +60,7 @@ func (s *SocialController) RegisterLogicMessage() {
 	RegisterRpcPlayerMessageHandler(enum.MSG_TYPE_PLAYER, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_CHANGE_MEMBER_POSITION_RESP, &rpcPb.ChangeMemberPositionResp{}, BackChangeMemberPositionFromSocialNode)
 	RegisterRpcPlayerMessageHandler(enum.MSG_TYPE_PLAYER, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_QUIT_ALLIANCE_RESP, &rpcPb.QuitAllianceResp{}, BackLeaveAllianceFromSocialNode)
 	RegisterRpcPlayerMessageHandler(enum.MSG_TYPE_PLAYER, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_PUSH_ALLIANCE_CHANGED, &rpcPb.PushAllianceChanged{}, BackAllianceChangedFromSocialNode)
+	RegisterRpcPlayerMessageHandler(enum.MSG_TYPE_PLAYER, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_ALLIANCE_ACTIVITY_ITEM_NUM_RESP, &rpcPb.GetAllianceActivityItemNumResp{}, BackGetAllianceActivityItemNumFromSocialNode)
 }
 
 func RegisterAllianceMessage() {
@@ -70,6 +72,8 @@ func RegisterAllianceMessage() {
 	RegisterAllianceMessageHandler(enum.MSG_TYPE_Alliance, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_KICK_ALLIANCE_MEMBER_REQ, &rpcPb.KickAllianceMemberReq{}, KickAllianceMemberOnSocialNode)
 	RegisterAllianceMessageHandler(enum.MSG_TYPE_Alliance, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_CHANGE_MEMBER_POSITION_REQ, &rpcPb.ChangeMemberPositionReq{}, ChangeMemberPositionOnSocialNode)
 	RegisterAllianceMessageHandler(enum.MSG_TYPE_Alliance, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_QUIT_ALLIANCE_REQ, &rpcPb.QuitAllianceReq{}, LeaveAllianceOnSocialNode)
+	RegisterAllianceMessageHandler(enum.MSG_TYPE_Alliance, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_ALLIANCE_ITEMS_OPERATION_REQ, &rpcPb.AllianceItemsOperationReq{}, AllianceItemsOperationOnSocialNode)
+	RegisterAllianceMessageHandler(enum.MSG_TYPE_Alliance, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_ALLIANCE_ACTIVITY_ITEM_NUM_REQ, &rpcPb.GetAllianceActivityItemNumReq{}, GetAllianceActivityItemNumOnSocialNode)
 }
 
 func ChangeAllianceBasicInfoHandler(message proto.Message, player *model.PlayerModel) {
@@ -428,7 +432,6 @@ func buildServerAllianceBasicInfo(alliance *model.AllianceEntity, playerAlliance
 		Notice:              alliance.Notice,
 		BadgeId:             alliance.BadgeId,
 		Level:               alliance.Level,
-		Exp:                 alliance.Exp,
 		ApplyType:           applyType,
 		PowerApplyCondition: alliance.PowerApplyCondition,
 		CityLevel:           alliance.CityLevelCondition,
@@ -738,9 +741,18 @@ func BackGetPlayerAllianceInfoFromSocialNode(message proto.Message, player *mode
 		members = append(members, info)
 	}
 
+	wareHouseList := make([]*pb.AllianceWarehouseInfo, 0, len(resp.GetWarehouse()))
+	for _, warehouse := range resp.GetWarehouse() {
+		wareHouseList = append(wareHouseList, &pb.AllianceWarehouseInfo{
+			ItemId:  warehouse.ItemId,
+			ItemNum: warehouse.Count,
+		})
+	}
+
 	messageSender.SendMessage(player, pb.MESSAGE_ID_GET_PLAYER_ALLIANCE_INFO_RESP, &pb.GetPlayerAllianceInfoResp{
 		BasicInfo: allianceBasicInfoToPb(resp.GetAlliance(), getAllianceLeaderName(resp.GetAlliance(), resp.GetMembers())),
 		Members:   members,
+		Warehouse: wareHouseList,
 	})
 }
 
@@ -1003,6 +1015,56 @@ func LeaveAllianceHandler(message proto.Message, player *model.PlayerModel) {
 	}
 }
 
+func AllianceSignInHandler(message proto.Message, player *model.PlayerModel) {
+	req, ok := message.(*pb.AllianceSignInReq)
+	if !ok {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_ALLIANCE_SIGN_IN_RESP, pb.ERROR_CODE_PB_CONV_ERROR)
+		return
+	}
+	if player == nil || player.User == nil {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_ALLIANCE_SIGN_IN_RESP, pb.ERROR_CODE_SYSTEM_ERROR)
+		return
+	}
+	if req.SignType == 1 {
+		cost := gameConfig.GetAllianceCheckInDiamondCost()
+		signEntity := player.SignInModel.Entity
+		if signEntity.BasicCount >= int32(len(cost)) {
+			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_ALLIANCE_SIGN_IN_RESP, pb.ERROR_CODE_ALLIANCE_SIGN_IN_COUNT_OVER)
+			return
+		}
+		err := itemService.RemoveItem(player, &gameConfig.ItemConfig{ID: enum.DIAMOND_ITEM_ID, Num: int64(cost[signEntity.BasicCount])}, enum.ITEM_CHANGE_REASON_ALLIANCE_SIGN_IN)
+		if err != nil {
+			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_ALLIANCE_SIGN_IN_RESP, pb.ERROR_CODE_REMOVE_ITEM_ERROR)
+			return
+		}
+		player.SignInModel.UpdateBasicCount(signEntity.BasicCount + 1)
+	} else if req.SignType == 2 {
+		signEntity := player.SignInModel.Entity
+		if player.SignInModel.Entity.AdvertisementCount > 0 {
+			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_ALLIANCE_SIGN_IN_RESP, pb.ERROR_CODE_ALLIANCE_SIGN_IN_COUNT_OVER) //次数超了
+			return
+		}
+		player.SignInModel.UpdateAdvertisementCount(signEntity.AdvertisementCount + 1)
+	}
+	if req.SignType != 0 {
+		items := gameConfig.Drop(gameConfig.GetAllianceCheckInRewards())
+		if items == nil {
+			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_ALLIANCE_SIGN_IN_RESP, pb.ERROR_CODE_CFG_NOT_FOUND)
+			return
+		}
+		err := itemService.AddItems(player, items, enum.ITEM_CHANGE_REASON_ALLIANCE_SIGN_IN)
+		if err != nil {
+			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_ALLIANCE_SIGN_IN_RESP, pb.ERROR_CODE_ADD_ITEM_ERROR)
+			return
+		}
+	}
+
+	messageSender.SendMessage(player, pb.MESSAGE_ID_ALLIANCE_SIGN_IN_RESP, &pb.AllianceSignInResp{
+		BasicCount:         player.SignInModel.Entity.BasicCount,
+		AdvertisementCount: player.SignInModel.Entity.AdvertisementCount,
+	})
+}
+
 func LeaveAllianceOnSocialNode(message proto.Message, session *logicSessionManager.AllianceSession, alliance *socialService.AllianceModel) {
 	req, ok := message.(*rpcPb.QuitAllianceReq)
 	if !ok {
@@ -1258,7 +1320,6 @@ func allianceBasicInfoToPb(alliance *rpcPb.AllianceInfo, leaderName string) *pb.
 		Notice:              alliance.GetNotice(),
 		BadgeId:             alliance.GetBadgeId(),
 		Level:               alliance.GetLevel(),
-		Exp:                 alliance.GetExp(),
 		ApplyType:           alliance.GetApplyType(),
 		PowerApplyCondition: alliance.GetPowerApplyCondition(),
 		CityLevel:           alliance.GetCityLevel(),
@@ -1277,4 +1338,85 @@ func BackAllianceChangedFromSocialNode(message proto.Message, player *model.Play
 	//if player == nil || player.User == nil {
 	//	return
 	//}
+}
+
+func AllianceItemsOperationOnSocialNode(message proto.Message, session *logicSessionManager.AllianceSession, alliance *socialService.AllianceModel) {
+	req, ok := message.(*rpcPb.AllianceItemsOperationReq)
+	if !ok {
+		socialPlatform.SendErrorMessageBySession(session.GetSession(), rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_ALLIANCE_ITEMS_OPERATION_RESP, pb.ERROR_CODE_PB_CONV_ERROR)
+		return
+	}
+
+	switch req.GetOperation() {
+	case int32(enum.AddProp):
+		err := alliance.AddItems(req.GetItems())
+		if err != nil {
+			socialPlatform.SendErrorMessageBySession(session.GetSession(), rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_ALLIANCE_ITEMS_OPERATION_RESP, pb.ERROR_CODE_SYSTEM_ERROR)
+			return
+		}
+	case int32(enum.RemoveProp):
+		err := alliance.RemoveItems(req.GetItems())
+		if err != nil {
+			socialPlatform.SendErrorMessageBySession(session.GetSession(), rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_ALLIANCE_ITEMS_OPERATION_RESP, pb.ERROR_CODE_SYSTEM_ERROR)
+			return
+		}
+		for _, v := range req.GetItems() {
+			v.Count = -v.Count
+		}
+	}
+	for _, v := range alliance.GetAllianceMember() {
+		rpcController.NotifyAllianceOperationToGateway(v, 0, pb.ALLIANCE_CHANGE_OPER_ITEM_CHANGE, req.GetItems())
+	}
+}
+
+func GetAllianceActivityItemNumOnSocialNode(message proto.Message, session *logicSessionManager.AllianceSession, alliance *socialService.AllianceModel) {
+	_, ok := message.(*rpcPb.GetAllianceActivityItemNumReq)
+	resp := &rpcPb.GetAllianceActivityItemNumResp{
+		ItemNum:   0,
+		ErrorCode: int32(pb.ERROR_CODE_SUCCESS),
+	}
+	if !ok {
+		resp.ErrorCode = int32(pb.ERROR_CODE_PB_CONV_ERROR)
+		socialPlatform.SendMessageBySession(session.GetSession(), rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_ALLIANCE_ACTIVITY_ITEM_NUM_RESP, resp)
+		return
+	}
+
+	itemNum, err := alliance.GetItemCount(&rpcPb.ItemInfo{ItemId: enum.ALLIANCE_TASK_ACTIVE_VALUE_ITEM_ID, Count: 0})
+	if err != nil {
+		// 道具不存在
+		resp.ErrorCode = int32(pb.ERROR_CODE_ITEM_NOT_EXIST)
+		socialPlatform.SendMessageBySession(session.GetSession(), rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_ALLIANCE_ACTIVITY_ITEM_NUM_RESP, resp)
+		return
+	}
+	socialPlatform.SendMessageBySession(session.GetSession(), rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_ALLIANCE_ACTIVITY_ITEM_NUM_RESP, &rpcPb.GetAllianceActivityItemNumResp{
+		ItemNum: itemNum,
+	})
+}
+
+func BackGetAllianceActivityItemNumFromSocialNode(message proto.Message, player *model.PlayerModel) {
+	resp, ok := message.(*rpcPb.GetAllianceActivityItemNumResp)
+	if !ok {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_ALLIANCE_DAILY_TASK_REWARD_RESP, pb.ERROR_CODE_PB_CONV_ERROR)
+		return
+	}
+	if pb.ERROR_CODE(resp.ErrorCode) != pb.ERROR_CODE_SUCCESS {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_ALLIANCE_DAILY_TASK_REWARD_RESP, pb.ERROR_CODE(resp.ErrorCode))
+		return
+	}
+	itemNum := resp.GetItemNum()
+	addItems, err := player.AllianceDailyActivityModel.RewardActivity(itemNum)
+	if err != nil {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_ALLIANCE_DAILY_TASK_REWARD_RESP, pb.ERROR_CODE_SYSTEM_ERROR)
+		return
+	}
+	err = itemService.AddItems(player, addItems, enum.ITEM_CHANGE_REASON_ALLIANCE_DAILY_TASK)
+	if err != nil {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_ALLIANCE_DAILY_TASK_REWARD_RESP, pb.ERROR_CODE_SYSTEM_ERROR)
+		return
+	}
+	messageSender.SendMessage(player, pb.MESSAGE_ID_ALLIANCE_DAILY_TASK_REWARD_RESP, &pb.AllianceDailyTaskRewardResp{
+		AllianceDailyDetail: &pb.AllianceDailyDetail{
+			DailyBox: player.AllianceDailyActivityModel.Entity.DailyBox,
+		},
+	})
 }

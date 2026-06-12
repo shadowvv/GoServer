@@ -3,6 +3,7 @@ package logicCommon
 import (
 	"github.com/drop/GoServer/server/enum"
 	"github.com/drop/GoServer/server/logic/gameConfig"
+	"github.com/drop/GoServer/server/logic/pb"
 )
 
 type PlayerInstanceRaid struct {
@@ -54,6 +55,7 @@ type MonsterTemplate struct {
 	BasicSkill  int32
 	AttrInfo    map[int32]int64
 	SkillId     []int32
+	PetInfo     *pb.PetBattleInfo // 宠物信息
 }
 
 type InstanceStageInfo struct {

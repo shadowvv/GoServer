@@ -170,7 +170,7 @@ func (v *VipCardService) AddVipCardFromItem(player logicCommon.PlayerInterface, 
 	}
 
 	// 添加/续期特权卡（hours 从 item.Num 获取）
-	vipCardModel.AddVipCardHours(itemId, hours)
+	vipCardModel.AddVipCardMinute(itemId, hours*60)
 
 	// 保存到数据库
 	vipCardModel.SaveModelToDB()

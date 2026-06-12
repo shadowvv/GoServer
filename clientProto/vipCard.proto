@@ -1,0 +1,54 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+import "commonMessage.proto";
+
+enum VipPrivilegeType {
+  VIP_PRIVILEGE_NONE = 0;  // NONE
+  VIP_PRIVILEGE_NO_AD = 1; // 免广告【数据=时间 秒】
+  VIP_PRIVILEGE_BATTLE_SPEED = 2; // 战斗加速【数据=万分比】
+  VIP_PRIVILEGE_IDLE_TIME = 3; // 挂机时长【上限 秒】
+  VIP_PRIVILEGE_IDLE_REWARD = 4; // 挂机奖励【快速领取钻石购买次数】
+  VIP_PRIVILEGE_MAIN_REWARD = 5; // 主线奖励【触发特权掉落】
+  VIP_PRIVILEGE_LOTTERY_GUAR = 6; // 抽卡保底【保底次数】
+  VIP_PRIVILEGE_FATIGUE_LIMIT = 7; // 疲劳值上限【整数】
+  VIP_PRIVILEGE_BUILD_QUEUE = 8; // 建筑队列【个数】
+  VIP_PRIVILEGE_INSTANCE_TICKET = 9; // 副本门票【每日免费次数】
+  VIP_PRIVILEGE_RECRUITMENT = 10; // 招募权益【每日可领取招募奖励】
+  VIP_PRIVILEGE_SPEED_ADD = 16; // 临时加速符特权
+}
+
+
+// 单条特权能力数据
+message VipPrivilegeData {
+  VipPrivilegeType type = 1; // 特权功能
+  int64 value = 2; // 数值（单位含义见枚举注释）
+}
+
+// 一张特权卡的信息
+message VipCardInfo {
+  int32 itemId = 1;                 // 特权卡的 itemId
+  int64 expireTime = 2;             // 过期时间（毫秒时间戳，-1 表示永久）
+  repeated VipPrivilegeData privs = 3; // 该卡拥有的所有特权能力
+}
+
+// 领取特权奖励请求
+message ClaimPrivilegeRewardReq {
+  int32 rewardType = 1; // 奖励类型
+}
+
+// 领取特权奖励响应
+message ClaimPrivilegeRewardResp {
+  repeated ItemBasicInfo rewards = 1; // 领取的道具列表
+}
+
+message ClaimPrivilegeRewardInfo {
+    int32 RewardType = 1;// 奖励类型
+    int64 LastClaimTime = 2;// 上次领取时间（毫秒时间戳）
+}
+
+// 推送
+message PushVipCardInfo {
+    VipCardInfo info = 1;
+}

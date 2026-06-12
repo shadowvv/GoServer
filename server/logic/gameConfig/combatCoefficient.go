@@ -3,8 +3,9 @@ package gameConfig
 import (
 	"errors"
 	"fmt"
-	"github.com/drop/GoServer/server/tool"
 	"sync/atomic"
+
+	"github.com/drop/GoServer/server/tool"
 )
 
 func init() {
@@ -73,20 +74,20 @@ func (s *CombatCoefficientCfgLoader) checkData() error {
 }
 
 func (s *CombatCoefficientCfgLoader) apply() {
-	attrPowerRatioMap := make(map[int32]map[int32]float64)
-	attrPowerRatioMap[1] = make(map[int32]float64)
-	attrPowerRatioMap[2] = make(map[int32]float64)
-	attrPowerRatioMap[3] = make(map[int32]float64)
-	attrPowerRatioMap[4] = make(map[int32]float64)
-	attrPowerRatioMap[5] = make(map[int32]float64)
-	attrPowerRatioMap[6] = make(map[int32]float64)
+	attrPowerRatioMap := make(map[int32]map[int32]int64)
+	attrPowerRatioMap[1] = make(map[int32]int64)
+	attrPowerRatioMap[2] = make(map[int32]int64)
+	attrPowerRatioMap[3] = make(map[int32]int64)
+	attrPowerRatioMap[4] = make(map[int32]int64)
+	attrPowerRatioMap[5] = make(map[int32]int64)
+	attrPowerRatioMap[6] = make(map[int32]int64)
 	for _, v := range s.temp1 {
-		attrPowerRatioMap[1][v.Id] = float64(v.PowerMultiplier1)
-		attrPowerRatioMap[2][v.Id] = float64(v.PowerMultiplier2)
-		attrPowerRatioMap[3][v.Id] = float64(v.PowerMultiplier3)
-		attrPowerRatioMap[4][v.Id] = float64(v.PowerMultiplier4)
-		attrPowerRatioMap[5][v.Id] = float64(v.PowerMultiplier5)
-		attrPowerRatioMap[6][v.Id] = float64(v.PowerMultiplier6)
+		attrPowerRatioMap[1][v.Id] = int64(v.PowerMultiplier1)
+		attrPowerRatioMap[2][v.Id] = int64(v.PowerMultiplier2)
+		attrPowerRatioMap[3][v.Id] = int64(v.PowerMultiplier3)
+		attrPowerRatioMap[4][v.Id] = int64(v.PowerMultiplier4)
+		attrPowerRatioMap[5][v.Id] = int64(v.PowerMultiplier5)
+		attrPowerRatioMap[6][v.Id] = int64(v.PowerMultiplier6)
 	}
 	combatCoefficient.Store(attrPowerRatioMap)
 }
@@ -110,10 +111,10 @@ type CombatCoefficientCfg struct {
 	PowerMultiplier6 int32 `json:"powerMultiplier6"`
 }
 
-func GetCombatCoefficientCfg(id int32) map[int32]float64 {
+func GetCombatCoefficientCfg(id int32) map[int32]int64 {
 	cfgMap := combatCoefficient.Load()
 	if cfgMap == nil {
 		return nil
 	}
-	return cfgMap.(map[int32]map[int32]float64)[id]
+	return cfgMap.(map[int32]map[int32]int64)[id]
 }

@@ -46,6 +46,7 @@
   - 代码：`server/logic/model/allianceModel.go`
 - Redis：
   - `alliance:basic:{allianceId}`
+  - `alliance:member:{allianceId}`（Set，成员 `userId` 集合）
   - `alliance:server:{serverId}`（ZSet，`score=allianceTotalPower`）
   - `alliance:name:index:{serverId}`（Hash，`name -> allianceId`）
   - `alliance:apply:list:{allianceId}`（ZSet，按申请时间）
@@ -103,6 +104,27 @@
 
 核对结果：**已实现**。  
 代码：`CreateAllianceHandler`（`server/logic/gameController/allianceController.go`）。
+
+### 3.2 `REDIS_ALLIANCE_MEMBER_INFO` 完整性（保存联盟成员 id）
+
+目标需求：
+- Redis key `alliance:member:{allianceId}` 需要保存联盟成员 `userId` 集合；
+- 联盟成员变更后，成员集合应同步更新；
+- 联盟解散后，成员集合应被清理。
+
+核对结果：**主流程已实现**。
+
+已覆盖写入/清理路径：
+- 建盟：`AllianceManager.attachCreatedAlliance` -> `syncAllianceMemberSetToRedis`
+- 自由入盟：`AllianceModel.ApplyAlliance` -> `syncAllianceMemberSetToRedis`
+- 审批入盟：`AllianceModel.ApproveAllianceApply` -> `syncAllianceMemberSetToRedis`
+- 踢出成员：`AllianceModel.KickAllianceMember` -> `syncAllianceMemberSetToRedis`
+- 主动退盟：`AllianceModel.QuitAlliance` -> `syncAllianceMemberSetToRedis`
+- 服务启动重建：`rebuildAllianceMemberInfoToRedis` -> `syncAllianceMemberSetToRedis`
+- 联盟移除/解散：`removeAllianceMemberInfoFromRedis` -> `clearAllianceMemberSetFromRedis`
+
+边界说明：
+- 已补齐清理兜底：`removeAllianceMemberInfoFromRedis` 现在即使成员 map 为空，也会执行 `clearAllianceMemberSetFromRedis`，避免残留旧成员 id。
 
 ## 4. 风险清单（当前）
 

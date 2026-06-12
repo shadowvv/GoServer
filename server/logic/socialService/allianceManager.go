@@ -12,7 +12,9 @@ import (
 	"github.com/drop/GoServer/server/logic/model"
 	"github.com/drop/GoServer/server/logic/pb"
 	"github.com/drop/GoServer/server/logic/platform/easyDB"
+	"github.com/drop/GoServer/server/logic/rpcPb"
 	"github.com/drop/GoServer/server/service/logger"
+	"github.com/drop/GoServer/server/tool"
 	"gorm.io/gorm"
 )
 
@@ -46,6 +48,12 @@ func (m *AllianceManager) LoadAlliances() {
 		return
 	}
 
+	allianceWarehouses, err := easyDB.GetPlayerEntitiesByWhere[model.AllianceWarehouseEntity](map[string]interface{}{})
+	if err != nil {
+		logger.ErrorBySprintf("[allianceManager] load alliance warehouses failed err:%v", err)
+		return
+	}
+
 	memberMap := make(map[int64]map[int64]*model.AllianceMemberEntity)
 	memberIdMap := make(map[int64][]int64)
 	for _, member := range members {
@@ -62,6 +70,14 @@ func (m *AllianceManager) LoadAlliances() {
 		allianceMembers[member.UserId] = member
 	}
 
+	bagForAlliance := make(map[int64]map[int32]*model.AllianceWarehouseEntity)
+	for _, v := range allianceWarehouses {
+		if bagForAlliance[v.AllianceId] == nil {
+			bagForAlliance[v.AllianceId] = make(map[int32]*model.AllianceWarehouseEntity)
+		}
+		bagForAlliance[v.AllianceId][v.ItemId] = v
+	}
+
 	newActors := make(map[int64]*AllianceModel, len(alliances))
 	newNameIndex := make(map[int32]map[string]int64)
 	for _, alliance := range alliances {
@@ -72,6 +88,11 @@ func (m *AllianceManager) LoadAlliances() {
 			alliance: alliance,
 			members:  memberMap[alliance.AllianceId],
 			dirty:    make(map[string]interface{}),
+		}
+		if bagForAlliance[alliance.AllianceId] == nil {
+			modelObj.allianceWarehouseEntity = make(map[int32]*model.AllianceWarehouseEntity)
+		} else {
+			modelObj.allianceWarehouseEntity = bagForAlliance[alliance.AllianceId]
 		}
 		if modelObj.members == nil {
 			modelObj.members = make(map[int64]*model.AllianceMemberEntity)
@@ -95,6 +116,7 @@ func (m *AllianceManager) LoadAlliances() {
 			serverMap[name] = alliance.AllianceId
 		}
 		modelObj.alliance.MemberNum = int32(len(modelObj.members))
+		modelObj.checkLevelUp()
 	}
 
 	m.mu.Lock()
@@ -103,6 +125,7 @@ func (m *AllianceManager) LoadAlliances() {
 	m.mu.Unlock()
 	rebuildAlliancesBasicToRedis(alliances)
 	rebuildAllianceMemberInfoToRedis(newActors)
+
 }
 
 func (m *AllianceManager) attachCreatedAlliance(alliance *model.AllianceEntity, members []*model.AllianceMemberEntity) {
@@ -110,9 +133,10 @@ func (m *AllianceManager) attachCreatedAlliance(alliance *model.AllianceEntity, 
 		return
 	}
 	modelObj := &AllianceModel{
-		alliance: alliance,
-		members:  make(map[int64]*model.AllianceMemberEntity),
-		dirty:    make(map[string]interface{}),
+		alliance:                alliance,
+		members:                 make(map[int64]*model.AllianceMemberEntity),
+		dirty:                   make(map[string]interface{}),
+		allianceWarehouseEntity: make(map[int32]*model.AllianceWarehouseEntity),
 	}
 	for _, member := range members {
 		if member == nil {
@@ -128,6 +152,7 @@ func (m *AllianceManager) attachCreatedAlliance(alliance *model.AllianceEntity, 
 	m.mu.Unlock()
 	m.setNameIndex(alliance.ServerId, alliance.Name, alliance.AllianceId)
 	syncAllianceBasicToRedis(alliance)
+	syncAllianceMemberSetToRedis(alliance.AllianceId, modelObj.members)
 }
 
 func (m *AllianceManager) GetAllianceById(allianceID int64) *AllianceModel {
@@ -180,6 +205,7 @@ func (m *AllianceManager) getOrLoadAllianceByID(allianceID int64) (*AllianceMode
 
 	m.setNameIndex(modelObj.alliance.ServerId, modelObj.alliance.Name, modelObj.alliance.AllianceId)
 	modelObj.alliance.MemberNum = int32(len(members))
+	syncAllianceMemberSetToRedis(modelObj.alliance.AllianceId, modelObj.members)
 	return modelObj, nil
 }
 
@@ -253,10 +279,7 @@ func (m *AllianceManager) FlushDirtyByProcessor(processorID int32, processorNum 
 	m.mu.RLock()
 	targets := make([]*AllianceModel, 0)
 	for allianceID, modelObj := range m.allianceInfos {
-		index := int(allianceID % int64(processorNum))
-		if index < 0 {
-			index = -index
-		}
+		index := tool.HashIndexByInt64(allianceID, processorNum)
 		if int32(index) != processorID {
 			continue
 		}
@@ -277,10 +300,7 @@ func (m *AllianceManager) HeartbeatByProcessor(processorID int32, processorNum i
 	m.mu.RLock()
 	targets := make([]*AllianceModel, 0)
 	for allianceID, modelObj := range m.allianceInfos {
-		index := int(allianceID % int64(processorNum))
-		if index < 0 {
-			index = -index
-		}
+		index := tool.HashIndexByInt64(allianceID, processorNum)
 		if int32(index) != processorID {
 			continue
 		}
@@ -329,10 +349,24 @@ func (m *AllianceManager) heartbeatIfNeed(modelObj *AllianceModel, now time.Time
 	if modelObj == nil || modelObj.alliance == nil {
 		return
 	}
+	if !tool.IsSameDayByMilli(modelObj.alliance.LastTickTime, now.UnixMilli()) {
+		if modelObj.allianceWarehouseEntity != nil {
+			if modelObj.allianceWarehouseEntity[enum.ALLIANCE_TASK_ACTIVE_VALUE_ITEM_ID] != nil {
+				err := modelObj.RemoveItems([]*rpcPb.ItemInfo{{
+					ItemId: enum.ALLIANCE_TASK_ACTIVE_VALUE_ITEM_ID,
+					Count:  modelObj.allianceWarehouseEntity[enum.ALLIANCE_TASK_ACTIVE_VALUE_ITEM_ID].Count,
+				}})
+				if err != nil {
+					logger.ErrorBySprintf("[allianceManager] heartbeat remove item failed allianceId:%d err:%v", modelObj.alliance.AllianceId, err)
+				}
+			}
+		}
+	}
 	if !modelObj.lastHeartbeatCheckTime.IsZero() && now.Sub(modelObj.lastHeartbeatCheckTime) < enum.AllianceHeartbeatCheckInterval {
 		return
 	}
 	modelObj.lastHeartbeatCheckTime = now
+	modelObj.UpdateLastTickTime(now.UnixMilli())
 
 	memberIds := make([]int64, len(modelObj.members))
 	index := 0

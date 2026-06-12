@@ -7,17 +7,20 @@ import (
 )
 
 type StaticDataEntity struct {
-	UserId                    int64 `gorm:"column:userId;primary_key"`
-	ChangeNicknameTimes       int32 `gorm:"column:changeNicknameTimes"`
-	ChargeTimes               int32 `gorm:"column:charge_times"`
-	HeroHistoryMaxLevel       int32 `gorm:"column:hero_history_max_level"`
-	DailyPrivilegeDrop        int32 `gorm:"column:daily_privilege_drop"`
-	ArenaChallengeTimes       int32 `gorm:"column:arena_challenge_times"`
-	ExpeditionNum             int32 `gorm:"column:expedition_num"`
-	BuyDispatchFormationNum   int32 `gorm:"column:buy_dispatch_formation_num"`
-	PetRecruitCount           int32 `gorm:"column:pet_recruit_count"`
-	GloryArenaJoinCount       int32 `gorm:"column:glory_arena_join_count"`
-	ResidentInstanceJoinCount int32 `gorm:"column:resident_instance_join_count"`
+	UserId                     int64 `gorm:"column:userId;primary_key"`
+	ChangeNicknameTimes        int32 `gorm:"column:changeNicknameTimes"`
+	ChargeTimes                int32 `gorm:"column:charge_times"`
+	HeroHistoryMaxLevel        int32 `gorm:"column:hero_history_max_level"`
+	DailyPrivilegeDrop         int32 `gorm:"column:daily_privilege_drop"`
+	ArenaChallengeTimes        int32 `gorm:"column:arena_challenge_times"`
+	ExpeditionNum              int32 `gorm:"column:expedition_num"`
+	BuyDispatchFormationNum    int32 `gorm:"column:buy_dispatch_formation_num"`
+	PetRecruitCount            int32 `gorm:"column:pet_recruit_count"`
+	CollectionLotteryDrawCount int32 `gorm:"column:collection_lottery_draw_count"`
+	GloryArenaJoinCount        int32 `gorm:"column:glory_arena_join_count"`
+	ResidentInstanceJoinCount  int32 `gorm:"column:resident_instance_join_count"`
+	BattleSpeedUpTimes         int32 `gorm:"column:battle_speed_up_times"`
+	DailyBattleSpeedUpTimes    int32 `gorm:"column:daily_battle_speed_up_times"`
 }
 
 func (u *StaticDataEntity) TableName() string {
@@ -81,6 +84,15 @@ func (s *StaticDataModel) UpdatePetRecruitCount(num int32) {
 	s.Changed["pet_recruit_count"] = num
 }
 
+func (s *StaticDataModel) GetCollectionLotteryDrawCount() int32 {
+	return s.Entity.CollectionLotteryDrawCount
+}
+
+func (s *StaticDataModel) UpdateCollectionLotteryDrawCount(num int32) {
+	s.Entity.CollectionLotteryDrawCount = num
+	s.Changed["collection_lottery_draw_count"] = num
+}
+
 func (s *StaticDataModel) GetGloryArenaJoinCount() int32 {
 	return s.Entity.GloryArenaJoinCount
 }
@@ -112,6 +124,16 @@ func (s *StaticDataModel) AddArenaChallengeTimes(times int32) {
 	s.Changed["arena_challenge_times"] = s.Entity.ArenaChallengeTimes
 }
 
+func (s *StaticDataModel) UpdateBattleSpeedUpTimes(times int32) {
+	s.Entity.BattleSpeedUpTimes = s.Entity.BattleSpeedUpTimes + times
+	s.Changed["battle_speed_up_times"] = s.Entity.BattleSpeedUpTimes
+}
+
+func (s *StaticDataModel) UpdateDailyBattleSpeedUpTimes(times int32) {
+	s.Entity.DailyBattleSpeedUpTimes = s.Entity.DailyBattleSpeedUpTimes + times
+	s.Changed["daily_battle_speed_up_times"] = s.Entity.DailyBattleSpeedUpTimes
+}
+
 func (s *StaticDataModel) GetChangeNicknameTimes() int32 {
 	return s.Entity.ChangeNicknameTimes
 }
@@ -132,6 +154,14 @@ func (s *StaticDataModel) GetArenaChallengeTimes() int32 {
 	return s.Entity.ArenaChallengeTimes
 }
 
+func (s *StaticDataModel) GetBattleSpeedUpTimes() int32 {
+	return s.Entity.BattleSpeedUpTimes
+}
+
+func (s *StaticDataModel) GetDailyBattleSpeedUpTimes() int32 {
+	return s.Entity.DailyBattleSpeedUpTimes
+}
+
 func (s *StaticDataModel) SaveModelToDB() {
 	if s.Changed == nil || len(s.Changed) == 0 {
 		return
@@ -143,6 +173,7 @@ func (s *StaticDataModel) SaveModelToDB() {
 func (s *StaticDataModel) Heartbeat(lastTickTime int64, currentTime int64, passDay int32, senderMsg bool) {
 	if passDay > 0 {
 		s.UpdateDailyPrivilegeDrop(gameConfig.GetDailyPrivilegeDropQuantityLimit())
+		s.UpdateDailyBattleSpeedUpTimes(0)
 	}
 }
 

@@ -20,9 +20,8 @@ import (
 )
 
 const (
-	configPath                = "config/robot.yaml"
-	robotStartupDelayJitterMs = 1000
-	periodicReportInterval    = 5 * time.Second
+	configPath             = "config/robot.yaml"
+	periodicReportInterval = 5 * time.Second
 )
 
 type RobotPlatform struct {
@@ -100,9 +99,9 @@ func (a *RobotPlatform) startSingleRobot(index int) {
 		run.Duration,
 		a.monitor,
 	)
-	interval := time.Duration(rand.Intn(robotStartupDelayJitterMs)) * time.Millisecond
-	logger.InfoWithSprintf("phase=robot_start status=scheduled robot=%s account=%s index=%d jitterMs=%d", robotName, account, index, interval.Milliseconds())
-	time.Sleep(interval)
+	delay, startupMode := buildRobotStartupDelay(a.cfg, index)
+	logger.InfoWithSprintf("phase=robot_start status=scheduled robot=%s account=%s index=%d startupMode=%s delayMs=%d", robotName, account, index, startupMode, delay.Milliseconds())
+	time.Sleep(delay)
 
 	startedAt := time.Now()
 	logger.InfoWithSprintf("phase=robot_start status=start robot=%s account=%s index=%d", robotName, account, index)
@@ -120,6 +119,13 @@ func buildRobotName(baseName string, index int) string {
 
 func buildRobotAccount(baseAccount string, index int) string {
 	return robotUtils.GenerateAccount(baseAccount, index)
+}
+
+func buildRobotStartupDelay(cfg *robotConfig.RobotConfig, index int) (time.Duration, string) {
+	if intervalMs := cfg.RuntimeStartupIntervalMs(); intervalMs > 0 {
+		return time.Duration(index) * time.Duration(intervalMs) * time.Millisecond, "interval"
+	}
+	return time.Duration(rand.Intn(cfg.RuntimeStartupJitterMs())) * time.Millisecond, "jitter"
 }
 
 func (a *RobotPlatform) addRobot(r *robotLogic.Robot) {

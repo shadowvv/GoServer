@@ -153,12 +153,6 @@ func (p *PlayerGloryArenaModel) SetSeasonTypeRound(seasonType enum.GloryArenaSea
 	}
 }
 
-// SetSeasonRound keeps backward compatibility for legacy callers.
-// legacy rule: odd season id => preseason, even season id => postseason.
-func (p *PlayerGloryArenaModel) SetSeasonRound(seasonId int32, roundId int32) {
-	p.SetSeasonTypeRound(enum.GetGloryArenaSeasonTypeBySeasonId(seasonId), roundId)
-}
-
 func (p *PlayerGloryArenaModel) SetEnrollStatus(enrolled bool) {
 	if enrolled {
 		p.resetCurrentEnrollProgress()
@@ -217,15 +211,17 @@ func (p *PlayerGloryArenaModel) AddWin(delta int32) {
 		}
 	}
 	roundBestDelta := p.Entity.RoundBestWin - oldRoundBestWin
-	realDelta := p.Entity.WinCount - oldWin
-	if realDelta > 0 {
-		p.addRoundWinCountByWinRange(oldWin+1, p.Entity.WinCount)
-		p.Entity.SeasonTotalWin += realDelta
+	if roundBestDelta > 0 {
+		p.Entity.SeasonTotalWin += roundBestDelta
 		if p.Entity.SeasonTotalWin < 0 {
 			p.Entity.SeasonTotalWin = 0
 		}
 		p.Changed["season_total_win"] = p.Entity.SeasonTotalWin
 		needNotifyRank = true
+	}
+	realDelta := p.Entity.WinCount - oldWin
+	if realDelta > 0 {
+		p.addRoundWinCountByWinRange(oldWin+1, p.Entity.WinCount)
 	}
 	if needNotifyRank {
 		p.notifyGloryArenaWinCountRankUpdate(roundBestDelta)
@@ -316,7 +312,7 @@ func (p *PlayerGloryArenaModel) notifyGloryArenaWinCountRankUpdate(roundBestDelt
 				logger.ErrorBySprintf("arena GetRankUniqueId error:%+v", err)
 			}
 			updateRankReq := &rpcPb.NotifyUpdateRankInfo{
-				Id:                p.Player.GetUserId(),
+				PlayerId:          p.Player.GetUserId(),
 				Score:             score,
 				IncrementalUpdate: incrementalUpdate,
 			}

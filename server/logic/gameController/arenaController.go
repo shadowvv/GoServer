@@ -59,6 +59,7 @@ func GetArenaLog(message proto.Message, player *model.PlayerModel) {
 				Opponent: &pb.PlayerBasicInfo{
 					UserId: log.AttackUserId,
 				},
+				Heroes: make([]*pb.HeroShowInfo, 0),
 			},
 			ChangeScore: -log.DefendScoreChange,
 			BattleTime:  log.ChallengeTime,
@@ -74,7 +75,13 @@ func GetArenaLog(message proto.Message, player *model.PlayerModel) {
 			pbLog.Opponent.OpponentBattlePower = battlePower
 			pbLog.Opponent.OpponentScore = playerInfo.BasicInfo.ArenaScore
 			for _, hero := range playerInfo.BattleInfo.FormationHeroes {
-				pbLog.Opponent.Units = append(pbLog.Opponent.Units, hero.Units)
+				info := &pb.HeroShowInfo{
+					Unit: hero.Units,
+				}
+				if hero.PetInfo != nil {
+					info.PetId = hero.PetInfo.PetId
+				}
+				pbLog.Opponent.Heroes = append(pbLog.Opponent.Heroes, info)
 			}
 		}
 		resp.AreaLogs = append(resp.AreaLogs, pbLog)
@@ -108,9 +115,15 @@ func GetChallengeList(message proto.Message, player *model.PlayerModel) {
 				if formation, ok := basicInfo.BattleInfo.FormationInfo[int32(pb.HeroFormationType_HERO_FORMATION_TYPE_ARENA_DEF)]; ok {
 					opponent.OpponentBattlePower = formation.BattlePower
 				}
-				opponent.Units = make([]int32, 0)
+				opponent.Heroes = make([]*pb.HeroShowInfo, 0)
 				for _, hero := range basicInfo.BattleInfo.FormationHeroes {
-					opponent.Units = append(opponent.Units, hero.Units)
+					info := &pb.HeroShowInfo{
+						Unit: hero.Units,
+					}
+					if hero.PetInfo != nil {
+						info.PetId = hero.PetInfo.PetId
+					}
+					opponent.Heroes = append(opponent.Heroes, info)
 				}
 			}
 		} else {
@@ -161,9 +174,15 @@ func RefreshChallengeList(message proto.Message, player *model.PlayerModel) {
 				if formation, ok := basicInfo.BattleInfo.FormationInfo[int32(pb.HeroFormationType_HERO_FORMATION_TYPE_ARENA_DEF)]; ok {
 					opponent.OpponentBattlePower = formation.BattlePower
 				}
-				opponent.Units = make([]int32, 0)
+				opponent.Heroes = make([]*pb.HeroShowInfo, 0)
 				for _, hero := range basicInfo.BattleInfo.FormationHeroes {
-					opponent.Units = append(opponent.Units, hero.Units)
+					info := &pb.HeroShowInfo{
+						Unit: hero.Units,
+					}
+					if hero.PetInfo != nil {
+						info.PetId = hero.PetInfo.PetId
+					}
+					opponent.Heroes = append(opponent.Heroes, info)
 				}
 			}
 		} else {

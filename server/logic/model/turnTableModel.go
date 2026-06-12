@@ -1,8 +1,6 @@
 package model
 
 import (
-	"time"
-
 	"github.com/drop/GoServer/server/enum"
 	"github.com/drop/GoServer/server/logic/gameConfig"
 	"github.com/drop/GoServer/server/logic/logicCommon"
@@ -112,7 +110,7 @@ func (m *TurnTableModel) SaveModelToDB() {
 }
 
 func (m *TurnTableModel) Heartbeat(lastTickTime int64, currentTime int64, passDay int32, senderMsg bool) {
-	if passDay <= 0 || activityService == nil || m.Player == nil {
+	if activityService == nil || m.Player == nil {
 		return
 	}
 	for _, entity := range m.Entities {
@@ -125,6 +123,10 @@ func (m *TurnTableModel) Heartbeat(lastTickTime int64, currentTime int64, passDa
 			continue
 		}
 		if tool.UnixNowMilli() >= act.GetSettleTime() {
+			m.FreezeActTasks(entity.ModId)
+			continue
+		}
+		if passDay <= 0 {
 			continue
 		}
 		pushes, _ := m.SyncActTasks(entity.ModId, false)
@@ -237,10 +239,16 @@ func (m *TurnTableModel) SyncActTasks(modId int32, forceReset bool) ([]*pb.PushT
 		taskEntity := NewTaskEntity(m.Player.GetUserId(), TurnTableTaskSlot(taskCfg.Id), taskCfg.Id, enum.TaskAffiliationAct, 0, enum.TaskStatusUnFinish, tool.UnixNowMilli(), 0)
 		oldEntity := m.Player.TaskModel.TaskEntityBySlot[taskEntity.SlotId]
 		if forceReset || oldEntity == nil || oldEntity.TaskAttribution != enum.TaskAffiliationAct || oldEntity.TaskID != taskCfg.Id {
-			if err := m.syncActTaskEntity(oldEntity, taskEntity); err != nil {
-				return nil, err
+			if oldEntity != nil {
+				m.Player.TaskModel.UpdateChangedWithNewData(oldEntity, taskEntity)
+				m.Player.TaskModel.DeteleTaskEntityFormMemory(oldEntity)
+				m.Player.TaskModel.AddTaskEntityToMemory(taskEntity)
+			} else {
+				m.Player.TaskModel.AddTaskEntityToMemory(taskEntity)
+				if err := easyDB.CreatePlayerEntity(taskEntity); err != nil {
+					return nil, err
+				}
 			}
-			m.Player.TaskModel.NeedCheckTaskList = append(m.Player.TaskModel.NeedCheckTaskList, taskEntity)
 			pushes = append(pushes, &pb.PushTaskUpdate{
 				Attribution: enum.TaskAffiliationAct,
 				TaskId:      taskEntity.TaskID,
@@ -249,9 +257,19 @@ func (m *TurnTableModel) SyncActTasks(modId int32, forceReset bool) ([]*pb.PushT
 			})
 			continue
 		}
-		m.Player.TaskModel.NeedCheckTaskList = append(m.Player.TaskModel.NeedCheckTaskList, oldEntity)
+		if oldEntity.Status == enum.TaskStatusUnFinish {
+			m.Player.TaskModel.NeedCheckTaskList = append(m.Player.TaskModel.NeedCheckTaskList, oldEntity)
+		} else if oldEntity.Status == enum.TaskStatusFinishAndReward {
+			m.Player.TaskModel.DeteleTaskEntityFormMemory(oldEntity)
+			for i := len(m.Player.TaskModel.NeedCheckTaskList) - 1; i >= 0; i-- {
+				if m.Player.TaskModel.NeedCheckTaskList[i] != oldEntity {
+					continue
+				}
+				m.Player.TaskModel.NeedCheckTaskList = append(m.Player.TaskModel.NeedCheckTaskList[:i], m.Player.TaskModel.NeedCheckTaskList[i+1:]...)
+			}
+		}
 	}
-	if entity.TaskRefreshTime > 0 && !tool.IsSameDay(time.UnixMilli(entity.TaskRefreshTime), time.UnixMilli(tool.UnixNowMilli())) {
+	if entity.TaskRefreshTime > 0 && !tool.IsSameDayByMilli(entity.TaskRefreshTime, tool.UnixNowMilli()) {
 		for _, taskCfg := range gameConfig.GetActTaskCfgsByActID(mainCfg.ActId) {
 			if taskCfg.Reflect != 1 {
 				continue
@@ -260,14 +278,26 @@ func (m *TurnTableModel) SyncActTasks(modId int32, forceReset bool) ([]*pb.PushT
 			if taskEntity == nil {
 				continue
 			}
+			coreCfg := gameConfig.GetCoreCfg(taskCfg.TaskId)
+			if coreCfg == nil {
+				continue
+			}
 			taskEntity.ProgressData = 0
 			taskEntity.Status = enum.TaskStatusUnFinish
 			taskEntity.UpdateTime = tool.UnixNowMilli()
-			m.markTaskChanged(taskEntity, map[string]interface{}{
+			if m.Player.TaskModel.TaskEntity[enum.TaskAffiliationAct] == nil ||
+				m.Player.TaskModel.TaskEntity[enum.TaskAffiliationAct][coreCfg.TaskType] == nil ||
+				m.Player.TaskModel.TaskEntity[enum.TaskAffiliationAct][coreCfg.TaskType][taskCfg.Id] == nil {
+				m.Player.TaskModel.AddTaskEntityToMemory(taskEntity)
+			}
+			if m.Player.TaskModel.Changed[enum.TaskAffiliationAct] == nil {
+				m.Player.TaskModel.Changed[enum.TaskAffiliationAct] = make(map[int32]map[string]interface{})
+			}
+			m.Player.TaskModel.Changed[enum.TaskAffiliationAct][taskEntity.SlotId] = map[string]interface{}{
 				"progress_data": taskEntity.ProgressData,
 				"status":        taskEntity.Status,
 				"update_time":   taskEntity.UpdateTime,
-			})
+			}
 			pushes = append(pushes, &pb.PushTaskUpdate{
 				Attribution: enum.TaskAffiliationAct,
 				TaskId:      taskEntity.TaskID,
@@ -276,29 +306,29 @@ func (m *TurnTableModel) SyncActTasks(modId int32, forceReset bool) ([]*pb.PushT
 			})
 		}
 	}
-	if entity.TaskRefreshTime == 0 || !tool.IsSameDay(time.UnixMilli(entity.TaskRefreshTime), time.UnixMilli(tool.UnixNowMilli())) {
+	if entity.TaskRefreshTime == 0 || !tool.IsSameDayByMilli(entity.TaskRefreshTime, tool.UnixNowMilli()) {
 		m.SetTaskRefreshTime(entity, tool.UnixNowMilli())
 	}
 	return pushes, nil
 }
 
-func (m *TurnTableModel) syncActTaskEntity(oldEntity *TaskEntity, newEntity *TaskEntity) error {
-	if oldEntity != nil {
-		m.Player.TaskModel.UpdateChangedWithNewData(oldEntity, newEntity)
-		m.Player.TaskModel.DeteleTaskEntityFormMemory(oldEntity)
-		m.Player.TaskModel.AddTaskEntityToMemory(newEntity)
-		return nil
+func (m *TurnTableModel) FreezeActTasks(modId int32) {
+	mainCfg := gameConfig.GetTurnTableMainCfg(modId)
+	if mainCfg == nil {
+		return
 	}
-	m.Player.TaskModel.AddTaskEntityToMemory(newEntity)
-	if err := easyDB.CreatePlayerEntity(newEntity); err != nil {
-		return err
+	for _, taskCfg := range gameConfig.GetActTaskCfgsByActID(mainCfg.ActId) {
+		taskEntity := m.Player.TaskModel.TaskEntityBySlot[TurnTableTaskSlot(taskCfg.Id)]
+		if taskEntity == nil || taskEntity.Status != enum.TaskStatusUnFinish {
+			continue
+		}
+		m.Player.TaskModel.DeteleTaskEntityFormMemory(taskEntity)
+		for i := len(m.Player.TaskModel.NeedCheckTaskList) - 1; i >= 0; i-- {
+			if m.Player.TaskModel.NeedCheckTaskList[i] != taskEntity {
+				continue
+			}
+			m.Player.TaskModel.NeedCheckTaskList = append(m.Player.TaskModel.NeedCheckTaskList[:i], m.Player.TaskModel.NeedCheckTaskList[i+1:]...)
+			break
+		}
 	}
-	return nil
-}
-
-func (m *TurnTableModel) markTaskChanged(entity *TaskEntity, changes map[string]interface{}) {
-	if m.Player.TaskModel.Changed[enum.TaskAffiliationAct] == nil {
-		m.Player.TaskModel.Changed[enum.TaskAffiliationAct] = make(map[int32]map[string]interface{})
-	}
-	m.Player.TaskModel.Changed[enum.TaskAffiliationAct][entity.SlotId] = changes
 }

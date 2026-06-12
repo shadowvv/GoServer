@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "../logic/pb;pb";
+
+// 背包操作结果枚举
+enum InventoryResult {
+  INVENTORY_RESULT_SUCCESS = 0;              // 成功
+  INVENTORY_RESULT_FULL = 1;                 // 背包已满
+  INVENTORY_RESULT_INVALID_ITEM = 2;       // 无效物品
+  INVENTORY_RESULT_NOT_ENOUGH_SPACE = 3;   // 空间不足
+  INVENTORY_RESULT_ITEM_NOT_FOUND = 4;     // 物品不存在
+  INVENTORY_RESULT_INVALID_POSITION = 5;   // 无效位置
+  INVENTORY_RESULT_CANNOT_STACK = 6;       // 无法堆叠
+  INVENTORY_RESULT_NOT_ENOUGH_ITEMS = 7;   // 物品数量不足
+  INVENTORY_RESULT_INVENTORY_NOT_FOUND = 8; // 背包不存在
+  INVENTORY_RESULT_SYSTEM_ERROR = 9;       // 系统错误
+}

@@ -5,6 +5,8 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"time"
 
@@ -48,7 +50,8 @@ func RegisterBackendMessage() {
 	backendPlatform.RegisterHttpMessage("/manage/gamepubilc", handleGmGamePublic)
 	backendPlatform.RegisterHttpMessage("/manage/editgamepubilc", handleGmEditGamePublic)
 	backendPlatform.RegisterHttpMessage("/manage/getTalk", handleGmGetTalk)
-	backendPlatform.RegisterHttpMessage("/manage/editclientversion", handleGmEditClientVersion)
+	// 编辑客户端版本，支持 JSON 和 multipart/form-data（上传配置文件），放宽 Body 上限到 50MB
+	backendPlatform.RegisterHttpMessageWithMaxBody("/manage/editclientversion", handleGmEditClientVersion, 50<<20)
 	backendPlatform.RegisterHttpMessage("/manage/getclientversion", handleGmGetClientVersion)
 	backendPlatform.RegisterHttpMessage("/manage/getuserinventory", handleGmGetUserInventory)
 	backendPlatform.RegisterHttpMessage("/manage/getServerActivityConfig", handleGmGetServerActivityConfig)
@@ -60,6 +63,9 @@ func RegisterBackendMessage() {
 	// 导入玩家数据 JSON 体积较大（可能数十 MB），单独放宽 Body 上限到 100MB
 	backendPlatform.RegisterHttpMessageWithMaxBody("/manage/importPlayer", handleGmImportPlayer, 100<<20)
 	backendPlatform.RegisterHttpMessage("/manage/getThroughput", handleGmGetThroughput)
+	backendPlatform.RegisterHttpMessage("/manage/getServerActivityOpen", handleGmGetServerActivityOpen)
+	backendPlatform.RegisterHttpMessage("/manage/editGmBuFa", handleEditGmBuFa)
+	backendPlatform.RegisterHttpMessage("/manage/GmKickPlayer", handleGmKickPlayer)
 }
 
 func handleGmLogin(w http.ResponseWriter, r *http.Request) {
@@ -723,6 +729,78 @@ func handleGmEditClientVersion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 判断是否是上传文件请求（multipart/form-data）
+	if r.Header.Get("Content-Type") != "" && len(r.Header.Get("Content-Type")) > 19 && r.Header.Get("Content-Type")[:19] == "multipart/form-data" {
+		// 转发 multipart 请求到 game server
+		if err := r.ParseMultipartForm(50 << 20); err != nil {
+			resp := &GmResp{Code: -1, Msg: fmt.Sprintf("parse form error: %s", err.Error())}
+			returnSendMsg(w, resp)
+			return
+		}
+
+		// 创建新的 multipart 请求转发
+		body := &bytes.Buffer{}
+		writer := multipart.NewWriter(body)
+
+		// 复制表单字段
+		for key, values := range r.MultipartForm.Value {
+			for _, value := range values {
+				writer.WriteField(key, value)
+			}
+		}
+
+		// 复制文件
+		if fileHeaders, ok := r.MultipartForm.File["file"]; ok {
+			for _, fileHeader := range fileHeaders {
+				file, err := fileHeader.Open()
+				if err != nil {
+					resp := &GmResp{Code: -1, Msg: fmt.Sprintf("open file error: %s", err.Error())}
+					returnSendMsg(w, resp)
+					return
+				}
+				defer file.Close()
+
+				part, err := writer.CreateFormFile("file", fileHeader.Filename)
+				if err != nil {
+					resp := &GmResp{Code: -1, Msg: fmt.Sprintf("create form file error: %s", err.Error())}
+					returnSendMsg(w, resp)
+					return
+				}
+				io.Copy(part, file)
+			}
+		}
+		writer.Close()
+
+		// 发送 POST 请求到 game server
+		req, err := http.NewRequest("POST", "http://127.0.0.1:8081/GmEditClientVersion", body)
+		if err != nil {
+			resp := &GmResp{Code: -1, Msg: fmt.Sprintf("create request error: %s", err.Error())}
+			returnSendMsg(w, resp)
+			return
+		}
+		req.Header.Set("Content-Type", writer.FormDataContentType())
+
+		backendResp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			resp := &GmResp{Code: -1, Msg: fmt.Sprintf("forward request error: %s", err.Error())}
+			returnSendMsg(w, resp)
+			return
+		}
+		defer backendResp.Body.Close()
+
+		var backendResult map[string]interface{}
+		if err := json.NewDecoder(backendResp.Body).Decode(&backendResult); err != nil {
+			resp := &GmResp{Code: -2, Msg: fmt.Sprintf("decode response error: %s", err.Error())}
+			returnSendMsg(w, resp)
+			return
+		}
+
+		resp := &GmResp{Code: 0, Msg: "", Data: backendResult}
+		returnSendMsg(w, resp)
+		return
+	}
+
+	// 原有的 JSON 请求逻辑
 	var req GmEditClientVersionReq
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		sendErrorMessage(pb.ERROR_CODE_INVALID_REQUEST_PARAM, w)
@@ -912,7 +990,7 @@ func handleGmEditServerActivityConfig(w http.ResponseWriter, r *http.Request) {
 	}
 	defer backendResp.Body.Close()
 
-	var backendResult map[string]interface{}
+	var backendResult GmResp
 	if err := json.NewDecoder(backendResp.Body).Decode(&backendResult); err != nil {
 		resp.Code = -2
 		resp.Msg = fmt.Sprintf("edit is error! err=%s", err.Error())
@@ -920,7 +998,9 @@ func handleGmEditServerActivityConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp.Data = backendResult
+	resp.Code = backendResult.Code
+	resp.Msg = backendResult.Msg
+	resp.Data = backendResult.Data
 	returnSendMsg(w, resp)
 }
 
@@ -1156,5 +1236,150 @@ func handleGmGetThroughput(w http.ResponseWriter, r *http.Request) {
 
 	GmGetThroughput(&req, resp)
 
+	returnSendMsg(w, resp)
+}
+
+func handleGmGetServerActivityOpen(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		sendErrorMessage(pb.ERROR_CODE_INVALID_REQUEST_PARAM, w)
+		return
+	}
+
+	var req GmGetServerActivityOpenReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		sendErrorMessage(pb.ERROR_CODE_INVALID_REQUEST_PARAM, w)
+		return
+	}
+
+	resp := &GmResp{
+		Code: 0,
+		Msg:  "",
+	}
+	resp.Data = &GmGetServerActivityOpenData{}
+
+	_, err2 := tool.ParseToken(req.Token)
+	if err2 != nil {
+		resp.Code = -2001
+		resp.Msg = fmt.Sprintf("token is error! err2=%s", err2.Error())
+		returnSendMsg(w, resp)
+		return
+	}
+
+	GmGetServerActivityOpen(&req, resp)
+
+	returnSendMsg(w, resp)
+}
+
+func handleEditGmBuFa(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		sendErrorMessage(pb.ERROR_CODE_INVALID_REQUEST_PARAM, w)
+		return
+	}
+	var req EditGmBuFaReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		sendErrorMessage(pb.ERROR_CODE_INVALID_REQUEST_PARAM, w)
+		return
+	}
+	resp := &GmResp{
+		Code: 0,
+		Msg:  "",
+	}
+
+	tokenData, err2 := tool.ParseToken(req.Token)
+	if err2 != nil {
+		resp.Code = -2001
+		resp.Msg = fmt.Sprintf("token is error! err2=%s", err2.Error())
+		returnSendMsg(w, resp)
+		return
+	}
+	if !enum.IsPermiss(tokenData.Permiss, enum.BuFaPermission) {
+		resp.Code = -2002
+		resp.Msg = "permiss is not exist"
+		returnSendMsg(w, resp)
+		return
+	}
+
+	toReq := &webProto.ConsumeProductReq{
+		PlayerId:  req.UserId,
+		OrderInfo: []*webProto.OrderInfo{},
+	}
+	orderInfo := &webProto.OrderInfo{
+		OrderId:   req.OrderId,
+		ProductId: req.ProductId,
+		Token:     "",
+	}
+	toReq.OrderInfo = append(toReq.OrderInfo, orderInfo)
+	jsonData, _ := json.Marshal(toReq)
+
+	backendResp, err := http.Post("http://127.0.0.1:8081/gmConsumeProduct", "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		resp.Code = -1
+		resp.Msg = fmt.Sprintf("edit is error! err=%s", err.Error())
+		returnSendMsg(w, resp)
+		return
+	}
+	defer backendResp.Body.Close()
+
+	var backendResult map[string]interface{}
+	if err := json.NewDecoder(backendResp.Body).Decode(&backendResult); err != nil {
+		resp.Code = -2
+		resp.Msg = fmt.Sprintf("edit is error! err=%s", err.Error())
+		returnSendMsg(w, resp)
+		return
+	}
+
+	resp.Data = backendResult
+	returnSendMsg(w, resp)
+}
+
+func handleGmKickPlayer(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		sendErrorMessage(pb.ERROR_CODE_INVALID_REQUEST_PARAM, w)
+		return
+	}
+	// 转发给http
+	var req GmKickPlayerReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		sendErrorMessage(pb.ERROR_CODE_INVALID_REQUEST_PARAM, w)
+		return
+	}
+	resp := &GmResp{
+		Code: 0,
+		Msg:  "",
+	}
+
+	tokenData, err2 := tool.ParseToken(req.Token)
+	if err2 != nil {
+		resp.Code = -2001
+		resp.Msg = fmt.Sprintf("token is error! err2=%s", err2.Error())
+		returnSendMsg(w, resp)
+		return
+	}
+	if !enum.IsPermiss(tokenData.Permiss, enum.KickPlayerPermission) {
+		resp.Code = -2002
+		resp.Msg = "permiss is not exist"
+		returnSendMsg(w, resp)
+		return
+	}
+	jsonData, _ := json.Marshal(req)
+
+	backendResp, err := http.Post("http://127.0.0.1:8081/GmKickPlayer", "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		resp.Code = -1
+		resp.Msg = fmt.Sprintf("edit is error! err=%s", err.Error())
+		returnSendMsg(w, resp)
+		return
+	}
+	defer backendResp.Body.Close()
+
+	var backendResult map[string]interface{}
+	if err := json.NewDecoder(backendResp.Body).Decode(&backendResult); err != nil {
+		resp.Code = -2
+		resp.Msg = fmt.Sprintf("edit is error! err=%s", err.Error())
+		returnSendMsg(w, resp)
+		return
+	}
+
+	resp.Data = backendResult
 	returnSendMsg(w, resp)
 }

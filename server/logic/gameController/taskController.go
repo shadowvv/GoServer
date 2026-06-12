@@ -3,6 +3,9 @@ package gameController
 import (
 	"fmt"
 
+	"github.com/drop/GoServer/server/logic/logicCommon"
+	"github.com/drop/GoServer/server/logic/rpcController"
+	"github.com/drop/GoServer/server/logic/rpcPb"
 	"github.com/drop/GoServer/server/service/serviceInterface"
 
 	"github.com/drop/GoServer/server/logic/platform/eventService"
@@ -36,6 +39,8 @@ func (l *TaskController) RegisterLogicMessage() {
 	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_BOUNTY_REWARD_REQ, &pb.BountyRewardReq{}, BountyRewardHandle, enum.FUNCTION_ID_BOUNTY)
 	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_GET_BOUNTY_DETAIL_REQ, &pb.GetBountyDetailReq{}, GetBountyDetailHandle, enum.FUNCTION_ID_BOUNTY)
 
+	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_GET_ALLIANCE_DAILY_TASK_DETAIL_REQ, &pb.GetAllianceDailyTaskDetailReq{}, GetAllianceDailyTaskDetailReq, enum.FUNCTION_ID_NONE)
+	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_ALLIANCE_DAILY_TASK_REWARD_REQ, &pb.AllianceDailyTaskRewardReq{}, AllianceDailyTaskReward, enum.FUNCTION_ID_NONE)
 	//  注册任务相关的内部消息处理函数
 	RegisterPlayerInnerTask(enum.INNER_MSG_EVENT_TASK_PLAYER, InnerPlayerTaskHandle)
 }
@@ -335,6 +340,84 @@ func GetBountyDetailHandle(message proto.Message, player *model.PlayerModel) {
 	})
 }
 
+func GetAllianceDailyTaskDetailReq(message proto.Message, player *model.PlayerModel) {
+	_, ok := message.(*pb.GetAllianceDailyTaskDetailReq)
+	if !ok {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_GET_ALLIANCE_DAILY_TASK_DETAIL_RESP, pb.ERROR_CODE_PB_CONV_ERROR)
+		return
+	}
+
+	allianceInfo := logicCommon.GetPlayerAllianceInfoFromRedis(player.GetUserId())
+	if allianceInfo == nil {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_GET_ALLIANCE_DAILY_TASK_DETAIL_RESP, pb.ERROR_CODE_PLAYER_NOT_STAY_IN_ALLIANCE)
+		return
+	}
+
+	if player.AllianceDailyActivityModel.Entity != nil {
+		messageSender.SendMessage(player, pb.MESSAGE_ID_GET_ALLIANCE_DAILY_TASK_DETAIL_RESP, &pb.GetAllianceDailyTaskDetailResp{
+			AllianceDailyDetail: &pb.AllianceDailyDetail{
+				DailyBox: player.AllianceDailyActivityModel.Entity.DailyBox,
+			},
+		})
+	} else {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_GET_ALLIANCE_DAILY_TASK_DETAIL_RESP, pb.ERROR_CODE_ALLIANCE_DAILY_ACTIVITY_NOT_FOUND)
+	}
+}
+
+func AllianceDailyTaskReward(message proto.Message, player *model.PlayerModel) {
+	req, ok := message.(*pb.AllianceDailyTaskRewardReq)
+	if !ok {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_ALLIANCE_DAILY_TASK_REWARD_RESP, pb.ERROR_CODE_PB_CONV_ERROR)
+		return
+	}
+
+	allianceInfo := logicCommon.GetPlayerAllianceInfoFromRedis(player.GetUserId())
+	if allianceInfo == nil {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_ALLIANCE_DAILY_TASK_REWARD_RESP, pb.ERROR_CODE_PLAYER_NOT_STAY_IN_ALLIANCE)
+		return
+	}
+
+	addItems := make([]*gameConfig.ItemConfig, 0)
+
+	// 任务全部领取
+	switch req.GetRewardType() {
+	case 1:
+		addItems = append(addItems, player.TaskModel.RewardAllianceDailyTask()...)
+		activityItemCount := int64(0)
+		for _, v := range addItems {
+			if v.ID == enum.ALLIANCE_TASK_ACTIVE_VALUE_ITEM_ID {
+				activityItemCount += v.Num
+			}
+		}
+		err := itemService.AddItems(player, addItems, enum.ITEM_CHANGE_REASON_ALLIANCE_DAILY_TASK)
+		if err != nil {
+			platformLogger.ErrorWithUser("add item failed", player, nil)
+			return
+		}
+		messageSender.SendMessage(player, pb.MESSAGE_ID_ALLIANCE_DAILY_TASK_REWARD_RESP, &pb.AllianceDailyTaskRewardResp{
+			AllianceDailyDetail: &pb.AllianceDailyDetail{
+				DailyBox: player.AllianceDailyActivityModel.Entity.DailyBox,
+			},
+		})
+	case 2:
+		// 发rpc到social处理后续的联盟日活宝箱领取问题
+		err := rpcController.SendMessageToSocial(
+			player.GetUserId(),
+			allianceInfo.AllianceId,
+			0,
+			rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_ALLIANCE_ACTIVITY_ITEM_NUM_REQ,
+			&rpcPb.GetAllianceActivityItemNumReq{
+				AllianceId: allianceInfo.AllianceId,
+			},
+		)
+		if err != nil {
+			platformLogger.ErrorWithUser("send rpc to social error", player, nil)
+			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_ALLIANCE_DAILY_TASK_REWARD_RESP, pb.ERROR_CODE_ALLIANCE_DAILY_ACTIVITY_REWARD_FAIL)
+			return
+		}
+	}
+}
+
 func InnerPlayerTaskHandle(messageTask serviceInterface.InnerTaskInterface) (any, error) {
 	innerTask, ok := messageTask.(*dispatcherService.InnerTask)
 	if !ok {
@@ -354,7 +437,7 @@ func InnerPlayerTaskHandle(messageTask serviceInterface.InnerTaskInterface) (any
 
 	var err error = nil
 	for taskAttributionId, taskAttributionMap := range player.TaskModel.TaskEntity {
-		for _, taskType := range enum.EventToObjectiveTypes[eventType] {
+		for _, taskType := range enum.PlayerEventTypes[eventType] {
 			if _, ok := taskAttributionMap[taskType]; ok {
 				switch taskType {
 				case enum.ObjectiveTypeAnyHeroReachWhatLevel:
@@ -459,6 +542,10 @@ func InnerPlayerTaskHandle(messageTask serviceInterface.InnerTaskInterface) (any
 					task.StrongEquipmentHowMany(req.(*eventService.EquipmentStrongEvent), player, taskAttributionId, taskType)
 				case enum.ObjectiveTypeWearHowManyEquipmentLevel:
 					task.WearHowManyEquipmentLevel(req.(*eventService.EquipmentWearEvent), player, taskAttributionId, taskType)
+				case enum.ObjectiveTypeStoneWhatClassWhatAttrLevelUpHowMany:
+					task.StoneWhatClassWhatAttrLevelUpHowMany(req.(*eventService.StoneAttrLevelUpEvent), player, taskAttributionId, taskType)
+				case enum.ObjectiveTypeCityAgeReachWhatStage:
+					task.CityAgeReachWhatStage(req.(*eventService.EventTypeCityAgeChange), player, taskAttributionId, taskType)
 				}
 			}
 		}

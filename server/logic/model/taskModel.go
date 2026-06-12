@@ -16,6 +16,7 @@ import (
 	"github.com/drop/GoServer/server/tool"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gorm.io/gorm"
 )
 
 type TaskEntity struct {
@@ -127,7 +128,7 @@ func (t *TaskModel) Heartbeat(lastTickTime int64, currentTime int64, passDay int
 	for attributionId, attributionMap := range t.TaskEntity {
 		for taskTypeId, taskMap := range attributionMap {
 			for taskId, entity := range taskMap {
-				if taskTypeId == enum.ObjectiveTypeWhatDispatchMapUnlockWhatStage {
+				if taskTypeId == enum.ObjectiveTypeWhatDispatchMapUnlockWhatStage || taskTypeId == enum.ObjectiveTypeLoginGame {
 					t.NeedCheckTaskList = append(t.NeedCheckTaskList, entity)
 				}
 				if entity == nil {
@@ -173,7 +174,7 @@ func (t *TaskModel) Heartbeat(lastTickTime int64, currentTime int64, passDay int
 	// 检查每日任务是否需要跨天刷新（只需检查一个entity的时间即可）
 	for _, taskIdMap := range t.TaskEntity[enum.TaskAffiliationDaily] {
 		for _, entity := range taskIdMap {
-			if !tool.IsSameDay(tool.MilliToTime(entity.UpdateTime), tool.MilliToTime(tool.UnixNowMilli())) {
+			if !tool.IsSameDayByMilli(entity.UpdateTime, tool.UnixNowMilli()) {
 				// 清空TaskMap中旧的索引（按旧TaskID），SlotMap由RefreshDailyTasks覆盖
 				t.TaskEntity[enum.TaskAffiliationDaily] = make(map[int32]map[int32]*TaskEntity)
 				t.RefreshDailyTasks()
@@ -183,6 +184,25 @@ func (t *TaskModel) Heartbeat(lastTickTime int64, currentTime int64, passDay int
 		break
 	}
 
+	if unlockService.CheckSystemUnlock(enum.FUNCTION_ID_ALLIANCE, t.player) {
+		if t.TaskEntity[enum.TaskAffiliationDailyAlliance] == nil || len(t.TaskEntity[enum.TaskAffiliationDailyAlliance]) == 0 {
+			t.RefreshAllianceDailyTasks()
+		}
+	}
+	for _, taskIdMap := range t.TaskEntity[enum.TaskAffiliationDailyAlliance] {
+		for _, entity := range taskIdMap {
+			if !tool.IsSameDayByMilli(entity.UpdateTime, tool.UnixNowMilli()) {
+				// 清空TaskMap中旧的索引（按旧TaskID），SlotMap由RefreshDailyTasks覆盖
+				t.TaskEntity[enum.TaskAffiliationDailyAlliance] = make(map[int32]map[int32]*TaskEntity)
+				t.RefreshAllianceDailyTasks()
+			}
+			break
+		}
+		break
+	}
+
+	toAdd = append(toAdd, t.checkDailyTaskUnlockAddTask()...)
+
 	// 添加新任务到内存
 	for _, newEntity := range toAdd {
 		t.AddTaskEntityToMemory(newEntity)
@@ -191,6 +211,97 @@ func (t *TaskModel) Heartbeat(lastTickTime int64, currentTime int64, passDay int
 	for _, delEntity := range toDelete {
 		t.DeteleTaskEntityFormMemory(delEntity)
 	}
+}
+
+func (t *TaskModel) checkDailyTaskUnlockAddTask() []*TaskEntity {
+	res := make([]*TaskEntity, 0)
+	allDailyTaskCfg := gameConfig.GetAllDailyTaskIDs()
+	dailyTaskIdList := t.generateUniqueDailyTaskIDs(int32(len(allDailyTaskCfg)))
+	dailySlotId := int32(0)
+	for _, v := range t.TaskEntity[enum.TaskAffiliationDaily] {
+		dailySlotId += int32(len(v))
+	}
+	for _, v := range dailyTaskIdList {
+		taskCoreId, err := gameConfig.GetCoreTaskId(enum.TaskAffiliationDaily, v)
+		if err != nil {
+			continue
+		}
+		taskCoreCfg := gameConfig.GetCoreCfg(taskCoreId)
+		if taskCoreCfg == nil {
+			continue
+		}
+		if _, ok := t.TaskEntity[enum.TaskAffiliationDaily][taskCoreCfg.TaskType][v]; !ok {
+			slotId := enum.TaskAffiliationDaily*10000 + int32(dailySlotId) + 1
+			entity := NewTaskEntity(t.UserId, slotId, v, enum.TaskAffiliationDaily, 0, enum.TaskStatusUnFinish, tool.UnixNowMilli(), tool.UnixNowMilli())
+			t.AddTaskEntityToMemory(entity)
+			err := easyDB.CreatePlayerEntity(entity)
+			if err != nil {
+				// INSERT失败（可能数据库已有记录），改用UPDATE
+				if t.Changed[enum.TaskAffiliationDaily] == nil {
+					t.Changed[enum.TaskAffiliationDaily] = make(map[int32]map[string]interface{})
+				}
+				t.Changed[enum.TaskAffiliationDaily][slotId] = map[string]interface{}{
+					"task_id":       entity.TaskID,
+					"progress_data": entity.ProgressData,
+					"status":        entity.Status,
+					"add_time":      entity.AddTime,
+					"update_time":   entity.UpdateTime,
+				}
+			}
+			res = append(res, entity)
+			dailySlotId++
+		}
+	}
+
+	dailySlotId = int32(0)
+	for _, v := range t.TaskEntity[enum.TaskAffiliationDailyAlliance] {
+		dailySlotId += int32(len(v))
+	}
+	allTaskIds := gameConfig.GetAllUnionDailyTaskIDs()
+	if allTaskIds == nil {
+		return nil
+	}
+	newTasks := make([]*TaskEntity, 0)
+	for _, taskID := range allTaskIds {
+		cfg := gameConfig.GetUnionDailyCfg(taskID)
+		if cfg == nil {
+			continue
+		}
+		if cfg.Unlock != 0 && !unlockService.CheckUnlock(cfg.Unlock, t.player) {
+			continue
+		}
+		taskCoreId, err := gameConfig.GetCoreTaskId(enum.TaskAffiliationDailyAlliance, taskID)
+		if err != nil {
+			continue
+		}
+		taskCoreCfg := gameConfig.GetCoreCfg(taskCoreId)
+		if taskCoreCfg == nil {
+			continue
+		}
+		if _, ok := t.TaskEntity[enum.TaskAffiliationDailyAlliance][taskCoreCfg.TaskType][taskID]; !ok {
+			slotId := enum.TaskAffiliationDailyAlliance*10000 + int32(dailySlotId) + 1
+			entity := NewTaskEntity(t.UserId, slotId, taskID, enum.TaskAffiliationDailyAlliance, 0, enum.TaskStatusUnFinish, tool.UnixNowMilli(), tool.UnixNowMilli())
+			t.AddTaskEntityToMemory(entity)
+			err := easyDB.CreatePlayerEntity(entity)
+			if err != nil {
+				// INSERT失败（可能数据库已有记录），改用UPDATE
+				if t.Changed[enum.TaskAffiliationDailyAlliance] == nil {
+					t.Changed[enum.TaskAffiliationDailyAlliance] = make(map[int32]map[string]interface{})
+				}
+				t.Changed[enum.TaskAffiliationDailyAlliance][slotId] = map[string]interface{}{
+					"task_id":       entity.TaskID,
+					"progress_data": entity.ProgressData,
+					"status":        entity.Status,
+					"add_time":      entity.AddTime,
+					"update_time":   entity.UpdateTime,
+				}
+			}
+			res = append(res, entity)
+			dailySlotId++
+		}
+	}
+	res = append(res, newTasks...)
+	return res
 }
 
 func (t *TaskModel) CheckTaskProgressData(entity *TaskEntity) {
@@ -378,9 +489,26 @@ func (t *TaskModel) CheckTaskProgressData(entity *TaskEntity) {
 			if cfg == nil {
 				continue
 			}
-			if cfg.Tier == taskCfg.TaskPara[0] {
+			if cfg.Tier >= taskCfg.TaskPara[0] {
 				num++
 			}
+		}
+	case enum.ObjectiveTypeStoneWhatClassWhatAttrLevelUpHowMany:
+		stoneEntity := t.player.StoneModel.Entities[taskCfg.TaskPara[0]]
+		stoneAttrIndexCfg := gameConfig.GetStatueAttrIndexMap()
+		if stoneEntity == nil {
+			num = 0
+		} else {
+			if len(stoneEntity.AttrLevel) >= len(stoneAttrIndexCfg[taskCfg.TaskPara[0]]) {
+				index := stoneAttrIndexCfg[taskCfg.TaskPara[0]][taskCfg.TaskPara[1]]
+				num = stoneEntity.AttrLevel[index]
+			}
+		}
+	case enum.ObjectiveTypeLoginGame:
+		num = taskCfg.TaskNum
+	case enum.ObjectiveTypeCityAgeReachWhatStage:
+		if t.player.CityAgeModel.Entity.AgeId >= taskCfg.TaskPara[0] {
+			num = taskCfg.TaskNum
 		}
 	}
 
@@ -408,19 +536,11 @@ func (t *TaskModel) CheckTaskProgressData(entity *TaskEntity) {
 func (t *TaskModel) RefreshDailyTasks() []*TaskEntity {
 	var newTasks []*TaskEntity
 
-	// 1. 统计需要多少新任务
-	dailyTaskMap := t.TaskEntity[enum.TaskAffiliationDaily]
-
 	allDailyTasksCfg := gameConfig.GetAllDailyTaskIDs()
 	if allDailyTasksCfg == nil {
 		return newTasks
 	}
 	totalNeeded := len(allDailyTasksCfg)
-
-	slotNum := 0
-	for _, taskIdList := range dailyTaskMap {
-		slotNum += len(taskIdList)
-	}
 
 	// 2. 生成不重复的任务ID列表
 	taskIDs := t.generateUniqueDailyTaskIDs(int32(totalNeeded))
@@ -520,6 +640,51 @@ func (t *TaskModel) generateUniqueDailyTaskIDs(neededCount int32) []int32 {
 	return validTaskIDs
 }
 
+func (t *TaskModel) RefreshAllianceDailyTasks() []*TaskEntity {
+	allTaskIds := gameConfig.GetAllUnionDailyTaskIDs()
+	if allTaskIds == nil {
+		return nil
+	}
+	newTasks := make([]*TaskEntity, 0)
+	for i, taskID := range allTaskIds {
+		cfg := gameConfig.GetUnionDailyCfg(taskID)
+		if cfg == nil {
+			continue
+		}
+		if cfg.Unlock != 0 && !unlockService.CheckUnlock(cfg.Unlock, t.player) {
+			continue
+		}
+		newTasks = append(newTasks, NewTaskEntity(t.UserId, enum.TaskAffiliationDailyAlliance*10000+int32(i)+1, taskID, enum.TaskAffiliationDailyAlliance, 0, 0, tool.UnixNowMilli(), tool.UnixNowMilli()))
+	}
+	for _, v := range newTasks {
+		if oldEntity := t.TaskEntityBySlot[v.SlotId]; oldEntity != nil {
+			// 先添加新任务到内存（覆盖旧slot）
+			t.AddTaskEntityToMemory(v)
+			t.UpdateChangedWithNewData(oldEntity, v)
+			// 标记旧任务状态（用于后续清理TaskEntity索引）
+			oldEntity.Status = enum.TaskStatusDeleteInMemory
+		} else {
+			// slot不存在，添加到内存并尝试INSERT
+			t.AddTaskEntityToMemory(v)
+			err := easyDB.CreatePlayerEntity(v)
+			if err != nil {
+				// INSERT失败（可能数据库已有记录），改用UPDATE
+				if t.Changed[enum.TaskAffiliationDailyAlliance] == nil {
+					t.Changed[enum.TaskAffiliationDailyAlliance] = make(map[int32]map[string]interface{})
+				}
+				t.Changed[enum.TaskAffiliationDailyAlliance][v.SlotId] = map[string]interface{}{
+					"task_id":       v.TaskID,
+					"progress_data": v.ProgressData,
+					"status":        v.Status,
+					"add_time":      v.AddTime,
+					"update_time":   v.UpdateTime,
+				}
+			}
+		}
+	}
+	return newTasks
+}
+
 func (t *TaskModel) CheckNewTask(attributionId int32, taskTypeId int32, taskId int32) *TaskEntity {
 	// 获取当前实体，做必要的空检查
 	currMapAttribution, ok := t.TaskEntity[attributionId]
@@ -559,7 +724,10 @@ func (t *TaskModel) CheckNewTask(attributionId int32, taskTypeId int32, taskId i
 		if taskNextCfg == nil {
 			return nil
 		}
-
+		if taskNextCfg.PreTasks != taskCfg.Id {
+			logger.ErrorBySprintf("taskNextCfg.PreTasks!=taskCfg.FollowTasks", zap.Int32("task_id", taskId), zap.Int32("attribution", attributionId))
+			return nil
+		}
 		if taskNextCfg.Unlock != 0 && !unlockService.CheckUnlock(taskNextCfg.Unlock, t.player) {
 			return nil
 		}
@@ -838,6 +1006,7 @@ func LoadTaskModel(player *PlayerModel) (*TaskModel, error) {
 		}
 		taskCfg := gameConfig.GetCoreCfg(taskId)
 		if taskCfg == nil {
+			logger.ErrorWithZapFields("load player task core is null ", zap.Int32("task id", taskId), zap.Int32("attribution", row.TaskAttribution))
 			continue
 		}
 		taskType := taskCfg.TaskType
@@ -1104,6 +1273,37 @@ func (t *TaskModel) RewardSingleTask(attributionId, taskId int32) ([]*pb.ItemBas
 	}
 
 	return allReward, pushUpdate, nil
+}
+
+func (t *TaskModel) RewardAllianceDailyTask() []*gameConfig.ItemConfig {
+	items := make([]*gameConfig.ItemConfig, 0)
+	for _, v := range t.TaskEntity[enum.TaskAffiliationDailyAlliance] {
+		for _, value := range v {
+			if value.Status == enum.TaskStatusFinishUnReward {
+				taskCfg := gameConfig.GetUnionDailyCfg(value.TaskID)
+				if taskCfg == nil {
+					logger.ErrorWithZapFields("union daily task cfg is nil", zap.Int32("task id", value.TaskID))
+					continue
+				}
+				taskType := gameConfig.GetTaskTypeByAttribution(enum.TaskAffiliationDailyAlliance, value.TaskID)
+				if taskType == 0 {
+					logger.ErrorWithZapFields("union daily task type is nil", zap.Int32("task id", value.TaskID))
+					continue
+				}
+				items = append(items, taskCfg.TaskReward...)
+				if taskCfg.ActId != nil && len(taskCfg.ActId) > 0 {
+					for index, actId := range taskCfg.ActId {
+						if flag, _ := t.player.PlayerActivityModel.CheckActivityOpen(actId); flag {
+							items = append(items, taskCfg.Item[index])
+						}
+					}
+				}
+				t.UpdateTaskStatus(value.TaskID, taskType, enum.TaskAffiliationDailyAlliance, enum.TaskStatusFinishAndReward)
+				t.UpdateUpdateTime(value.TaskID, taskType, enum.TaskAffiliationDailyAlliance, tool.UnixNowMilli())
+			}
+		}
+	}
+	return items
 }
 
 type TaskActiveRewardEntity struct {
@@ -1884,4 +2084,104 @@ func LoadPassCardTask(userid int64, player *PlayerModel) (*PassCardTaskModel, er
 	}
 
 	return NewPassCardTaskModel(entities, player, userid, int32(enum.TaskAffiliationPassCard*10000+num), finishTaskSlotList), err
+}
+
+type AllianceDailyActivityEntity struct {
+	UserId             int64 `gorm:"column:user_id;primaryKey"`
+	DailyBox           int32 `gorm:"column:daily_box"`
+	DailyBoxUpdateTime int64 `gorm:"column:daily_box_update_time"`
+}
+
+func (a *AllianceDailyActivityEntity) TableName() string {
+	return "alliance_daily_activity"
+}
+
+type AllianceDailyActivityModel struct {
+	UserId  int64
+	Entity  *AllianceDailyActivityEntity
+	Changed map[string]interface{}
+}
+
+var _ logicCommon.PlayerModelInterface = (*AllianceDailyActivityModel)(nil)
+
+func (m *AllianceDailyActivityModel) SaveModelToDB() {
+	if m.Changed != nil || len(m.Changed) > 0 {
+		easyDB.UpdatePlayerEntity(m.Entity, m.Changed, m.UserId)
+	}
+	m.Changed = make(map[string]interface{})
+}
+
+func (m *AllianceDailyActivityModel) Heartbeat(lastTickTime int64, currentTime int64, passDay int32, senderMsg bool) {
+	if !tool.IsSameDayByMilli(m.Entity.DailyBoxUpdateTime, currentTime) {
+		m.UpdateDailyBox(0)
+		m.UpdateDailyBoxUpdateTime(currentTime)
+	}
+}
+
+func (m *AllianceDailyActivityModel) UpdateDailyBox(box int32) {
+	m.Entity.DailyBox = box
+	m.Changed["daily_box"] = box
+}
+
+func (m *AllianceDailyActivityModel) UpdateDailyBoxUpdateTime(time int64) {
+	m.Entity.DailyBoxUpdateTime = time
+	m.Changed["daily_box_update_time"] = time
+}
+
+func NewAllianceDailyActivityModel(userId int64, entity *AllianceDailyActivityEntity) *AllianceDailyActivityModel {
+	return &AllianceDailyActivityModel{
+		UserId:  userId,
+		Entity:  entity,
+		Changed: make(map[string]interface{}),
+	}
+}
+
+func creatAllianceDailyActivityEntity(entity *AllianceDailyActivityEntity) error {
+	return easyDB.CreatePlayerEntity(entity)
+}
+
+func LoadAllianceDailyActivityModel(userId int64) (*AllianceDailyActivityModel, error) {
+	row, err := easyDB.GetPlayerEntityByWhere[AllianceDailyActivityEntity](map[string]interface{}{"user_id": userId})
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			err = creatAllianceDailyActivityEntity(&AllianceDailyActivityEntity{
+				UserId:             userId,
+				DailyBox:           0,
+				DailyBoxUpdateTime: tool.UnixNowMilli(),
+			})
+			if err != nil {
+				return nil, err
+			} else {
+				return NewAllianceDailyActivityModel(userId, &AllianceDailyActivityEntity{
+					UserId:             userId,
+					DailyBox:           0,
+					DailyBoxUpdateTime: tool.UnixNowMilli(),
+				}), nil
+			}
+		}
+	}
+	return NewAllianceDailyActivityModel(userId, row), nil
+}
+
+func (a *AllianceDailyActivityModel) RewardActivity(itemCount int64) ([]*gameConfig.ItemConfig, error) {
+	res := make([]*gameConfig.ItemConfig, 0)
+	dailyRewardCfg := gameConfig.GetDailyAwardsCfg(1)
+	if dailyRewardCfg == nil {
+		return nil, errors.New("daily reward cfg not found")
+	}
+	dailyBox := a.Entity.DailyBox
+	for dailyRewardCfg != nil {
+		if dailyRewardCfg.Type == 3 {
+			if itemCount >= int64(dailyRewardCfg.Point) && dailyBox < dailyRewardCfg.Id {
+				itemList := gameConfig.Drop(dailyRewardCfg.DropId)
+				res = append(res, itemList...)
+				dailyBox = dailyRewardCfg.Id
+			}
+		}
+		dailyRewardCfg = gameConfig.GetDailyAwardsCfg(dailyRewardCfg.Id + 1)
+	}
+	a.UpdateDailyBox(dailyBox)
+	a.UpdateDailyBoxUpdateTime(tool.UnixNowMilli())
+
+	return res, nil
 }

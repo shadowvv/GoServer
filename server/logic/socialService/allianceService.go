@@ -79,7 +79,6 @@ func (s *AllianceService) CreateAlliance(req *rpcPb.CreateAllianceReq) *rpcPb.Cr
 			BadgeId:             req.BadgeId,
 			Notice:              "",
 			Level:               1,
-			Exp:                 0,
 			ApplyType:           0,
 			PowerApplyCondition: 0,
 			CityLevelCondition:  0,
@@ -215,7 +214,6 @@ func allianceToPb(entity *model.AllianceEntity, leaderUserId int64) *rpcPb.Allia
 		Announce:            entity.Announce,
 		BadgeId:             entity.BadgeId,
 		Level:               entity.Level,
-		Exp:                 entity.Exp,
 		ApplyType:           entity.ApplyType,
 		PowerApplyCondition: entity.PowerApplyCondition,
 		CityLevel:           entity.CityLevelCondition,
@@ -293,7 +291,7 @@ func notifyAllianceArenaRankDelta(playerId int64, serverID int32, allianceId int
 		return
 	}
 	req := &rpcPb.NotifyUpdateRankInfo{
-		Id:                allianceId,
+		AllianceId:        allianceId,
 		Score:             deltaScore,
 		IncrementalUpdate: true,
 	}
@@ -319,7 +317,7 @@ func notifyAllianceGloryArenaRoundRankDelta(playerId int64, serverID int32, alli
 		return
 	}
 	req := &rpcPb.NotifyUpdateRankInfo{
-		Id:                allianceID,
+		AllianceId:        allianceID,
 		Score:             deltaScore,
 		IncrementalUpdate: true,
 	}
@@ -348,7 +346,7 @@ func syncAllianceRankFinalScores(playerID int64, serverID int32, allianceID int6
 	)
 	if len(arenaRankIDs) > 0 {
 		arenaReq := &rpcPb.NotifyUpdateRankInfo{
-			Id:                allianceID,
+			AllianceId:        allianceID,
 			Score:             arenaScore,
 			IncrementalUpdate: false,
 		}
@@ -368,7 +366,7 @@ func syncAllianceRankFinalScores(playerID int64, serverID int32, allianceID int6
 	)
 	if len(gloryRankIDs) > 0 {
 		gloryReq := &rpcPb.NotifyUpdateRankInfo{
-			Id:                allianceID,
+			AllianceId:        allianceID,
 			Score:             gloryRoundBestWin,
 			IncrementalUpdate: false,
 		}
@@ -493,6 +491,33 @@ func syncMemberAllianceInfoToRedis(alliance *model.AllianceEntity, members map[i
 			alliance.AllianceId, err,
 		)
 	}
+
+	syncAllianceMemberSetToRedis(alliance.AllianceId, members)
+}
+
+func syncAllianceMemberSetToRedis(allianceID int64, members map[int64]*model.AllianceMemberEntity) {
+	if allianceID <= 0 || dbService.RDB == nil {
+		return
+	}
+
+	key := enum.GetAllianceMemberInfoKey(allianceID)
+	ctx := context.Background()
+	memberIDs := make([]interface{}, 0, len(members))
+	for _, member := range members {
+		if member == nil || member.UserId <= 0 {
+			continue
+		}
+		memberIDs = append(memberIDs, strconv.FormatInt(member.UserId, 10))
+	}
+
+	pip := dbService.RDB.Pipeline()
+	pip.Del(ctx, key)
+	if len(memberIDs) > 0 {
+		pip.SAdd(ctx, key, memberIDs...)
+	}
+	if _, err := pip.Exec(ctx); err != nil {
+		logger.ErrorBySprintf("[allianceManager] sync alliance member set failed allianceId:%d err:%v", allianceID, err)
+	}
 }
 
 func rebuildAlliancesBasicToRedis(alliances []*model.AllianceEntity) {
@@ -565,6 +590,7 @@ func rebuildAllianceMemberInfoToRedis(actors map[int64]*AllianceModel) {
 			}
 		}
 		if len(memberInfoMap) == 0 {
+			clearAllianceMemberSetFromRedis(actor.alliance.AllianceId)
 			continue
 		}
 		_, err := dbService.RDB.Pipelined(ctx, func(pipe redis.Pipeliner) error {
@@ -584,6 +610,7 @@ func rebuildAllianceMemberInfoToRedis(actors map[int64]*AllianceModel) {
 			logger.ErrorBySprintf("[allianceManager] rebuild alliance member info failed err:%v", err)
 			return
 		}
+		syncAllianceMemberSetToRedis(actor.alliance.AllianceId, actor.members)
 	}
 }
 
@@ -661,11 +688,17 @@ func removeAllianceNameIndexFromRedis(serverID int32, name string) {
 }
 
 func removeAllianceMemberInfoFromRedis(alliance *AllianceModel) {
-	ctx := context.Background()
-	memberInfoMap := make(map[int64]*logicCommon.PlayerAllianceInfo)
 	if alliance == nil || alliance.alliance == nil {
 		return
 	}
+	allianceID := alliance.alliance.AllianceId
+	if dbService.RDB == nil {
+		return
+	}
+	defer clearAllianceMemberSetFromRedis(allianceID)
+
+	ctx := context.Background()
+	memberInfoMap := make(map[int64]*logicCommon.PlayerAllianceInfo)
 	for _, member := range alliance.members {
 		if member == nil {
 			continue
@@ -698,5 +731,15 @@ func removeAllianceMemberInfoFromRedis(alliance *AllianceModel) {
 	if err != nil {
 		logger.ErrorBySprintf("[allianceManager] rebuild alliance member info failed err:%v", err)
 		return
+	}
+}
+
+func clearAllianceMemberSetFromRedis(allianceID int64) {
+	if allianceID <= 0 || dbService.RDB == nil {
+		return
+	}
+	ctx := context.Background()
+	if err := dbService.RDB.Del(ctx, enum.GetAllianceMemberInfoKey(allianceID)).Err(); err != nil {
+		logger.ErrorBySprintf("[allianceManager] remove alliance member set redis failed allianceId:%d err:%v", allianceID, err)
 	}
 }

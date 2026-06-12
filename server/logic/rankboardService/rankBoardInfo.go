@@ -33,10 +33,20 @@ func NewRankBoard(rankId string, infos []*model.RankBoardInfoEntity) *RankBoardI
 		index:        make(map[int64]*model.RankBoardInfoEntity),
 		lastActiveAt: tool.UnixNowMilli(),
 	}
+	needPersistBackfill := false
 	for _, e := range infos {
+		if e == nil {
+			continue
+		}
+		// Backward compatibility for rows created before update_time was introduced.
+		if e.UpdateTime <= 0 {
+			e.UpdateTime = e.EnterTime
+			needPersistBackfill = true
+		}
 		temp.rankInfo = append(temp.rankInfo, e)
 		temp.index[e.Id] = e
 	}
+	temp.dirty = needPersistBackfill
 	temp.close.Store(false)
 	return temp
 }
@@ -56,6 +66,7 @@ func (r *RankBoardInfo) UpdateScore(userId int64, score int64, incrementalUpdate
 			}
 			e.Score = score
 		}
+		e.UpdateTime = now
 		if resort {
 			r.resort()
 		}
@@ -65,10 +76,11 @@ func (r *RankBoardInfo) UpdateScore(userId int64, score int64, incrementalUpdate
 	}
 
 	newEntity := &model.RankBoardInfoEntity{
-		Id:        userId,
-		Score:     score,
-		EnterTime: now,
-		Rank:      int32(len(r.rankInfo) + 1),
+		Id:         userId,
+		Score:      score,
+		EnterTime:  now,
+		UpdateTime: now,
+		Rank:       int32(len(r.rankInfo) + 1),
 	}
 
 	if int32(len(r.rankInfo)) < maxNum {
@@ -109,7 +121,7 @@ func (r *RankBoardInfo) resort() {
 		if a.Score != b.Score {
 			return a.Score > b.Score
 		}
-		return a.EnterTime < b.EnterTime
+		return a.UpdateTime < b.UpdateTime
 	})
 
 	for i, e := range r.rankInfo {
@@ -130,8 +142,9 @@ func (r *RankBoardInfo) ThumbUp(userId int64, thumbUp int32) {
 
 	if e, ok := r.index[userId]; ok {
 		e.ThumbUpCount += thumbUp
+		e.UpdateTime = tool.UnixNowMilli()
 		r.dirty = true
-		r.lastActiveAt = tool.UnixNowMilli()
+		r.lastActiveAt = e.UpdateTime
 	}
 }
 
@@ -216,28 +229,42 @@ func (r *RankBoardInfo) tryRecoverAndSettleRanks(currentTime int64) {
 
 	settleCfg, version, serverID, ok := r.buildSettleCfgByRankID()
 	if !ok || settleCfg == nil || version == "" {
+		logger.InfoWithSprintf("[rankSettle] skip rankId:%s reason:invalid_settle_cfg ok:%t cfgNil:%t version:%s currentDate:%d", r.rankId, ok, settleCfg == nil, version, todayDate)
 		return
 	}
+	logger.InfoWithSprintf("[rankSettle] check rankId:%s pointType:%d version:%s serverID:%d settleTypes:%v rewardIds:%v mailIds:%v currentDate:%d allowToday:%t", r.rankId, settleCfg.PointType, version, serverID, settleCfg.SettleTypes, settleCfg.RankRewardIDs, settleCfg.MailIDs, todayDate, allowTodaySettle)
 	if settleCfg.SendRewardType == int32(enum.RANK_BOARD_SEND_REWARD_TYPE_ENTER) {
+		logger.InfoWithSprintf("[rankSettle] skip rankId:%s reason:enter_reward_type sendRewardType:%d", r.rankId, settleCfg.SendRewardType)
 		return
 	}
 	if len(settleCfg.SettleTypes) == 0 || len(settleCfg.RankRewardIDs) == 0 || len(settleCfg.MailIDs) == 0 {
+		logger.InfoWithSprintf("[rankSettle] skip rankId:%s reason:empty_settle_config settleTypes:%v rewardIds:%v mailIds:%v", r.rankId, settleCfg.SettleTypes, settleCfg.RankRewardIDs, settleCfg.MailIDs)
 		return
 	}
 
 	for _, settleType := range settleCfg.SettleTypes {
 		settleDates := logicCommon.GetRankSettleTaskSettleDates(settleCfg.PointType, settleType, settleCfg.SettleTypes, version, currentTime)
+		if len(settleDates) == 0 {
+			logger.InfoWithSprintf("[rankSettle] skip rankId:%s reason:empty_settle_dates pointType:%d settleType:%d allSettleTypes:%v version:%s serverID:%d currentDate:%d", r.rankId, settleCfg.PointType, settleType, settleCfg.SettleTypes, version, serverID, todayDate)
+			continue
+		}
+		logger.InfoWithSprintf("[rankSettle] rankId:%s settleType:%d settleDates:%v", r.rankId, settleType, settleDates)
 		for _, settleDate := range settleDates {
 			if settleDate <= 0 {
+				logger.InfoWithSprintf("[rankSettle] skip rankId:%s reason:invalid_settle_date settleType:%d settleDate:%d", r.rankId, settleType, settleDate)
 				continue
 			}
 			if settleDate == todayDate && !allowTodaySettle {
+				logger.InfoWithSprintf("[rankSettle] skip rankId:%s reason:before_daily_settle_window settleType:%d settleDate:%d currentDate:%d", r.rankId, settleType, settleDate, todayDate)
 				continue
 			}
 			taskVersion := fmt.Sprintf("%08d", settleDate)
+			logger.InfoWithSprintf("[rankSettle] process rankId:%s settleType:%d taskVersion:%s settleDate:%d", r.rankId, settleType, taskVersion, settleDate)
 			if err := rankBoardService.ensureAndProcessSettleTask(r.rankId, int8(settleType), taskVersion, settleDate, serverID, settleCfg, currentTime); err != nil {
 				logger.ErrorBySprintf("[rankBoardInfo] settle task process failed rankId:%s settleType:%d taskVersion:%s err:%v", r.rankId, settleType, taskVersion, err)
+				continue
 			}
+			logger.InfoWithSprintf("[rankSettle] process done rankId:%s settleType:%d taskVersion:%s", r.rankId, settleType, taskVersion)
 		}
 	}
 }

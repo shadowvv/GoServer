@@ -128,7 +128,7 @@ func (s *CityCfgLoader) loadData() error {
 		var v PetSanctuaryCfg
 		v.Id = ParseInt(row["id"])
 		v.Unlock = ParseIntArray(row["unlock"])
-		v.Cost = ParseItemArray(row["cost"])
+		v.Item = ParseItemArray(row["item"])
 		v.Time = ParseInt(row["time"])
 		v.DropGroupId1 = ParseInt(row["dropGroupId1"])
 		v.DropGroupId2 = ParseInt(row["dropGroupId2"])
@@ -422,7 +422,7 @@ type PetSanctuaryCfg struct {
 	// 升级条件
 	Unlock []int32 `json:"unlock"`
 	// 升级消耗
-	Cost []*ItemConfig `json:"cost"`
+	Item []*ItemConfig `json:"item"`
 	// 升级时间s
 	Time int32 `json:"time"`
 	// 掉落id
@@ -446,7 +446,7 @@ func GetPetSanctuaryCfg(id int32) *PetSanctuaryCfg {
 }
 
 func (p *PetSanctuaryCfg) GetItem() []*ItemConfig {
-	return p.Cost
+	return p.Item
 }
 
 func (p *PetSanctuaryCfg) GetTime() int32 {

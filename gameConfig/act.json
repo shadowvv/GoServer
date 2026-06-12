@@ -200,6 +200,78 @@
       "modId": "10",
       "weight": "851"
     },
+    "121": {
+      "drop": "15082",
+      "id": "121",
+      "limit": "",
+      "minimumGuarantee": "150|1",
+      "modId": "11",
+      "weight": "30"
+    },
+    "122": {
+      "drop": "15083",
+      "id": "122",
+      "limit": "1",
+      "minimumGuarantee": "",
+      "modId": "11",
+      "weight": "2"
+    },
+    "123": {
+      "drop": "15084",
+      "id": "123",
+      "limit": "2",
+      "minimumGuarantee": "",
+      "modId": "11",
+      "weight": "30"
+    },
+    "124": {
+      "drop": "15085",
+      "id": "124",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "11",
+      "weight": "237"
+    },
+    "125": {
+      "drop": "15086",
+      "id": "125",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "11",
+      "weight": "638"
+    },
+    "126": {
+      "drop": "15087",
+      "id": "126",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "11",
+      "weight": "1000"
+    },
+    "127": {
+      "drop": "15088",
+      "id": "127",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "11",
+      "weight": "533"
+    },
+    "128": {
+      "drop": "15089",
+      "id": "128",
+      "limit": "1",
+      "minimumGuarantee": "",
+      "modId": "11",
+      "weight": "10"
+    },
+    "129": {
+      "drop": "15090",
+      "id": "129",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "11",
+      "weight": "2487"
+    },
     "13": {
       "drop": "18233",
       "id": "13",
@@ -208,6 +280,86 @@
       "modId": "2",
       "weight": "6"
     },
+    "130": {
+      "drop": "15091",
+      "id": "130",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "11",
+      "weight": "500"
+    },
+    "131": {
+      "drop": "15092",
+      "id": "131",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "11",
+      "weight": "2605"
+    },
+    "132": {
+      "drop": "15093",
+      "id": "132",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "11",
+      "weight": "1928"
+    },
+    "133": {
+      "drop": "15094",
+      "id": "133",
+      "limit": "",
+      "minimumGuarantee": "150|1",
+      "modId": "12",
+      "weight": "30"
+    },
+    "134": {
+      "drop": "15095",
+      "id": "134",
+      "limit": "1",
+      "minimumGuarantee": "",
+      "modId": "12",
+      "weight": "2"
+    },
+    "135": {
+      "drop": "15096",
+      "id": "135",
+      "limit": "2",
+      "minimumGuarantee": "",
+      "modId": "12",
+      "weight": "30"
+    },
+    "136": {
+      "drop": "15097",
+      "id": "136",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "12",
+      "weight": "237"
+    },
+    "137": {
+      "drop": "15086",
+      "id": "137",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "12",
+      "weight": "638"
+    },
+    "138": {
+      "drop": "15087",
+      "id": "138",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "12",
+      "weight": "1000"
+    },
+    "139": {
+      "drop": "15088",
+      "id": "139",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "12",
+      "weight": "533"
+    },
     "14": {
       "drop": "18234",
       "id": "14",
@@ -215,6 +367,46 @@
       "minimumGuarantee": "",
       "modId": "2",
       "weight": "2"
+    },
+    "140": {
+      "drop": "15089",
+      "id": "140",
+      "limit": "1",
+      "minimumGuarantee": "",
+      "modId": "12",
+      "weight": "10"
+    },
+    "141": {
+      "drop": "15090",
+      "id": "141",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "12",
+      "weight": "2487"
+    },
+    "142": {
+      "drop": "15091",
+      "id": "142",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "12",
+      "weight": "500"
+    },
+    "143": {
+      "drop": "15092",
+      "id": "143",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "12",
+      "weight": "2605"
+    },
+    "144": {
+      "drop": "15093",
+      "id": "144",
+      "limit": "",
+      "minimumGuarantee": "",
+      "modId": "12",
+      "weight": "1928"
     },
     "15": {
       "drop": "18235",
@@ -974,6 +1166,18 @@
       "id": "10",
       "use": "9340000~1"
     },
+    "11": {
+      "actId": "711",
+      "exchange": "",
+      "id": "11",
+      "use": "9340000~1"
+    },
+    "12": {
+      "actId": "712",
+      "exchange": "",
+      "id": "12",
+      "use": "9340000~1"
+    },
     "2": {
       "actId": "702",
       "exchange": "",
@@ -1042,6 +1246,96 @@
       "param": "1500",
       "type": "2"
     },
+    "100": {
+      "drop": "1110029~1",
+      "id": "100",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "11",
+      "param": "300",
+      "type": "2"
+    },
+    "101": {
+      "drop": "2140020~52",
+      "id": "101",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "11",
+      "param": "500",
+      "type": "2"
+    },
+    "102": {
+      "drop": "1110029~1",
+      "id": "102",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "11",
+      "param": "800",
+      "type": "2"
+    },
+    "103": {
+      "drop": "2140020~52",
+      "id": "103",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "11",
+      "param": "1000",
+      "type": "2"
+    },
+    "104": {
+      "drop": "1110035~1",
+      "id": "104",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "11",
+      "param": "1300",
+      "type": "2"
+    },
+    "105": {
+      "drop": "2140020~52",
+      "id": "105",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "11",
+      "param": "1500",
+      "type": "2"
+    },
+    "106": {
+      "drop": "1110035~1",
+      "id": "106",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "11",
+      "param": "2000",
+      "type": "2"
+    },
+    "107": {
+      "drop": "2140020~100",
+      "id": "107",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "11",
+      "param": "2500",
+      "type": "2"
+    },
+    "108": {
+      "drop": "1110007~1",
+      "id": "108",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "12",
+      "param": "30",
+      "type": "2"
+    },
+    "109": {
+      "drop": "2140021~11",
+      "id": "109",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "12",
+      "param": "50",
+      "type": "2"
+    },
     "11": {
       "drop": "1110036~1",
       "id": "11",
@@ -1049,6 +1343,96 @@
       "loopLayer": "",
       "modId": "1",
       "param": "2000",
+      "type": "2"
+    },
+    "110": {
+      "drop": "1110013~1",
+      "id": "110",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "12",
+      "param": "100",
+      "type": "2"
+    },
+    "111": {
+      "drop": "2140021~41",
+      "id": "111",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "12",
+      "param": "200",
+      "type": "2"
+    },
+    "112": {
+      "drop": "1110030~1",
+      "id": "112",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "12",
+      "param": "300",
+      "type": "2"
+    },
+    "113": {
+      "drop": "2140021~52",
+      "id": "113",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "12",
+      "param": "500",
+      "type": "2"
+    },
+    "114": {
+      "drop": "1110030~1",
+      "id": "114",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "12",
+      "param": "800",
+      "type": "2"
+    },
+    "115": {
+      "drop": "2140021~52",
+      "id": "115",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "12",
+      "param": "1000",
+      "type": "2"
+    },
+    "116": {
+      "drop": "1110036~1",
+      "id": "116",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "12",
+      "param": "1300",
+      "type": "2"
+    },
+    "117": {
+      "drop": "2140021~52",
+      "id": "117",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "12",
+      "param": "1500",
+      "type": "2"
+    },
+    "118": {
+      "drop": "1110036~1",
+      "id": "118",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "12",
+      "param": "2000",
+      "type": "2"
+    },
+    "119": {
+      "drop": "2140021~100",
+      "id": "119",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "12",
+      "param": "2500",
       "type": "2"
     },
     "12": {
@@ -1097,7 +1481,7 @@
       "type": "2"
     },
     "17": {
-      "drop": "1110016~1",
+      "drop": "1110033~1",
       "id": "17",
       "itemId": "9340000",
       "loopLayer": "",
@@ -1115,7 +1499,7 @@
       "type": "2"
     },
     "19": {
-      "drop": "1110016~1",
+      "drop": "1110033~1",
       "id": "19",
       "itemId": "9340000",
       "loopLayer": "",
@@ -1421,7 +1805,7 @@
       "type": "2"
     },
     "5": {
-      "drop": "1110013~1",
+      "drop": "1110030~1",
       "id": "5",
       "itemId": "9340000",
       "loopLayer": "",
@@ -1619,7 +2003,7 @@
       "type": "2"
     },
     "7": {
-      "drop": "1110013~1",
+      "drop": "1110030~1",
       "id": "7",
       "itemId": "9340000",
       "loopLayer": "",
@@ -1799,7 +2183,7 @@
       "type": "2"
     },
     "88": {
-      "drop": "1110016~1",
+      "drop": "1110033~1",
       "id": "88",
       "itemId": "9340000",
       "loopLayer": "",
@@ -1826,7 +2210,7 @@
       "type": "2"
     },
     "90": {
-      "drop": "1110016~1",
+      "drop": "1110033~1",
       "id": "90",
       "itemId": "9340000",
       "loopLayer": "",
@@ -1877,6 +2261,42 @@
       "loopLayer": "",
       "modId": "10",
       "param": "2500",
+      "type": "2"
+    },
+    "96": {
+      "drop": "1110006~1",
+      "id": "96",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "11",
+      "param": "30",
+      "type": "2"
+    },
+    "97": {
+      "drop": "2140020~11",
+      "id": "97",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "11",
+      "param": "50",
+      "type": "2"
+    },
+    "98": {
+      "drop": "1110012~1",
+      "id": "98",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "11",
+      "param": "100",
+      "type": "2"
+    },
+    "99": {
+      "drop": "2140020~41",
+      "id": "99",
+      "itemId": "9340000",
+      "loopLayer": "",
+      "modId": "11",
+      "param": "200",
       "type": "2"
     }
   }

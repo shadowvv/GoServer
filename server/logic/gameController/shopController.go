@@ -587,7 +587,7 @@ func buyItemSuccess(orderId int64, payType enum.RechargeType, player *model.Play
 	// 掉落
 	err := itemService.AddItemsWithPayType(player, dropItems, enum.ITEM_CHANGE_REASON_CASH_SHOP_BUY, payType)
 	if err != nil {
-		logger.ErrorBySprintf("recharge add items error", player, err)
+		platformLogger.ErrorWithUser("recharge add items error", player, err)
 	}
 
 	if itemCfg.TypeId == int32(enum.ShopItemTypeWeekly) || itemCfg.TypeId == int32(enum.ShopItemTypeFirstCharge) {

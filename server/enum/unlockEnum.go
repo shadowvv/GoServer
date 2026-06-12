@@ -53,6 +53,10 @@ const (
 	UNLOCK_TYPE_PLAYER_GLORY_ARENA_ENROLL_LOST             // 玩家擂台报名3负
 	UNLOCK_TYPE_PLAYER_GLORY_ARENA_ENROLL_WIN_COUNT        // 玩家擂台报名n胜
 	UNLOCK_TYPE_PLAYER_GLORY_ARENA_FIRST_ENTER             // 玩家每日首次进入擂台
+	UNLOCK_TYPE_PLAYER_PET_LOTTERY_DRAW_COUNT              // 玩家招募宠物次数
+	UNLOCK_TYPE_PLAYER_EXPEDITION_COUNT                    // 玩家出征次数 param = 0:今天 param = 1:累计
+	UNLOCK_TYPE_PLAYER_COLLECTION_LOTTERY_DRAW_COUNT       // 玩家藏品抽取次数 param = 0:今天 param = 1:累计
+
 )
 
 var serverUnlockType = map[UnlockType]bool{
@@ -64,7 +68,7 @@ var serverUnlockType = map[UnlockType]bool{
 }
 
 func IsValidUnlockType(v int32) bool {
-	if v >= int32(UNLOCK_TYPE_PLAYER_IN_MAIN_INSTANCE) && v <= int32(UNLOCK_TYPE_PLAYER_GLORY_ARENA_FIRST_ENTER) {
+	if v >= int32(UNLOCK_TYPE_PLAYER_IN_MAIN_INSTANCE) && v <= int32(UNLOCK_TYPE_PLAYER_COLLECTION_LOTTERY_DRAW_COUNT) {
 		return true
 	}
 	return false

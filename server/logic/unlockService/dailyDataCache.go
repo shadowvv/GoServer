@@ -17,7 +17,6 @@ type DailyDataCache struct {
 }
 
 const (
-	// 每日数据过期时间：27小时（比24小时多3小时，防止跨时区问题）
 	DailyDataExpire = 27 * time.Hour
 )
 
@@ -88,6 +87,50 @@ func (d *DailyDataCache) RecordLottery(ctx context.Context, userId int64, lotter
 	return nil
 }
 
+// RecordPetRecruit 记录宠物招募次数
+func (d *DailyDataCache) RecordPetRecruit(ctx context.Context, userId int64, count int32) error {
+	today := time.Now().Format("20060102")
+	redisKey := enum.GetDailyPetRecruitCountKey(today)
+	userField := strconv.FormatInt(userId, 10)
+
+	_, err := dbService.RDB.HIncrBy(ctx, redisKey, userField, int64(count)).Result()
+	if err != nil {
+		return err
+	}
+	dbService.RDB.Expire(ctx, redisKey, DailyDataExpire)
+
+	return nil
+}
+
+// RecordCollectionLottery 记录藏品抽取次数
+func (d *DailyDataCache) RecordCollectionLottery(ctx context.Context, userId int64, count int32) error {
+	today := time.Now().Format("20060102")
+	redisKey := enum.GetDailyCollectionLotteryCountKey(today)
+	userField := strconv.FormatInt(userId, 10)
+
+	_, err := dbService.RDB.HIncrBy(ctx, redisKey, userField, int64(count)).Result()
+	if err != nil {
+		return err
+	}
+	dbService.RDB.Expire(ctx, redisKey, DailyDataExpire)
+
+	return nil
+}
+
+// RecordExpedition 记录出征
+func (d *DailyDataCache) RecordExpedition(ctx context.Context, userId int64) error {
+	today := time.Now().Format("20060102")
+	userField := strconv.FormatInt(userId, 10)
+	countKey := enum.GetDailyExpeditionCountKey(today)
+	_, err := dbService.RDB.HIncrBy(ctx, countKey, userField, int64(1)).Result()
+	if err != nil {
+		return err
+	}
+	dbService.RDB.Expire(ctx, countKey, DailyDataExpire)
+
+	return nil
+}
+
 // GetDailyHeroLevelUpCount 获取今日英雄升级次数
 func (d *DailyDataCache) GetDailyHeroLevelUpCount(ctx context.Context, userId int64) (int32, error) {
 	today := time.Now().Format("20060102")
@@ -106,6 +149,48 @@ func (d *DailyDataCache) GetDailyHeroLevelUpCount(ctx context.Context, userId in
 func (d *DailyDataCache) GetDailyLotteryCount(ctx context.Context, userId int64, lotteryId int32) (int32, error) {
 	today := time.Now().Format("20060102")
 	redisKey := enum.GetDailyLotteryCountKey(today, lotteryId)
+	userField := strconv.FormatInt(userId, 10)
+
+	countStr, err := dbService.RDB.HGet(ctx, redisKey, userField).Result()
+	if err != nil {
+		return 0, nil
+	}
+	count, _ := strconv.ParseInt(countStr, 10, 32)
+	return int32(count), nil
+}
+
+// GetDailyPetRecruitCount 获取今日宠物招募次数
+func (d *DailyDataCache) GetDailyPetRecruitCount(ctx context.Context, userId int64) (int32, error) {
+	today := time.Now().Format("20060102")
+	redisKey := enum.GetDailyPetRecruitCountKey(today)
+	userField := strconv.FormatInt(userId, 10)
+
+	countStr, err := dbService.RDB.HGet(ctx, redisKey, userField).Result()
+	if err != nil {
+		return 0, nil
+	}
+	count, _ := strconv.ParseInt(countStr, 10, 32)
+	return int32(count), nil
+}
+
+// GetDailyCollectionLotteryCount 获取今日藏品抽取次数
+func (d *DailyDataCache) GetDailyCollectionLotteryCount(ctx context.Context, userId int64) (int32, error) {
+	today := time.Now().Format("20060102")
+	redisKey := enum.GetDailyCollectionLotteryCountKey(today)
+	userField := strconv.FormatInt(userId, 10)
+
+	countStr, err := dbService.RDB.HGet(ctx, redisKey, userField).Result()
+	if err != nil {
+		return 0, nil
+	}
+	count, _ := strconv.ParseInt(countStr, 10, 32)
+	return int32(count), nil
+}
+
+// GetDailyExpeditionCount 获取今日出征次数
+func (d *DailyDataCache) GetDailyExpeditionCount(ctx context.Context, userId int64) (int32, error) {
+	today := time.Now().Format("20060102")
+	redisKey := enum.GetDailyExpeditionCountKey(today)
 	userField := strconv.FormatInt(userId, 10)
 
 	countStr, err := dbService.RDB.HGet(ctx, redisKey, userField).Result()
@@ -153,6 +238,9 @@ func (d *DailyDataCache) ClearExpiredData(ctx context.Context, date string) erro
 		enum.REDIS_DAILY_LOTTERY_COUNT + date + "*",
 		enum.REDIS_DAILY_LOTTERY_QUALITY + date + "*",
 		enum.REDIS_DAILY_LOTTERY_HERO + date + "*",
+		enum.REDIS_DAILY_PET_RECRUIT_COUNT + date + "*",
+		enum.REDIS_DAILY_COLLECTION_LOTTERY_COUNT + date + "*",
+		enum.REDIS_DAILY_EXPEDITION_COUNT + date + "*",
 	}
 
 	for _, pattern := range patterns {

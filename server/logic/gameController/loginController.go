@@ -216,32 +216,46 @@ func LoginReqHandle(message proto.Message, user logicCommon.UserBaseInterface) {
 func afterLoginHandler(messageTask serviceInterface.InnerTaskInterface) (any, error) {
 	p := sessionManager.GetPlayerBasicInfoByUserId(messageTask.GetReqId())
 	if p == nil {
-		logger.ErrorBySprintf("message error")
+		logger.ErrorBySprintf("player is not in server %d", messageTask.GetReqId())
 		return nil, nil
 	}
-	innerTask, ok := messageTask.(*dispatcherService.InnerTask)
+	player, ok := p.(*model.PlayerModel)
 	if !ok {
-		logger.ErrorBySprintf("message error")
+		logger.ErrorBySprintf("player model transfer error %d", messageTask.GetReqId())
 		return nil, nil
 	}
-	if innerTask.ReqParameter == nil {
-		logger.ErrorBySprintf("message error")
-		return nil, nil
-	}
-	param, ok := innerTask.ReqParameter.(*loginParam)
-	if !ok {
-		logger.ErrorBySprintf("message error")
-		return nil, nil
-	}
-	player := p.(*model.PlayerModel)
-	ok = afterLogin(player, param)
-	if !ok {
-		return nil, nil
-	}
-	pushLoginMessage(player)
-	enum.PublishLogin(dbService.RDB, player.GetUserId(), player.GetUserAccount(), 0)
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				loginMutexService.ExitMutex(player.GetUserAccount(), player.GetSession().GetID())
+				logger.ErrorBySprintf("afterLogin err player:%s panic:%+v", player.GetUserAccount(), r)
+				messageSender.CloseSessionWithError(player, pb.MESSAGE_ID_LOGIN_RESP, pb.ERROR_CODE_SYSTEM_ERROR)
+			}
+		}()
 
-	RetryDeliverFieldItemHandler(player)
+		innerTask, ok := messageTask.(*dispatcherService.InnerTask)
+		if !ok {
+			logger.ErrorBySprintf("message error")
+			return
+		}
+		if innerTask.ReqParameter == nil {
+			logger.ErrorBySprintf("message error")
+			return
+		}
+		param, ok := innerTask.ReqParameter.(*loginParam)
+		if !ok {
+			logger.ErrorBySprintf("message error")
+			return
+		}
+		ok = afterLogin(player, param)
+		if !ok {
+			return
+		}
+		pushLoginMessage(player)
+		enum.PublishLogin(dbService.RDB, player.GetUserId(), player.GetUserAccount(), 0)
+
+		//RetryDeliverFieldItemHandler(player)
+	}()
 	return nil, nil
 }
 
@@ -268,7 +282,7 @@ func afterLogin(player *model.PlayerModel, param *loginParam) bool {
 			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_LOGIN_RESP, pb.ERROR_CODE_LOGIN_ENTER_SCENE_ERROR)
 			return false
 		}
-		dispatcher.DispatchInnerMessageTask(enum.INNER_MSG_TYPE_PLAYER, enum.INNER_MEG_AFTER_LOGIN, player.GetUserId(), nil, 0, 0, nil)
+		dispatcher.DispatchInnerMessageTask(enum.INNER_MSG_TYPE_PLAYER, enum.INNER_MEG_AFTER_LOGIN, player.GetUserId(), param, 0, 0, nil)
 		return false
 	}
 	// 功能解锁
@@ -414,15 +428,18 @@ func pushLoginMessage(player *model.PlayerModel) {
 	}
 
 	openInfo := make([]*pb.FunctionOpenInfo, 0)
+	unlockTime := int64(0)
 	for funcId, status := range player.PlayerFunctionModel.FunctionStatus {
 		rewardCommited := int32(0)
 		if entity := player.PlayerFunctionModel.Get(int32(funcId)); entity != nil {
 			rewardCommited = entity.RewardCommited
+			unlockTime = entity.UnlockTime
 		}
 		openInfo = append(openInfo, &pb.FunctionOpenInfo{
 			FuncId:         int32(funcId),
 			Status:         status,
 			RewardCommited: rewardCommited,
+			UnlockTime:     unlockTime,
 		})
 	}
 
@@ -492,6 +509,12 @@ func pushLoginMessage(player *model.PlayerModel) {
 
 	allianceInfo := logicCommon.GetPlayerAllianceInfoFromRedis(player.GetUserId())
 
+	dailyTempBattleSpeedUpCount := player.StaticData.GetBattleSpeedUpTimes()
+	if dailyTempBattleSpeedUpCount > 0 {
+		dailyTempBattleSpeedUpCount = player.StaticData.GetDailyBattleSpeedUpTimes()
+	} else {
+		dailyTempBattleSpeedUpCount = -1
+	}
 	res := &pb.LoginResp{
 		BasicInfo: &pb.PlayerBasicInfo{
 			UserId:      player.GetUserId(),
@@ -531,7 +554,8 @@ func pushLoginMessage(player *model.PlayerModel) {
 			AllianceId:   allianceInfo.AllianceId,
 			AllianceName: allianceInfo.AllianceName,
 		},
-		BuyDispatchFormationNum: player.StaticData.GetBuyDispatchFormationNum(),
+		BuyDispatchFormationNum:   player.StaticData.GetBuyDispatchFormationNum(),
+		DailyTempBattleSpeedCount: dailyTempBattleSpeedUpCount,
 	}
 
 	player.User.UpdateLastLoginTime(tool.UnixNowMilli())
@@ -633,10 +657,12 @@ func loadPlayerFromDB(player *model.PlayerModel, userEntity *model.UserEntity, i
 	player.TaskModel = taskModel
 	player.AppendPlayerModel(taskModel)
 
-	if _, ok := cityAge.Service.GetOrLoadModel(player, false); !ok {
+	cityAgeModel, ok := cityAge.Service.GetOrLoadModel(player, false)
+	if !ok {
 		logger.ErrorWithZapFields("load city age model error")
 		return errors.New("load city age model error")
 	}
+	player.HeroAttrModels = append(player.HeroAttrModels, cityAgeModel)
 
 	equipModel, err := model.LoadEquipmentBags(userEntity.UserId, player)
 	if err != nil {
@@ -675,6 +701,13 @@ func loadPlayerFromDB(player *model.PlayerModel, userEntity *model.UserEntity, i
 		}
 	}
 	player.AppendPlayerModel(player.PassTaskModel)
+
+	player.AllianceDailyActivityModel, err = model.LoadAllianceDailyActivityModel(userEntity.UserId)
+	if err != nil {
+		logger.ErrorWithZapFields("load alliance daily activity model error")
+		return err
+	}
+	player.AppendPlayerModel(player.AllianceDailyActivityModel)
 
 	if player.AlbumRewardModel == nil {
 		player.AlbumRewardModel = model.NewAlbumRewardModel(userEntity.UserId, model.LoadAlbumRewardScore(userEntity.UserId))
@@ -969,6 +1002,13 @@ func loadPlayerFromDB(player *model.PlayerModel, userEntity *model.UserEntity, i
 	player.AppendPlayerModel(player.AppearanceModel)
 	player.HeroAttrModels = append(player.HeroAttrModels, player.AppearanceModel)
 
+	player.SignInModel, err = model.LoadSignInModel(userEntity.UserId)
+	if err != nil {
+		logger.ErrorWithZapFields("load sign in model error")
+		return err
+	}
+	player.AppendPlayerModel(player.SignInModel)
+
 	return nil
 }
 
@@ -1035,10 +1075,12 @@ func CreatePlayer(player *model.PlayerModel, user *model.LoginUser, userId int64
 		player.TaskModel = model.NewTaskModel(userId, make(map[int32]map[int32]map[int32]*model.TaskEntity), make(map[int32]*model.TaskEntity), player)
 		player.AppendPlayerModel(player.TaskModel)
 	}
-	if _, ok := cityAge.Service.GetOrLoadModel(player, true); !ok {
+	cityAgeModel, ok := cityAge.Service.GetOrLoadModel(player, true)
+	if !ok {
 		logger.ErrorWithZapFields("create city age model error")
 		return errors.New("create city age model error")
 	}
+	player.AppendHeroAttrModel(cityAgeModel)
 	if player.EquipmentModel == nil {
 		player.EquipmentModel = model.NewEquipmentCollectionModel(userId, make(map[int64]*model.EquipmentEntity), player)
 		player.AppendPlayerModel(player.EquipmentModel)
@@ -1058,7 +1100,7 @@ func CreatePlayer(player *model.PlayerModel, user *model.LoginUser, userId int64
 	}
 	player.AppendPlayerModel(player.ExpeditionModel)
 
-	player.LotteryModel = model.NewLotteryModel(userId, make(map[int32]*model.LotteryEntity), make(map[int32][]*model.LotteryLog), make(map[int32]map[int32]bool), make(map[int32]map[int32]bool))
+	player.LotteryModel = model.NewLotteryModel(userId, make(map[int32]*model.LotteryEntity), &model.LotteryLuckyEventEntity{}, make(map[int32][]*model.LotteryLog), make(map[int32]map[int32]bool), make(map[int32]map[int32]bool))
 	player.AppendPlayerModel(player.LotteryModel)
 
 	player.LoopBoxModel, err = model.CreatLoopBoxModel(userId)
@@ -1224,6 +1266,21 @@ func CreatePlayer(player *model.PlayerModel, user *model.LoginUser, userId int64
 	player.AppendPlayerModel(player.AppearanceModel)
 	player.AppendHeroAttrModel(player.AppearanceModel)
 
+	signInModel, err := model.LoadSignInModel(player.GetUserId())
+	if err != nil {
+		logger.ErrorWithZapFields("load signin model error")
+		return err
+	}
+	player.SignInModel = signInModel
+	player.AppendPlayerModel(player.SignInModel)
+
+	player.AllianceDailyActivityModel, err = model.LoadAllianceDailyActivityModel(player.GetUserId())
+	if err != nil {
+		logger.ErrorWithZapFields("load alliance daily activity model error")
+		return err
+	}
+	player.AppendPlayerModel(player.AllianceDailyActivityModel)
+
 	enum.PublishRegister(dbService.RDB, player.GetUserId(), player.GetUserAccount(), int64(getPlayerInfoCountByAccount(player.GetUserAccount())))
 
 	return nil
@@ -1301,7 +1358,7 @@ func LoadRecentPlayerBasicInfoFromDB() {
 }
 
 func getPlayerInfoCountByAccount(account string) int32 {
-	info, err := easyDB.GetServerEntitiesByWhere[model.UserEntity](map[string]interface{}{"account": account})
+	info, err := easyDB.GetPlayerEntitiesByWhere[model.UserEntity](map[string]interface{}{"account": account})
 	if err != nil {
 		return 0
 	}

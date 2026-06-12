@@ -24,6 +24,18 @@
       "sendRewardType": "2",
       "settlementType": "3"
     },
+    "12": {
+      "id": "12",
+      "mailId": "9003",
+      "pN": "10",
+      "pNMax": "10",
+      "pointType": "10",
+      "rankRewardsId": "1013",
+      "rankThreshold": "",
+      "rankType": "1",
+      "sendRewardType": "1",
+      "settlementType": "2"
+    },
     "2": {
       "id": "2",
       "mailId": "",
@@ -95,6 +107,18 @@
       "rankType": "1",
       "sendRewardType": "1",
       "settlementType": "4"
+    },
+    "9": {
+      "id": "9",
+      "mailId": "11003",
+      "pN": "100",
+      "pNMax": "300",
+      "pointType": "9",
+      "rankRewardsId": "1010",
+      "rankThreshold": "",
+      "rankType": "1",
+      "sendRewardType": "1",
+      "settlementType": "3"
     }
   },
   "rankAct": {
@@ -108,7 +132,22 @@
       "pNMax": "10",
       "pointType": "2",
       "rankRewardsId": "1001",
-      "rankThreshold": "40",
+      "rankThreshold": "70",
+      "rankType": "2",
+      "sendRewardType": "2",
+      "settlementType": "5"
+    },
+    "10": {
+      "actId": "104",
+      "allDropId": "10317",
+      "id": "10",
+      "likeDropId": "10318",
+      "mailId": "8006",
+      "pN": "6",
+      "pNMax": "6",
+      "pointType": "1",
+      "rankRewardsId": "1005",
+      "rankThreshold": "41",
       "rankType": "2",
       "sendRewardType": "2",
       "settlementType": "5"
@@ -123,7 +162,7 @@
       "pNMax": "10",
       "pointType": "2",
       "rankRewardsId": "1002",
-      "rankThreshold": "70",
+      "rankThreshold": "117",
       "rankType": "2",
       "sendRewardType": "2",
       "settlementType": "5"
@@ -138,7 +177,7 @@
       "pNMax": "8",
       "pointType": "2",
       "rankRewardsId": "1003",
-      "rankThreshold": "117",
+      "rankThreshold": "150",
       "rankType": "2",
       "sendRewardType": "2",
       "settlementType": "5"
@@ -153,7 +192,7 @@
       "pNMax": "7",
       "pointType": "2",
       "rankRewardsId": "1004",
-      "rankThreshold": "150",
+      "rankThreshold": "200",
       "rankType": "2",
       "sendRewardType": "2",
       "settlementType": "5"
@@ -168,7 +207,67 @@
       "pNMax": "6",
       "pointType": "2",
       "rankRewardsId": "1005",
-      "rankThreshold": "200",
+      "rankThreshold": "250",
+      "rankType": "2",
+      "sendRewardType": "2",
+      "settlementType": "5"
+    },
+    "6": {
+      "actId": "104",
+      "allDropId": "10317",
+      "id": "6",
+      "likeDropId": "10318",
+      "mailId": "8002",
+      "pN": "10",
+      "pNMax": "10",
+      "pointType": "1",
+      "rankRewardsId": "1001",
+      "rankThreshold": "16",
+      "rankType": "2",
+      "sendRewardType": "2",
+      "settlementType": "5"
+    },
+    "7": {
+      "actId": "104",
+      "allDropId": "10317",
+      "id": "7",
+      "likeDropId": "10318",
+      "mailId": "8003",
+      "pN": "10",
+      "pNMax": "10",
+      "pointType": "1",
+      "rankRewardsId": "1002",
+      "rankThreshold": "26",
+      "rankType": "2",
+      "sendRewardType": "2",
+      "settlementType": "5"
+    },
+    "8": {
+      "actId": "104",
+      "allDropId": "10317",
+      "id": "8",
+      "likeDropId": "10318",
+      "mailId": "8004",
+      "pN": "8",
+      "pNMax": "8",
+      "pointType": "1",
+      "rankRewardsId": "1003",
+      "rankThreshold": "31",
+      "rankType": "2",
+      "sendRewardType": "2",
+      "settlementType": "5"
+    },
+    "9": {
+      "actId": "104",
+      "allDropId": "10317",
+      "id": "9",
+      "likeDropId": "10318",
+      "mailId": "8005",
+      "pN": "7",
+      "pNMax": "7",
+      "pointType": "1",
+      "rankRewardsId": "1004",
+      "rankThreshold": "36",
       "rankType": "2",
       "sendRewardType": "2",
       "settlementType": "5"

@@ -43,8 +43,11 @@ func (eh *TaskEventHandler) handleEvent(event eventService.GameEvent) {
 		return
 	}
 	eventType := event.GetEventType()
-	if _, ok := enum.EventToObjectiveTypes[eventType]; ok {
+	if _, ok := enum.PlayerEventTypes[eventType]; ok {
 		dispatcher.DispatchInnerMessageTask(enum.INNER_MSG_TYPE_PLAYER, enum.INNER_MSG_EVENT_TASK_PLAYER, event.GetObjectID(), event, 0, 0, nil)
+	}
+	if _, ok := enum.AllianceEventTypes[eventType]; ok {
+		// todo 联盟团队任务存在，关心事件，objectId 是联盟id,抛给联盟服务器
 	}
 }
 

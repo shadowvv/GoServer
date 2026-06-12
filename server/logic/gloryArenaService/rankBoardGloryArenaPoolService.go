@@ -2,6 +2,7 @@ package gloryArenaService
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sort"
@@ -89,21 +90,28 @@ func (s *RankBoardGloryArenaPoolService) StartService() {
 		defer ticker.Stop()
 		for range ticker.C {
 			now := tool.UnixNowMilli()
+			logger.InfoWithSprintf("[gloryArenaPoolService] tick start now:%d local:%s", now, time.UnixMilli(now).Format(time.RFC3339))
 			if err := s.buildRoundPoolForAllOpenServers(now); err != nil {
 				logger.ErrorBySprintf("[gloryArenaPoolService] build round pool failed err:%v", err)
+			} else {
+				logger.InfoWithSprintf("[gloryArenaPoolService] build round pool finished now:%d", now)
 			}
 			if err := s.tryDailyMergePools(now); err != nil {
 				logger.ErrorBySprintf("[gloryArenaPoolService] daily merge pools failed err:%v", err)
+			} else {
+				logger.InfoWithSprintf("[gloryArenaPoolService] daily merge pools finished now:%d", now)
 			}
 		}
 	}()
 }
 
 func (s *RankBoardGloryArenaPoolService) buildRoundPoolForAllOpenServers(currentTime int64) error {
+	logger.InfoWithSprintf("[gloryArenaPoolService] build round pool begin currentTime:%d", currentTime)
 	sortedServers, crossStateMap, err := s.loadCrossServerStateMap(currentTime)
 	if err != nil {
 		return err
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] build round pool loaded servers:%d crossStates:%d", len(sortedServers), len(crossStateMap))
 	if len(sortedServers) == 0 || len(crossStateMap) == 0 {
 		return nil
 	}
@@ -121,11 +129,14 @@ func (s *RankBoardGloryArenaPoolService) buildRoundPoolForAllOpenServers(current
 		if handledVersion[crossState.GroupVersion] {
 			continue
 		}
+		logger.InfoWithSprintf("[gloryArenaPoolService] build round pool processing serverId:%d groupVersion:%s roundOpen:%t seasonType:%d roundStart:%d roundEnd:%d groupServerIds:%v",
+			serverID, crossState.GroupVersion, crossState.IsRoundOpen, crossState.SeasonType, crossState.RoundStart, crossState.RoundEnd, crossState.GroupServerIDs)
 		if err = s.ensureRoundPoolByCrossState(serverID, crossState, currentTime); err != nil {
 			logger.ErrorBySprintf("[gloryArenaPoolService] build round pools failed serverId:%d groupVersion:%s err:%v", serverID, crossState.GroupVersion, err)
 		}
 		handledVersion[crossState.GroupVersion] = true
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] build round pool done handledVersions:%d", len(handledVersion))
 	return nil
 }
 
@@ -134,6 +145,16 @@ func (s *RankBoardGloryArenaPoolService) loadCrossServerStateMap(currentTime int
 	if err != nil {
 		return nil, nil, err
 	}
+
+	// Gateway owns ops_state and writes the authoritative groupVersion.
+	// Rank should consume this first to avoid split-brain with local server-info cache.
+	opsStateMap, opsErr := s.loadCrossServerStateMapFromRedis()
+	if opsErr != nil {
+		logger.ErrorBySprintf("[gloryArenaPoolService] load ops_state from redis failed, fallback calculate by local server info, err:%v", opsErr)
+	} else if len(opsStateMap) > 0 {
+		return servers, opsStateMap, nil
+	}
+
 	if len(servers) == 0 {
 		return nil, map[int32]*logicCommon.GloryArenaOpsServerState{}, nil
 	}
@@ -143,6 +164,42 @@ func (s *RankBoardGloryArenaPoolService) loadCrossServerStateMap(currentTime int
 		return nil, nil, err
 	}
 	return servers, stateMap, nil
+}
+
+func (s *RankBoardGloryArenaPoolService) loadCrossServerStateMapFromRedis() (map[int32]*logicCommon.GloryArenaOpsServerState, error) {
+	ctx := context.Background()
+	rawStates, err := dbService.RDB.HGetAll(ctx, enum.GetGloryArenaOpsStateKey()).Result()
+	if err != nil {
+		return nil, err
+	}
+	if len(rawStates) == 0 {
+		return map[int32]*logicCommon.GloryArenaOpsServerState{}, nil
+	}
+
+	stateMap := make(map[int32]*logicCommon.GloryArenaOpsServerState, len(rawStates))
+	for serverIDStr, payload := range rawStates {
+		if payload == "" {
+			continue
+		}
+		serverID64, parseErr := strconv.ParseInt(serverIDStr, 10, 32)
+		if parseErr != nil {
+			logger.ErrorBySprintf("[gloryArenaPoolService] parse ops_state serverId failed serverId:%s err:%v", serverIDStr, parseErr)
+			continue
+		}
+		state := &logicCommon.GloryArenaOpsServerState{}
+		if unmarshalErr := json.Unmarshal([]byte(payload), state); unmarshalErr != nil {
+			logger.ErrorBySprintf("[gloryArenaPoolService] unmarshal ops_state failed serverId:%s err:%v", serverIDStr, unmarshalErr)
+			continue
+		}
+		if state.ServerID <= 0 {
+			state.ServerID = int32(serverID64)
+		}
+		if state.ServerID <= 0 {
+			continue
+		}
+		stateMap[state.ServerID] = state
+	}
+	return stateMap, nil
 }
 
 func (s *RankBoardGloryArenaPoolService) loadSortedOpenServers() ([]logicCommon.ServerInfoInterface, error) {
@@ -175,6 +232,7 @@ func (s *RankBoardGloryArenaPoolService) ensureRoundPoolByCrossState(serverID in
 	ctx := context.Background()
 	opponentKey := enum.GetGloryArenaPoolOpponentRoundKey(crossState.GroupVersion)
 	qualifyKey := enum.GetGloryArenaPoolQualifyRoundKey(crossState.GroupVersion)
+	logger.InfoWithSprintf("[gloryArenaPoolService] ensure round pool begin serverId:%d groupVersion:%s opponentKey:%s qualifyKey:%s", serverID, crossState.GroupVersion, opponentKey, qualifyKey)
 	needBuildOpponent, err := needRebuildOpponentPool(ctx, opponentKey)
 	if err != nil {
 		return err
@@ -183,15 +241,29 @@ func (s *RankBoardGloryArenaPoolService) ensureRoundPoolByCrossState(serverID in
 	if err != nil {
 		return err
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] ensure round pool decide serverId:%d groupVersion:%s needBuildOpponent:%t needBuildQualify:%t",
+		serverID, crossState.GroupVersion, needBuildOpponent, needBuildQualify)
 
 	if needBuildQualify {
-		if _, err = s.buildQualifyPoolByCrossState(serverID, crossState, currentTime); err != nil {
+		buildResult, buildErr := s.buildQualifyPoolByCrossState(serverID, crossState, currentTime)
+		if buildErr != nil {
+			err = buildErr
 			return err
+		}
+		if buildResult != nil {
+			logger.InfoWithSprintf("[gloryArenaPoolService] build qualify pool success serverId:%d groupVersion:%s poolKey:%s topN:%d members:%d groupServerIds:%v",
+				serverID, crossState.GroupVersion, buildResult.PoolKey, buildResult.TopN, buildResult.MemberCount, buildResult.GroupServerIDs)
 		}
 	}
 	if needBuildOpponent {
-		if _, err = s.buildChallengePoolByCrossState(serverID, crossState, currentTime); err != nil {
+		buildResult, buildErr := s.buildChallengePoolByCrossState(serverID, crossState, currentTime)
+		if buildErr != nil {
+			err = buildErr
 			return err
+		}
+		if buildResult != nil {
+			logger.InfoWithSprintf("[gloryArenaPoolService] build opponent pool success serverId:%d groupVersion:%s poolKey:%s topN:%d members:%d groupServerIds:%v",
+				serverID, crossState.GroupVersion, buildResult.PoolKey, buildResult.TopN, buildResult.MemberCount, buildResult.GroupServerIDs)
 		}
 	}
 	return nil
@@ -201,17 +273,21 @@ func (s *RankBoardGloryArenaPoolService) tryDailyMergePools(currentTime int64) e
 	now := time.UnixMilli(currentTime)
 	hour := now.Hour()
 	if hour < gloryArenaMergeHourLo || hour >= gloryArenaMergeHourHi {
+		logger.InfoWithSprintf("[gloryArenaPoolService] daily merge skip by hour currentTime:%d hour:%d allowed:[%d,%d)", currentTime, hour, gloryArenaMergeHourLo, gloryArenaMergeHourHi)
 		return nil
 	}
 	today := int32(tool.GetTodayDataIntByTimeStamp(currentTime))
 	if s.lastDailyMergeDate == today {
+		logger.InfoWithSprintf("[gloryArenaPoolService] daily merge skip by date today:%d lastMergedDate:%d", today, s.lastDailyMergeDate)
 		return nil
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] daily merge begin currentTime:%d today:%d", currentTime, today)
 
 	sortedServers, crossStateMap, err := s.loadCrossServerStateMap(currentTime)
 	if err != nil {
 		return err
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] daily merge loaded servers:%d crossStates:%d", len(sortedServers), len(crossStateMap))
 	if len(sortedServers) == 0 || len(crossStateMap) == 0 {
 		return nil
 	}
@@ -229,18 +305,23 @@ func (s *RankBoardGloryArenaPoolService) tryDailyMergePools(currentTime int64) e
 		if handledVersion[crossState.GroupVersion] {
 			continue
 		}
+		logger.InfoWithSprintf("[gloryArenaPoolService] daily merge processing serverId:%d groupVersion:%s seasonType:%d roundStart:%d roundEnd:%d groupServerIds:%v",
+			serverID, crossState.GroupVersion, crossState.SeasonType, crossState.RoundStart, crossState.RoundEnd, crossState.GroupServerIDs)
 		if err = s.mergePoolsByCrossState(serverID, crossState, currentTime); err != nil {
 			logger.ErrorBySprintf("[gloryArenaPoolService] daily merge pool failed serverId:%d groupVersion:%s err:%v", serverID, crossState.GroupVersion, err)
 			continue
 		}
+		logger.InfoWithSprintf("[gloryArenaPoolService] daily merge success serverId:%d groupVersion:%s", serverID, crossState.GroupVersion)
 		handledVersion[crossState.GroupVersion] = true
 	}
 
 	s.lastDailyMergeDate = today
+	logger.InfoWithSprintf("[gloryArenaPoolService] daily merge done today:%d handledVersions:%d", today, len(handledVersion))
 	return nil
 }
 
 func (s *RankBoardGloryArenaPoolService) mergePoolsByCrossState(serverID int32, crossState *logicCommon.GloryArenaOpsServerState, currentTime int64) error {
+	logger.InfoWithSprintf("[gloryArenaPoolService] merge pools begin serverId:%d groupVersion:%s groupServerIds:%v", serverID, crossState.GroupVersion, crossState.GroupServerIDs)
 	if err := s.mergeOpponentPoolByCrossState(crossState); err != nil {
 		return err
 	}
@@ -248,6 +329,7 @@ func (s *RankBoardGloryArenaPoolService) mergePoolsByCrossState(serverID int32, 
 		return err
 	}
 	_ = serverID
+	logger.InfoWithSprintf("[gloryArenaPoolService] merge pools done serverId:%d groupVersion:%s", serverID, crossState.GroupVersion)
 	return nil
 }
 
@@ -265,6 +347,7 @@ func (s *RankBoardGloryArenaPoolService) mergeOpponentPoolByCrossState(crossStat
 	if err != nil {
 		return err
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] merge opponent pool load existing groupVersion:%s poolKey:%s existingMembers:%d", crossState.GroupVersion, poolKey, len(merged))
 	for _, sid := range crossState.GroupServerIDs {
 		list, listErr := s.getBattlePowerTopPlayersByServer(sid, topN)
 		if listErr != nil {
@@ -280,6 +363,7 @@ func (s *RankBoardGloryArenaPoolService) mergeOpponentPoolByCrossState(crossStat
 			}
 		}
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] merge opponent pool write groupVersion:%s poolKey:%s mergedMembers:%d", crossState.GroupVersion, poolKey, len(merged))
 	return writeMergedChallengePoolToRedis(poolKey, merged)
 }
 
@@ -297,6 +381,7 @@ func (s *RankBoardGloryArenaPoolService) mergeQualifyPoolByCrossState(crossState
 	if err != nil {
 		return err
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] merge qualify pool load existing groupVersion:%s poolKey:%s existingMembers:%d", crossState.GroupVersion, poolKey, len(merged))
 	for _, sid := range crossState.GroupServerIDs {
 		list, listErr := s.getArenaTopPlayersByServer(sid, topN, currentTime)
 		if listErr != nil {
@@ -310,6 +395,7 @@ func (s *RankBoardGloryArenaPoolService) mergeQualifyPoolByCrossState(crossState
 			merged[p.PlayerID] = true
 		}
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] merge qualify pool write groupVersion:%s poolKey:%s mergedMembers:%d", crossState.GroupVersion, poolKey, len(merged))
 	return writeMergedQualifyPoolToRedis(poolKey, merged)
 }
 
@@ -362,6 +448,8 @@ func (s *RankBoardGloryArenaPoolService) buildChallengePoolByCrossState(serverID
 	if topN <= 0 {
 		return nil, ErrGloryArenaPoolRankNotConfigured
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] build opponent pool begin serverId:%d groupVersion:%s topN:%d groupServerIds:%v",
+		serverID, crossState.GroupVersion, topN, crossState.GroupServerIDs)
 
 	uniq := make(map[int64]*GloryArenaQualifiedRankPlayer)
 	failedServers := make([]int32, 0)
@@ -395,6 +483,8 @@ func (s *RankBoardGloryArenaPoolService) buildChallengePoolByCrossState(serverID
 	if err := writeChallengePoolToRedis(poolKey, uniq); err != nil {
 		return nil, err
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] build opponent pool write done serverId:%d groupVersion:%s poolKey:%s members:%d",
+		serverID, crossState.GroupVersion, poolKey, len(uniq))
 
 	groupIDs := make([]int32, len(crossState.GroupServerIDs))
 	copy(groupIDs, crossState.GroupServerIDs)
@@ -412,6 +502,8 @@ func (s *RankBoardGloryArenaPoolService) buildQualifyPoolByCrossState(serverID i
 	if topN <= 0 {
 		return nil, ErrGloryArenaQualifyRankNotConfigured
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] build qualify pool begin serverId:%d groupVersion:%s topN:%d groupServerIds:%v currentTime:%d",
+		serverID, crossState.GroupVersion, topN, crossState.GroupServerIDs, currentTime)
 
 	uniq := make(map[int64]*GloryArenaQualifiedRankPlayer)
 	for _, sid := range crossState.GroupServerIDs {
@@ -440,6 +532,8 @@ func (s *RankBoardGloryArenaPoolService) buildQualifyPoolByCrossState(serverID i
 	if err := writeQualifiedPoolToRedis(poolKey, uniq); err != nil {
 		return nil, err
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] build qualify pool write done serverId:%d groupVersion:%s poolKey:%s members:%d",
+		serverID, crossState.GroupVersion, poolKey, len(uniq))
 
 	groupIDs := make([]int32, len(crossState.GroupServerIDs))
 	copy(groupIDs, crossState.GroupServerIDs)
@@ -457,10 +551,16 @@ func (s *RankBoardGloryArenaPoolService) getBattlePowerTopPlayersByServer(server
 		return nil, nil
 	}
 	rankID := fmt.Sprintf("common_%d_%d", enum.GLORY_ARENA_BATTLE_POWER_RANK_ID, serverID)
+	logger.InfoWithSprintf("[gloryArenaPoolService] query battle power rank table serverId:%d rankTable:%s topN:%d",
+		serverID, rankID, topN)
 	rankInfos, _, err := rankboardService.GetRankInfo(rankID, int(topN), 0)
 	if err != nil {
+		logger.ErrorBySprintf("[gloryArenaPoolService] query battle power rank failed serverId:%d rankTable:%s topN:%d err:%v",
+			serverID, rankID, topN, err)
 		return nil, err
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] query battle power rank success serverId:%d rankTable:%s fetched:%d",
+		serverID, rankID, len(rankInfos))
 	return toQualifiedPlayers(serverID, topN, rankInfos), nil
 }
 
@@ -469,15 +569,24 @@ func (s *RankBoardGloryArenaPoolService) getArenaTopPlayersByServer(serverID int
 		return nil, nil
 	}
 	version := logicCommon.GetArenaRankVersionByTime(serverID, currentTime)
+	arenaRankID := gameConfig.GetArenaRankId()
+	sourceRankTable := fmt.Sprintf("common_%d_%s", arenaRankID, version)
 	versionRankID, err := logicCommon.GetRankUniqueId(gameConfig.GetArenaRankId(), 0, 0, serverID, version)
 	if err != nil {
-		logger.ErrorBySprintf("arena GetRankUniqueId error:%+v", err)
+		logger.ErrorBySprintf("[gloryArenaPoolService] arena GetRankUniqueId failed serverId:%d arenaRankId:%d version:%s sourceRankTable:%s err:%+v",
+			serverID, arenaRankID, version, sourceRankTable, err)
 		return nil, err
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] query arena rank table serverId:%d arenaRankId:%d version:%s sourceRankTable:%s queryRankID:%s topN:%d",
+		serverID, arenaRankID, version, sourceRankTable, versionRankID, topN)
 	rankInfos, _, err := rankboardService.GetRankInfo(versionRankID, int(topN), 0)
 	if err != nil {
+		logger.ErrorBySprintf("[gloryArenaPoolService] query arena rank failed serverId:%d version:%s queryRankID:%s topN:%d err:%v",
+			serverID, version, versionRankID, topN, err)
 		return nil, err
 	}
+	logger.InfoWithSprintf("[gloryArenaPoolService] query arena rank success serverId:%d version:%s queryRankID:%s fetched:%d",
+		serverID, version, versionRankID, len(rankInfos))
 	return toQualifiedPlayers(serverID, topN, rankInfos), nil
 }
 
@@ -723,7 +832,7 @@ func (s *RankBoardGloryArenaPoolService) TryAppendByArenaRankUpdate(rankID strin
 	if err != nil {
 		return false, err
 	}
-	if crossState == nil || crossState.GroupVersion == "" || crossState.RoundStart <= 0 {
+	if crossState == nil || crossState.GroupVersion == "" || crossState.RoundStart <= 0 || !crossState.IsRoundOpen {
 		return false, nil
 	}
 
@@ -768,6 +877,10 @@ func (s *RankBoardGloryArenaPoolService) getCrossServerStateByServerID(serverID 
 	if serverID <= 0 {
 		return nil, ErrGloryArenaPoolServerInfoMissing
 	}
+	if state := logicCommon.LoadGloryArenaOpsStateByServerID(serverID); state != nil {
+		return state, nil
+	}
+
 	sortedServers, err := s.loadSortedOpenServers()
 	if err != nil {
 		return nil, err

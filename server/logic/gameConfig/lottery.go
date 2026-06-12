@@ -91,6 +91,8 @@ func (s *LotteryCfgLoader) loadData() error {
 		v.Guarantees2Type = ParseInt(row["guarantees2Type"])
 		v.ActModID = ParseInt(row["actModID"])
 		v.UnlockID = ParseInt(row["unlockID"])
+		v.LuckyGuarantees = ParseLotteryCfgArray(row["luckGuarantees"])
+		v.LuckyGuaranteesWeight = ParseIntMatrix(row["luckGuaranteesWeight"])
 		if v.Id <= 0 {
 			continue
 		}
@@ -107,6 +109,13 @@ func (s *LotteryCfgLoader) checkData() error {
 		}
 		if len(v.DropGroupId1) != len(v.Weight1) || len(v.DropGroupId2) != len(v.Weight2) {
 			return errors.New(fmt.Sprintf("[gameConfig] load summonPool error invalid DropGroupId or Weight ID:%d", id))
+		}
+		if len(v.LuckyGuaranteesWeight) != len(v.LuckyGuarantees) {
+			return errors.New(fmt.Sprintf("[gameConfig] load summonPool error invalid LuckyGuaranteesWeight ID:%d", id))
+		}
+		// 如果有奖励式保底，则不能有单次保底和循环保底
+		if len(v.LuckyGuarantees) > 0 && (len(v.Guarantees1) > 0 || len(v.Guarantees2) > 0) {
+			return errors.New(fmt.Sprintf("[gameConfig] LuckyGuarantees is exist and can not have Guarantees1 or Guarantees2 lotteryId ID:%d", id))
 		}
 	}
 	return nil
@@ -141,6 +150,10 @@ type SummonPoolCfg struct {
 	Guarantees *LotteryCfg `json:"guarantees"`
 	// 保底抽数权重
 	GuaranteesWeight []int32 `json:"guaranteesWeight"`
+	// 奖励式保底
+	LuckyGuarantees []*LotteryCfg `json:"luckGuarantees"`
+	// 奖励式保底权重
+	LuckyGuaranteesWeight [][]int32 `json:"luckGuaranteesWeight"`
 	// 单次保底抽数1
 	Guarantees1 []*LotteryCfg `json:"guarantees1"`
 	// 单次保底卡池权重

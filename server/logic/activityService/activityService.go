@@ -13,9 +13,6 @@ func getActivityVersion(date string, index int32, openCount int32) string {
 	return fmt.Sprintf("d%ss%dc%d", date, index, openCount)
 }
 
-func isLoopActivity(activity *model.ServerActivityConfigEntity) bool {
-	if len(activity.WeekOpenDays) != 0 || len(activity.MonthOpenDays) != 0 || activity.LoopActivity {
-		return true
-	}
-	return false
+func HasPreActivity(activity *model.ServerActivityConfigEntity) bool {
+	return activity.HasPreActivity
 }

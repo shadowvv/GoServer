@@ -1,0 +1,233 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+enum HeroFormationType {
+  HERO_FORMATION_TYPE_NONE=0;// 占位符
+  HERO_FORMATION_TYPE_MAIN = 4; // 主线阵容
+  HERO_FORMATION_TYPE_FIVE_VS_FIVE=1;// 5V5爬塔
+  HERO_FORMATION_TYPE_ARENA_ATK=2;// 竞技场进攻
+  HERO_FORMATION_TYPE_ARENA_DEF=3;// 竞技场防守
+  HERO_FORMATION_TYPE_EXPEDITION=5;// 派遣
+  HERO_FORMATION_TYPE_ADVENTURE=6;//奇遇副本
+  HERO_FORMATION_TYPE_HONOR_ARENA=7;//荣耀擂台
+}
+
+// 英雄升级请求
+message HeroLevelUpReq {
+  int64 heroOwnId=1; // 英雄唯一ID
+  int32 levelUpType = 2; //升级类型 1：升一级 2：升五级 3：升十级
+}
+
+// 英雄升级响应
+message HeroLevelUpResp {
+  bool isSuccess = 1; // 是否升级成功
+  HeroBagInfo heroInfo = 2; // 英雄信息
+}
+
+// 英雄升星请求
+message HeroStarUpReq {
+  int64 heroOwnId=1; // 英雄唯一ID
+  map<string, MaterialList> materialsCultivated = 2; // 已培养升星材料MAP
+}
+
+// 材料列表
+message MaterialList {
+  repeated int64 heroOwnIds = 1; // 材料英雄ID列表
+}
+
+// 英雄升星响应
+message HeroStarUpResp {
+  bool isSuccess = 1; // 是否升星成功
+  HeroBagInfo heroInfo = 2; // 英雄信息
+}
+
+// 英雄图鉴详情请求
+message HeroAlbumDetailsReq {
+  int32 uid = 1; // 用户ID
+}
+
+//英雄图鉴相关消息
+message HeroAlbumInfo {
+  int64 heroId = 1; // 英雄ID
+  int32 historyMaxStar = 2; // 历史最高星级
+  int32 unclaimedScore = 3;  //未领取积分
+}
+
+// 英雄图鉴详情响应
+message HeroAlbumDetailsResp {
+  int32 claimedReward = 1; // 已领取档位
+  int32 allScore = 2; // 总积分
+  repeated HeroAlbumInfo heroAlbumInfo = 3; // 英雄图鉴信息列表
+}
+
+// 英雄图鉴奖励请求
+message HeroAlbumRewardReq {
+  int64 uid = 1;// 用户id
+  int64 heroId = 2; // 英雄ID 0表示一键领取
+}
+
+// 英雄图鉴奖励响应
+message HeroAlbumRewardResp {
+  bool isSuccess = 1; // 是否领取成功
+  int32 claimedReward = 2; // 已领取档位
+  int32 allScore = 3; // 总积分
+}
+
+// 图鉴积分奖励
+message HeroAlbumItemRewardReq{
+  int64 uid = 1; // 用户ID
+}
+
+// 图鉴积分奖励响应
+message HeroAlbumItemRewardResp{
+  bool isSuccess = 1; // 是否领取成功
+  int32 claimedReward = 2; // 已领取档位
+}
+
+// 英雄转职请求
+message HeroEvolutionReq {
+  int64 uid = 1;// 用户ID
+  int64 heroOwnId = 2; // 英雄ID
+  int32 evolutionPath = 3; // 转职方向配置ID
+}
+
+// 英雄转职响应
+message HeroEvolutionResp {
+  bool isSuccess = 1; // 是否转职成功
+  HeroBagInfo heroInfo = 2; // 英雄信息
+}
+
+// 英雄阵容详情请求
+message HeroFormationDetailsReq {
+  int64 uid = 1; // 用户ID
+}
+
+// 英雄阵容相关消息
+message HeroFormationDetails {
+  int32 formationId = 1; // 阵容ID
+  repeated int64 heroOwnIds = 2; // 阵容中的英雄ID列表
+  int32 formationType = 3; // 阵容类型
+  repeated int32 comberSkillId = 4; // 阵容组合技ID
+  repeated int32 comberSkillLevel = 5; // 阵容组合技等级
+  repeated int32  classSynergyId= 6; // 职业羁绊
+}
+
+// 英雄阵容详情响应
+message HeroFormationDetailsResp {
+  repeated HeroFormationDetails formations = 1; // 英雄阵容详情列表
+}
+
+// 设置英雄阵容请求
+message HeroSetFormationReq {
+  int32 formationId = 1; // 阵容ID
+  repeated int64 heroOwnIds = 2; // 阵容中的英雄ID列表
+  int32 formationType = 3; // 阵容类型
+}
+
+// 设置英雄阵容响应
+message HeroSetFormationResp {
+  bool isSuccess = 1; // 是否设置成功
+  int64 formationPower=2;
+}
+
+// 英雄背包信息
+message HeroBagInfo {
+  int64 heroOwnId = 1; // 英雄唯一ID
+  int64 heroId = 2; // 英雄ID
+  int32 level = 3; // 英雄等级
+  int32 star = 4; // 英雄星级
+  int32 evolutionPath = 5; // 英雄转职阶段
+  int64 evolutionTime = 16; // 转职时间
+  bool isActive = 6; // 是否上阵
+  map<int32, int64> Attributes = 7; // 英雄属性列表
+  int32 breakNum=8; // 英雄进阶次数
+  bool isCultivated=9; // 是否培养
+  int32 basicSkill = 10; // 基础技能
+  int32 activeSkill = 11; // 主动技能
+  int32 passiveSkill1 = 12; // 被动技能1
+  int32 passiveSkill2 = 13; // 被动技能2
+  int32 classSkill = 14; // 职业技能
+}
+
+// 英雄进阶请求
+message HeroBreakReq {
+  int64 uid = 1; // 用户ID
+  int64 heroOwnId = 2; // 英雄唯一ID
+}
+
+// 英雄进阶响应
+message HeroBreakResp {
+  bool isSuccess = 1; // 是否进阶成功
+  HeroBagInfo heroInfo = 2; // 英雄信息
+}
+
+// 英雄重生请求
+message HeroRebithReq {
+  int64 heroOwnId = 1; // 英雄唯一ID
+}
+
+// 英雄重生响应
+message HeroRebithResp {
+  bool isSuccess = 1; // 是否重生成功
+  HeroBagInfo heroInfo = 2; // 英雄信息
+}
+
+// 获取英雄详情请求
+message GetPlayerHeroDetailReq {
+  int64 uid = 1; // 用户ID
+  int64 heroOwnId = 2; // 英雄唯一ID
+  int32 operationType=3; // 操作类型 0 基础查看 1 全部查看
+}
+
+// 获取英雄详情响应
+message GetPlayerHeroDetailResp {
+  HeroBagInfo heroInfo = 1; // 英雄信息
+}
+
+// 无损换将请求
+message HeroExchangeNotLossReq {
+  int64 oldHeroOwnId = 1; // 旧英雄唯一ID
+  int64 newHeroOwnId = 2; // 新英雄ID
+  int32 formationId = 3; // 阵容ID
+  int32 formationType = 4; // 阵容类型
+}
+
+// 无损换将响应
+message HeroExchangeNotLossResp {
+  bool isSuccess = 1; // 是否换将成功
+  HeroBagInfo oldHeroInfo = 2; // 旧英雄信息
+  HeroBagInfo newHeroInfo = 3; // 新英雄信息
+  HeroFormationDetails updatedFormation = 4; // 更新后的阵容信息
+}
+
+message PushAddHeroDetail{
+  repeated HeroBagInfo heroInfo = 1; // 新增英雄信息
+}
+
+message GetHeroMaxDetailReq{
+  int32 heroId=1;// 英雄模板id
+}
+
+message GetHeroMaxDetailResp{
+  repeated HeroBagInfo heroInfo=1;// 英雄最高级详情
+  repeated int32 comboSkill=2;// 英雄参与合体技
+}
+
+message PushHeroPowerChange{
+  repeated HeroBagInfo heroInfos=1;// 英雄信息列表
+  int32 pushType=2;// 推送类型 0 单独 1 全部
+}
+
+message GetHeroFormationMaxLevelListReq{
+  int32 formationType=1;// 阵容ID
+}
+
+message GetHeroFormationMaxLevelListResp{
+  repeated int32 formationHeroLevelInfo=1;// 阵容英雄等级信息
+  int64 formationPower=2;
+}
+
+message BuyDispatchFormationReq{}
+
+message BuyDispatchFormationResp {}

@@ -52,20 +52,23 @@ type GameSessionCloserHooker struct {
 
 var _ logicCommon.SessionCloseHooker = (*GameSessionCloserHooker)(nil)
 
-func (g *GameSessionCloserHooker) OnSessionClose(player logicCommon.PlayerInterface) {
+func (g *GameSessionCloserHooker) OnSessionClose(player logicCommon.PlayerInterface, isForce bool) {
 	if player == nil {
 		return
 	}
-	dispatcher.DispatchInnerMessageTask(enum.INNER_MSG_TYPE_PLAYER, enum.INNER_MSG_PLAYER_LOGOUT, player.GetUserId(), nil, 0, 0, nil)
+	dispatcher.DispatchInnerMessageTask(enum.INNER_MSG_TYPE_PLAYER, enum.INNER_MSG_PLAYER_LOGOUT, player.GetUserId(), isForce, 0, 0, nil)
 }
 
-func RemovePlayerFromGame(playerModel *model.PlayerModel) {
+func RemovePlayerFromGame(playerModel *model.PlayerModel, IsForce bool) {
 	// Avoid mutating user model from a detached goroutine.
 	playerModel.User.UpdateLastOfflineTime(tool.UnixNowMilli())
 	playerModel.BuildPlayerCacheInfo()
 	logicCommon.UpdatePlayerBasicInfo(playerModel.PlayerCacheInfo.BasicInfo)
 	playerModel.User.SaveModelToDB()
 
+	if IsForce {
+		loginMutexService.ExitMutex(playerModel.GetUserAccount(), playerModel.GetSession().GetID())
+	}
 	go func() {
 		if loginMutexService.EnterMutex(playerModel.GetUserAccount(), playerModel.GetSession().GetID()) {
 			logger.InfoWithSprintf("player logout,playerId:%d,sessionId:%d", playerModel.GetUserId(), playerModel.GetSession().GetID())
@@ -99,9 +102,6 @@ func (g *GameRpcHooker) OnNodeConnect(id int32, nodeType enum.NodeType) {
 		ServerNodeService.InitGateRpcClient()
 		rpcController.InitGatewayRpcClients()
 	} else if nodeType == enum.NODE_TYPE_SOCIAL {
-		if !rpcController.IsSocialRpcEnabled() {
-			return
-		}
 		ServerNodeService.InitSocialRpcClient()
 		rpcController.InitSocialRpcClients()
 	}
@@ -143,7 +143,7 @@ func (g *gameMessageSender) SendMessage(player logicCommon.UserBaseInterface, ms
 	player.GetSession().Send(int32(msgId), message)
 }
 
-func (g *gameMessageSender) Broadcast(msgId pb.MESSAGE_ID, msg proto.Message, broadcastType enum.BroadcastType, typeId int32) {
+func (g *gameMessageSender) Broadcast(msgId pb.MESSAGE_ID, msg proto.Message, broadcastType enum.BroadcastType, typeId int64) {
 	frame, err := codec.Marshal(int32(msgId), msg)
 	if err != nil {
 		logger.ErrorWithZapFields(fmt.Sprintf("[net] broadcast messageId:%d marshal error: %v", msgId, err))

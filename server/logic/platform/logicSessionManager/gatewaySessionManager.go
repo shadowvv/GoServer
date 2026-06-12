@@ -112,7 +112,7 @@ func (sm *GatewaySessionManager) ReplacePlayerWithNewInfo(newUser *logicCommon.G
 	return nil
 }
 
-func (sm *GatewaySessionManager) OnConnectionTimeout(session serviceInterface.SessionInterface) {
+func (sm *GatewaySessionManager) OnSessionClose(session serviceInterface.SessionInterface, isForce bool) {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
 
@@ -176,6 +176,22 @@ func (sm *GatewaySessionManager) GetPlayerSessionsByServerId(serverId int32) map
 	return sm.serverIdSessionMap[serverId]
 }
 
+func (sm *GatewaySessionManager) GetPlayerSessionsByUserIds(userId []int64) map[int64]*logicCommon.GatewayPlayerInfo {
+	sm.mu.RLock()
+	defer sm.mu.RUnlock()
+
+	players := make(map[int64]*logicCommon.GatewayPlayerInfo)
+	for _, playerId := range userId {
+		if _, ok := sm.UserIdPlayerMap[playerId]; !ok {
+			continue
+		}
+		player := sm.UserIdPlayerMap[playerId]
+		players[player.UserId] = player
+	}
+
+	return players
+}
+
 func (sm *GatewaySessionManager) GetPlayerByUserId(useId int64) *logicCommon.GatewayPlayerInfo {
 	sm.mu.RLock()
 	defer sm.mu.RUnlock()
@@ -204,7 +220,39 @@ func (sm *GatewaySessionManager) KickOutNodePlayer(nodeId int32, hooker func(pla
 	}
 }
 
-// TODO:
-func (sm *GatewaySessionManager) KickOutPlayer(playerId int64, serverId int32) {
+func (sm *GatewaySessionManager) KickOutPlayer(playerId int64, hooker func(player logicCommon.UserBaseInterface)) {
+	sm.mu.RLock()
+	player := sm.UserIdPlayerMap[playerId]
+	sm.mu.RUnlock()
+	if player == nil {
+		logger.ErrorBySprintf("player %d is not online", playerId)
+		return
+	}
+	hooker(player)
+}
 
+func (sm *GatewaySessionManager) KickOutServerPlayer(serverId int32, hooker func(player logicCommon.UserBaseInterface)) {
+	sm.mu.RLock()
+	players := make([]*logicCommon.GatewayPlayerInfo, 0)
+	for _, player := range sm.serverIdSessionMap[serverId] {
+		players = append(players, player)
+	}
+	sm.mu.RUnlock()
+
+	for _, player := range players {
+		hooker(player)
+	}
+}
+
+func (sm *GatewaySessionManager) KickOutAllPlayer(hooker func(player logicCommon.UserBaseInterface)) {
+	sm.mu.RLock()
+	players := make([]*logicCommon.GatewayPlayerInfo, 0)
+	for _, player := range sm.sessionPlayerMap {
+		players = append(players, player)
+	}
+	sm.mu.RUnlock()
+
+	for _, player := range players {
+		hooker(player)
+	}
 }

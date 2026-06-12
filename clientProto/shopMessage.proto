@@ -1,0 +1,77 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+// 获取商城物品
+message GetShopInfoReq {
+	int32 shopType = 1;
+}
+
+// 获取商城物品
+message GetShopInfoResp {
+	map<int32,ShopInfo> shopInfos = 1;// 商城物品信息
+	repeated PassItemInfo passInfo = 2;
+
+}
+
+// 商城物品信息
+message ShopInfo {
+	int32 shopType = 1;// 商城类型
+	repeated ShopItemInfo itemInfos = 2;// 商城物品信息
+}
+
+// 商城物品信息
+message ShopItemInfo {
+	int32 itemId = 1;// 商城物品id
+	int32 buyCount = 2;// 购买数量
+	int64 leftTime = 3;// 剩余时间
+	int32 status = 4;// 0:可见 1:可购买
+	int64 unlockTime = 5;// 解锁时间
+	bool isFirstBuy = 6;// 是否是第一次购买
+}
+
+// 周卡信息
+message PassItemInfo{
+	int32 itemId = 1;// 周卡物品id
+	bool canAccept = 2;// 是否能领取
+	int32 leftTimes = 3;// 剩余次数
+}
+
+// 购买商城物品
+message BuyShopItemReq {
+	int32 id = 1; // 商城物品id
+	map<int32,int32> itemIds = 2;// 自选商品id
+	int32 useToken = 3;// 使用代币
+}
+
+// 购买商城物品
+message BuyShopItemResp {
+	int64 orderId = 1;
+}
+
+// 获取周卡奖励
+message GetPassAwardReq {
+	int32 id = 1; // 周卡id
+}
+
+// 获取周卡奖励
+message GetPassAwardResp {
+
+}
+
+// 商城物品推送
+message PushShopItemPop {
+	repeated ShopItemInfo itemInfos = 1;// 商城物品信息
+	repeated PassItemInfo firstChargeInfo = 2;// 首充
+}
+
+//购买信息推送
+message PushOrderInfo{
+	int32 id = 1;	// 商城物品id
+	int64 orderId = 2;	//订单号，代币购买为空
+	bool isCoupon = 3;	//是否是代金券订单
+	string payPlatform = 4; // 支付平台
+	string gpOrderId = 5;	//谷歌的订单id，ios的transaction_id
+	string token = 6;	//埋点用，谷歌传，ios不传
+	bool isSandbox = 7;	//是否是沙盒支付
+}

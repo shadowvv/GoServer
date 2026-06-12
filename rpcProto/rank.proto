@@ -13,7 +13,7 @@ message ForwardRankBoardMessage {
   RPC_MESSAGE_ID msgId = 2;// 发送的rpc协议id
   RPC_MESSAGE_ID respMsgId = 3; // 回复的rpc协议id，这样可以相同请求不同的回复
   int32 backMessageId = 4; // 请求rpc的客户端协议，用来返回协议的错误码
-  string rankId = 5;// 排行榜id
+  repeated string rankId = 5;// 排行榜id
   bytes payload = 6;
 }
 
@@ -36,6 +36,16 @@ message GetRankInfoResp {
   int32 actRankId = 4;
   int32 myRank = 5;
   string rankId = 6;
+  repeated RankPageInfo rankPageInfos = 7;
+}
+
+message RankPageInfo {
+  repeated RankInfo rankInfos = 1;
+  int32 commonId = 2;
+  int32 activityId = 3;
+  int32 actRankId = 4;
+  int32 myRank = 5;
+  string rankId = 6;
 }
 
 message RankInfo {
@@ -48,9 +58,10 @@ message RankInfo {
 }
 
 message NotifyUpdateRankInfo {
-  int64 id = 1;          // id:当前有可能时玩家id或者联盟id
+  int64 playerId = 1;        // 玩家id
   int64 score = 2;           // 分数
   bool incrementalUpdate = 3; // 增量更新
+  int64 allianceId = 4;      // 联盟id，仅联盟榜直接更新时传入
 }
 
 message ThumbUpRankInfo {

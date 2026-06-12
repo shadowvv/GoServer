@@ -14,6 +14,7 @@ import (
 type Dispatcher struct {
 	router                serviceInterface.RouterInterface
 	gatewayMsgProcessor   *GatewayMessageProcessor
+	sidewayMsgProcessor   *SidewayMessageProcessor
 	loginMsgProcessor     *LoginMessageProcessor
 	sceneMsgProcessor     *SceneMessageProcessor
 	rankBoardMsgProcessor *RankBoardMessageProcessor
@@ -39,6 +40,11 @@ func NewDispatcher(router serviceInterface.RouterInterface, sessionManager logic
 			panic("[dispatcher] gateway process config is nil")
 		}
 		dispatcher.gatewayMsgProcessor = NewGatewayMessageProcess(sessionManager, config)
+		sidewayConfig := processConfig["sideway"]
+		if sidewayConfig == nil {
+			sidewayConfig = config
+		}
+		dispatcher.sidewayMsgProcessor = NewSidewayMessageProcessor(sessionManager, sidewayConfig)
 	case enum.NODE_TYPE_GAME:
 		loginConfig := processConfig["login"]
 		if loginConfig == nil {
@@ -67,7 +73,11 @@ func NewDispatcher(router serviceInterface.RouterInterface, sessionManager logic
 
 func (d *Dispatcher) DispatchGameMessage(session serviceInterface.SessionInterface, msgID, msgType int32, msg proto.Message) {
 	if d.nodeType == enum.NODE_TYPE_GATEWAY {
-		d.gatewayMsgProcessor.PushMessage(session, msgType, msg)
+		if msgType == int32(enum.MSG_TYPE_SIDEWAY) {
+			d.sidewayMsgProcessor.PushMessage(session, msgID, msg)
+		} else {
+			d.gatewayMsgProcessor.PushMessage(session, msgType, msg)
+		}
 	} else if d.nodeType == enum.NODE_TYPE_GAME {
 		if msgType == int32(enum.MSG_TYPE_LOGIN) {
 			d.loginMsgProcessor.PushMessage(session, msgID, msg)
@@ -132,6 +142,13 @@ func (d *Dispatcher) RegisterPlayerMessageHandler(msgID int32, h logicCommon.Pla
 
 func (d *Dispatcher) RegisterGatewayMessageHandler(msgType enum.MessageType, h logicCommon.GatewayMessageHandler) {
 	d.gatewayMsgProcessor.RegisterGatewayMessageHandler(int32(msgType), h)
+}
+
+func (d *Dispatcher) RegisterSidewayMessageHandler(msgID int32, h logicCommon.SidewayMessageHandler) {
+	if d.nodeType != enum.NODE_TYPE_GATEWAY || d.sidewayMsgProcessor == nil {
+		return
+	}
+	d.sidewayMsgProcessor.RegisterSidewayMessageHandler(msgID, h)
 }
 
 func (d *Dispatcher) RegisterRankBoardMessageHandler(id int32, h logicCommon.RankBoardMessageHandler) {

@@ -36,16 +36,12 @@ var _ LogicControllerInterface = (*PlayerController)(nil)
 func (p *PlayerController) RegisterLogicMessage() {
 	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_HEART_REQ, &pb.HeartReq{}, onPlayerHeartbeatHandler, enum.FUNCTION_ID_NONE)
 	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_CHANGE_NICKNAME_REQ, &pb.ChangeNicknameReq{}, ChangeNickNameHandle, enum.FUNCTION_ID_NONE)
-	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_GET_OTHER_PLAYER_BASIC_INFO_REQ, &pb.GetOtherPlayerBasicInfoReq{}, GatewayDoLogicHandler, enum.FUNCTION_ID_NONE)
 	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_EXCHANGE_ITEM_REQ, &pb.ExchangeItemReq{}, exchangeItem, enum.FUNCTION_ID_NONE)
 	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_GET_ANNOUNCE_REQ, &pb.GetAnnounceReq{}, GetAnnounceHandle, enum.FUNCTION_ID_NONE)
 	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_GET_SYSTEM_UNLOCK_REWARD_REQ, &pb.GetSystemUnlockRewardReq{}, GetSystemUnlockRewardHandler, enum.FUNCTION_ID_NONE)
+	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_GET_TEMP_BATTLE_SPEED_UP_REQ, &pb.GetTempBattleSpeedUpReq{}, GetTempBattleSpeedHandler, enum.FUNCTION_ID_BATTLE_SPEED)
 
-	RegisterPlayerInnerTask(enum.INNER_MSG_EVENT_UPDATE_RANKBOARD, updatePlayerRankInfoHandler)
-}
-
-func GatewayDoLogicHandler(message proto.Message, player *model.PlayerModel) {
-	// 逻辑移交给网关处理
+	RegisterPlayerInnerTask(enum.INNER_MSG_EVENT_UPDATE_RANK_BOARD, updatePlayerRankInfoHandler)
 }
 
 func updatePlayerRankInfoHandler(messageTask serviceInterface.InnerTaskInterface) (any, error) {
@@ -65,14 +61,14 @@ func updatePlayerRankInfoHandler(messageTask serviceInterface.InnerTaskInterface
 	}
 	player := p.(*model.PlayerModel)
 
-	if _, ok := enum.EventToObjectiveTypes[eventType]; ok {
+	if _, ok := enum.PlayerEventTypes[eventType]; ok {
 		switch eventType {
 		case enum.EventTypePassInstance:
 			ev := event.(*eventService.PassInstanceEvent)
 			if ev.InstanceTypeId == enum.MAIN_INSTANCE_ID {
 				info := &rpcPb.NotifyUpdateRankInfo{
-					Id:    ev.PlayerID,
-					Score: int64(ev.InstanceId),
+					PlayerId: ev.PlayerID,
+					Score:    int64(player.PlayerInstanceModel.GetMainInstanceMaxStageId()),
 				}
 				updatePlayerRankInfo(player, info, enum.RANK_BOARD_SCORE_TYPE_MAIN_INSTANCE)
 			} else if ev.InstanceTypeId == enum.FIVE_VS_FIVE_TOWER_INSTANCE_ID {
@@ -81,8 +77,8 @@ func updatePlayerRankInfoHandler(messageTask serviceInterface.InnerTaskInterface
 					return nil, nil
 				}
 				info := &rpcPb.NotifyUpdateRankInfo{
-					Id:    ev.PlayerID,
-					Score: int64(towerCfg.Level),
+					PlayerId: ev.PlayerID,
+					Score:    int64(towerCfg.Level),
 				}
 				updatePlayerRankInfo(player, info, enum.RANK_BOARD_SCORE_TYPE_TOWER)
 			}
@@ -90,8 +86,8 @@ func updatePlayerRankInfoHandler(messageTask serviceInterface.InnerTaskInterface
 			ev := event.(*eventService.BuildLevelUpEvent)
 			if ev.BuildId == enum.ARCHITECTURE_TYPE_MAIN {
 				info := &rpcPb.NotifyUpdateRankInfo{
-					Id:    ev.PlayerID,
-					Score: int64(ev.BuildLevel),
+					PlayerId: ev.PlayerID,
+					Score:    int64(ev.BuildLevel),
 				}
 				updatePlayerRankInfo(player, info, enum.RANK_BOARD_SCORE_TYPE_LEVEL)
 			}
@@ -304,7 +300,6 @@ func GetAnnounceHandle(message proto.Message, player *model.PlayerModel) {
 func GetSystemUnlockRewardHandler(message proto.Message, player *model.PlayerModel) {
 	req, ok := message.(*pb.GetSystemUnlockRewardReq)
 	if !ok {
-
 		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_GET_SYSTEM_UNLOCK_REWARD_RESP, pb.ERROR_CODE_PB_CONV_ERROR)
 		return
 	}
@@ -330,4 +325,62 @@ func GetSystemUnlockRewardHandler(message proto.Message, player *model.PlayerMod
 	player.PlayerFunctionModel.CommitReward(req.SystemId)
 
 	messageSender.SendMessage(player, pb.MESSAGE_ID_GET_SYSTEM_UNLOCK_REWARD_RESP, &pb.GetSystemUnlockRewardResp{})
+}
+
+func GetTempBattleSpeedHandler(message proto.Message, player *model.PlayerModel) {
+	currentSpeed := player.VipCardModel.GetFunctionValue(enum.VIP_PRIVILEGE_BATTLE_SPEED, tool.UnixNowMilli())
+	if currentSpeed > 0 {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_GET_TEMP_BATTLE_SPEED_UP_RESP, pb.ERROR_CODE_ERROR_CODE_ALREADY_SPEED_UP)
+		return
+	}
+	itemCfg := gameConfig.GetItemCfg(gameConfig.GetBattleSpeedUpItemId())
+	if itemCfg == nil {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_GET_TEMP_BATTLE_SPEED_UP_RESP, pb.ERROR_CODE_SYSTEM_ERROR)
+		return
+	}
+	entity := player.VipCardModel.GetVipCardByItemId(itemCfg.TargetId, tool.UnixNowMilli())
+	if len(entity) != 0 {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_GET_TEMP_BATTLE_SPEED_UP_RESP, pb.ERROR_CODE_ERROR_CODE_ALREADY_SPEED_UP)
+		return
+	}
+	if player.StaticData.GetBattleSpeedUpTimes() == 0 {
+		player.StaticData.UpdateBattleSpeedUpTimes(1)
+		player.VipCardModel.AddVipCardMinute(itemCfg.TargetId, int64(gameConfig.GetBattleSpeedUpTime()/60))
+		messageSender.SendMessage(player, pb.MESSAGE_ID_GET_TEMP_BATTLE_SPEED_UP_RESP, &pb.GetTempBattleSpeedUpResp{})
+	} else {
+		if player.StaticData.GetDailyBattleSpeedUpTimes() >= gameConfig.GetDailyBattleSpeedUpTimes() {
+			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_GET_TEMP_BATTLE_SPEED_UP_RESP, pb.ERROR_CODE_ERROR_CODE_DAILY_SPEED_UP_OVER)
+			return
+		}
+		player.StaticData.UpdateDailyBattleSpeedUpTimes(player.StaticData.GetDailyBattleSpeedUpTimes() + 1)
+		player.VipCardModel.AddVipCardMinute(itemCfg.TargetId, int64(gameConfig.GetBattleSpeedUpTime()/60))
+		messageSender.SendMessage(player, pb.MESSAGE_ID_GET_TEMP_BATTLE_SPEED_UP_RESP, &pb.GetTempBattleSpeedUpResp{})
+	}
+
+	vipPush := &pb.VipCardInfo{}
+	entity = player.VipCardModel.GetVipCardByItemId(itemCfg.TargetId, tool.UnixNowMilli())
+	for _, card := range entity {
+		if card == nil || card.ItemId != itemCfg.TargetId {
+			continue
+		}
+		cfg := gameConfig.GetVipCardCfg(card.ItemId)
+		if cfg == nil {
+			continue
+		}
+		privs := make([]*pb.VipPrivilegeData, 0, len(cfg.Functions))
+		for privType, value := range cfg.Functions {
+			privs = append(privs, &pb.VipPrivilegeData{
+				Type:  pb.VipPrivilegeType(privType),
+				Value: value,
+			})
+		}
+		vipPush.ItemId = card.ItemId
+		vipPush.ExpireTime = card.ExpireTime
+		vipPush.Privs = privs
+		break
+	}
+
+	messageSender.SendMessage(player, pb.MESSAGE_ID_PUSH_VIP_CARD_INFO, &pb.PushVipCardInfo{
+		Info: vipPush,
+	})
 }

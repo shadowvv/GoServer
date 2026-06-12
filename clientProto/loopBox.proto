@@ -1,0 +1,45 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+import "commonMessage.proto";
+
+message LoopLevelUpReq{
+}
+
+message LoopLevelUpResp{
+  int32 loopLevel=1; // 循环盒当前等级
+  int32 loopEx=2; // 循环盒当前经验
+}
+
+message LoopPointReq{
+}
+
+message LoopPointResp{
+  repeated int32 BoxList=1; // 当前拥有盒子数量 0-4 表示1-5某个盒子发了多少个
+  int32 point=2;// 当前积分
+  int32 loopId=3; // 当前循环id
+}
+
+message GetLoopBoxDetailInfoReq{
+}
+
+message GetLoopBoxDetailInfoResp{
+  int32 systemEx=1;// 系统经验
+  int32 systemLevel=2; // 系统等级
+  int32 systemPoint=3; //系统积分
+  repeated int32 boxList=4; // 当前拥有盒子数量 0-4 表示1-5某个盒子有多少个
+  int32 loopId=5; // 当前积分宝箱下标
+}
+
+message OpenLoopBoxReq{
+  int32 boxId=1; // 盒子id
+  int32 openNum=2; // 开启数量
+}
+
+message OpenLoopBoxResp{
+  repeated ItemBasicInfo infoList=1; // 开启结果 message ItemBasicInfo{int32 itemId = 1;int32 count = 2;}
+  int32 boxNum=2; // 开启后该箱子数量
+  int32 systemPoint=3; //系统积分
+  int32 systemEx=4;// 系统经验
+}

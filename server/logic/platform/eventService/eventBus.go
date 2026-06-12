@@ -168,8 +168,8 @@ func (eb *EventBus) SubmitAdChestOpenEvent(objectID int64, openCount int32) {
 func (eb *EventBus) SubmitMainTaskChangeEvent(objectID int64) {
 	eb.Publish(NewMainTaskChangeEvent(objectID))
 }
-func (eb *EventBus) SubmitStoneAttrLevelUpEvent(objectID int64) {
-	eb.Publish(NewStoneAttrLevelUpEvent(objectID))
+func (eb *EventBus) SubmitStoneAttrLevelUpEvent(objectID int64, class int32, attrId int32, levelUpNum int32) {
+	eb.Publish(NewStoneAttrLevelUpEvent(objectID, class, attrId, levelUpNum))
 }
 
 func (eb *EventBus) SubmitAddHeroAlbumEvent(objectID int64, heroID int32) {
@@ -177,4 +177,8 @@ func (eb *EventBus) SubmitAddHeroAlbumEvent(objectID int64, heroID int32) {
 }
 func (eb *EventBus) SubmitPetLevelUpEvent(objectID int64, petOwnID int64, oldLevel, newLevel int32) {
 	eb.Publish(NewPetLevelUpEvent(objectID, petOwnID, oldLevel, newLevel))
+}
+
+func (eb *EventBus) SubmitCityAgeChangeEvent(objectID int64, cityAge int32) {
+	eb.Publish(NewEventTypeCityAgeChangeEvent(objectID, cityAge))
 }

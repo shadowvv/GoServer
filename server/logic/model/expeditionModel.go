@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/drop/GoServer/server/enum"
@@ -27,10 +28,11 @@ func (u *ExpeditionEntity) TableName() string {
 }
 
 type ExpeditionBattlefieldEntity struct {
-	UserId           int64  `gorm:"column:user_id;primaryKey"`        // 玩家id
-	BattlefieldId    int32  `gorm:"column:battlefield_id;primaryKey"` // 战场id
-	BattlefieldLevel int32  `gorm:"column:battlefield_level"`         // 战场等级
-	PointInfos       string `gorm:"column:battle_point_infos"`        // 战场点信息
+	UserId              int64  `gorm:"column:user_id;primaryKey"`        // 玩家id
+	BattlefieldId       int32  `gorm:"column:battlefield_id;primaryKey"` // 战场id
+	BattlefieldLevel    int32  `gorm:"column:battlefield_level"`         // 战场等级
+	BattlefieldMaxLevel int32  `gorm:"column:battlefield_max_level"`     // 最大战场等级
+	PointInfos          string `gorm:"column:battle_point_infos"`        // 战场点信息
 
 	PointMonsterInfos map[int32]*PointInfo `gorm:"-"` // 战场点信息
 }
@@ -204,38 +206,8 @@ func (d *ExpeditionModel) Heartbeat(lastTickTime int64, currentTime int64, passD
 }
 
 func (d *ExpeditionModel) CheckExpeditionUnlock(slotNum int32) error {
-	for _, cfg := range gameConfig.GetAllCityDispatchCfg() {
-		if cfg.Level != 1 {
-			continue
-		}
-		if d.BattlefieldEntities[cfg.Area] != nil {
-			continue
-		}
-		if !unlockService.CheckUnlock(cfg.Unlock, d.Player) {
-			continue
-		}
-		entity := &ExpeditionBattlefieldEntity{
-			UserId:            d.UserId,
-			BattlefieldId:     cfg.Area,
-			BattlefieldLevel:  1,
-			PointMonsterInfos: make(map[int32]*PointInfo),
-		}
-		emptyPoint := make([]int32, len(cfg.MonsterPoint))
-		copy(emptyPoint, cfg.MonsterPoint)
-		infos := randomMonster(cfg, cfg.AllMonsterNum, emptyPoint, d.ExpeditionData.monsterCount)
-		for _, info := range infos {
-			entity.PointMonsterInfos[info.PointId] = info
-		}
-		marshal, err := json.Marshal(entity.PointMonsterInfos)
-		if err != nil {
-			logger.ErrorBySprintf("json marshal battlefieldPointInfos error: %v", err)
-			continue
-		}
-		entity.PointInfos = string(marshal)
-		if err := easyDB.CreatePlayerEntity(entity); err != nil {
-			return err
-		}
-		d.BattlefieldEntities[cfg.Area] = entity
+	if err := d.checkBattlefieldUnlock(); err != nil {
+		return err
 	}
 
 	for i := int32(1); i <= slotNum; i++ {
@@ -254,25 +226,63 @@ func (d *ExpeditionModel) CheckExpeditionUnlock(slotNum int32) error {
 	return nil
 }
 
+func (d *ExpeditionModel) checkBattlefieldUnlock() error {
+	for _, cfg := range gameConfig.GetAllCityDispatchCfg() {
+		if cfg.Level != 1 {
+			continue
+		}
+		if d.BattlefieldEntities[cfg.Area] != nil {
+			continue
+		}
+		if !unlockService.CheckUnlock(cfg.Unlock, d.Player) {
+			continue
+		}
+		entity := &ExpeditionBattlefieldEntity{
+			UserId:              d.UserId,
+			BattlefieldId:       cfg.Area,
+			BattlefieldLevel:    cfg.Level,
+			BattlefieldMaxLevel: cfg.Level,
+			PointMonsterInfos:   make(map[int32]*PointInfo),
+		}
+		emptyPoint := make([]int32, len(cfg.MonsterPoint))
+		copy(emptyPoint, cfg.MonsterPoint)
+		infos := randomMonster(cfg, cfg.AllMonsterNum, emptyPoint, d.getMonsterRefreshLimitCount())
+		for _, info := range infos {
+			entity.PointMonsterInfos[info.PointId] = info
+		}
+		marshal, err := json.Marshal(entity.PointMonsterInfos)
+		if err != nil {
+			logger.ErrorBySprintf("json marshal battlefieldPointInfos error: %v", err)
+			continue
+		}
+		entity.PointInfos = string(marshal)
+		if err := easyDB.CreatePlayerEntity(entity); err != nil {
+			return err
+		}
+		d.BattlefieldEntities[cfg.Area] = entity
+	}
+
+	return nil
+}
+
 func randomMonster(cfg *gameConfig.CityDispatchCfg, monsterNum int32, emptyPointIds []int32, monsterCount map[int32]int32) []*PointInfo {
 	currentTime := tool.UnixNowMilli()
 	if monsterNum > int32(len(emptyPointIds)) {
 		monsterNum = int32(len(emptyPointIds))
 	}
+	limitCount := make(map[int32]int32, len(monsterCount))
+	for monsterId, count := range monsterCount {
+		limitCount[monsterId] = count
+	}
 	pointIds := tool.Shuffle(emptyPointIds)
 	points := make([]*PointInfo, 0)
 	for i := int32(0); i < monsterNum; i++ {
 		pointId := pointIds[i]
-		monsterId := cfg.RandomMonsterId(monsterCount)
+		monsterId := cfg.RandomMonsterId(limitCount)
 		if monsterId == 0 {
-			logger.ErrorBySprintf("cityDispatchCfg.RandomMonsterId() monsterId == 0")
 			continue
 		}
-		if _, ok := monsterCount[monsterId]; !ok {
-			monsterCount[monsterId] = 1
-		} else {
-			monsterCount[monsterId] += 1
-		}
+		limitCount[monsterId] += 1
 		points = append(points, &PointInfo{
 			PointId:         pointId,
 			MonsterId:       monsterId,
@@ -283,6 +293,97 @@ func randomMonster(cfg *gameConfig.CityDispatchCfg, monsterNum int32, emptyPoint
 		})
 	}
 	return points
+}
+
+func (d *ExpeditionModel) getMonsterRefreshLimitCount() map[int32]int32 {
+	monsterCount := make(map[int32]int32, len(d.ExpeditionData.monsterCount))
+	for monsterId, count := range d.ExpeditionData.monsterCount {
+		monsterCount[monsterId] = count
+	}
+	for _, bf := range d.BattlefieldEntities {
+		if bf == nil {
+			continue
+		}
+		for _, point := range bf.PointMonsterInfos {
+			if point == nil || point.Status == enum.ExpeditionPointStatusReward {
+				continue
+			}
+			monsterCount[point.MonsterId] += 1
+		}
+	}
+	return monsterCount
+}
+
+func (d *ExpeditionModel) refreshBattlefieldIdleAndEmptyPoints(bf *ExpeditionBattlefieldEntity, cfg *gameConfig.CityDispatchCfg, pointChange *[]*pb.ExpeditionPointInfo) bool {
+	if bf.PointMonsterInfos == nil {
+		bf.PointMonsterInfos = make(map[int32]*PointInfo)
+	}
+
+	changed := false
+	emptyPoints := make(map[int32]bool)
+	for _, pointId := range cfg.MonsterPoint {
+		emptyPoints[pointId] = true
+	}
+
+	existingMonsterNum := int32(0)
+	for index, point := range bf.PointMonsterInfos {
+		if point == nil {
+			delete(bf.PointMonsterInfos, index)
+			changed = true
+			continue
+		}
+		if point.Status == enum.ExpeditionPointStatusIdle {
+			*pointChange = append(*pointChange, &pb.ExpeditionPointInfo{
+				PointId: point.PointId,
+			})
+			delete(bf.PointMonsterInfos, index)
+			changed = true
+			continue
+		}
+		delete(emptyPoints, point.PointId)
+		existingMonsterNum++
+	}
+
+	monsterNum := cfg.AllMonsterNum - existingMonsterNum
+	if monsterNum <= 0 {
+		return changed
+	}
+
+	temp := make([]int32, 0, len(emptyPoints))
+	for pointId := range emptyPoints {
+		temp = append(temp, pointId)
+	}
+	newPoints := randomMonster(cfg, monsterNum, temp, d.getMonsterRefreshLimitCount())
+	if len(newPoints) == 0 {
+		return changed
+	}
+	changed = true
+	for _, point := range newPoints {
+		bf.PointMonsterInfos[point.PointId] = point
+		*pointChange = append(*pointChange, &pb.ExpeditionPointInfo{
+			PointId:         point.PointId,
+			MonsterId:       point.MonsterId,
+			NextRefreshTime: point.NextRefreshTime,
+		})
+	}
+	return changed
+}
+
+func (d *ExpeditionModel) addMonsterRefreshCount(monsterId int32) {
+	if monsterId <= 0 {
+		return
+	}
+	if d.ExpeditionData.monsterCount == nil {
+		d.ExpeditionData.monsterCount = make(map[int32]int32)
+	}
+	d.ExpeditionData.monsterCount[monsterId] += 1
+	marshal, err := json.Marshal(d.ExpeditionData.monsterCount)
+	if err != nil {
+		logger.ErrorBySprintf("json marshal monsterRefreshCount error: %v", err)
+		return
+	}
+	d.ExpeditionData.MonsterRefreshCount = string(marshal)
+	d.ExpeditionChanged["monster_refresh_count"] = d.ExpeditionData.MonsterRefreshCount
 }
 
 func (d *ExpeditionModel) checkAllStatus() {
@@ -310,6 +411,7 @@ func (d *ExpeditionModel) checkAllStatus() {
 	slotChange := make([]*pb.ExpeditionSlotInfo, 0)
 	pointChange := make([]*pb.ExpeditionPointInfo, 0)
 	battleFieldChange := make(map[int32]bool)
+
 	// 出征状态更新
 	for slotId, active := range d.SlotEntities {
 		if active == nil {
@@ -367,7 +469,7 @@ func (d *ExpeditionModel) checkAllStatus() {
 			for pointId := range emptyPoints {
 				temp = append(temp, pointId)
 			}
-			newPoints := randomMonster(cfg, monsterNum, temp, d.ExpeditionData.monsterCount)
+			newPoints := randomMonster(cfg, monsterNum, temp, d.getMonsterRefreshLimitCount())
 			if len(newPoints) > 0 {
 				battleFieldChange[bf.BattlefieldId] = true
 				for _, point := range newPoints {
@@ -516,6 +618,7 @@ func (d *ExpeditionModel) completeSlot(slotId int32) (*ExpeditionSlotEntity, *Po
 		point = bf.PointMonsterInfos[pointId]
 		if point != nil {
 			point.Status = enum.ExpeditionPointStatusReward
+			d.addMonsterRefreshCount(point.MonsterId)
 		}
 	}
 
@@ -531,6 +634,7 @@ func (d *ExpeditionModel) completeSlot(slotId int32) (*ExpeditionSlotEntity, *Po
 	changed["end_time"] = slot.EndTime
 
 	d.Player.StaticData.AddExpeditionNum(1)
+	_ = unlockService.RecordExpedition(context.Background(), d.UserId)
 	return slot, point, battlefieldId
 }
 
@@ -550,13 +654,38 @@ func (d *ExpeditionModel) markBattlefieldPointInfosChanged(battlefieldId int32) 
 	bfChanged["battle_point_infos"] = bf.PointInfos
 }
 
-func (d *ExpeditionModel) ChangeLevel(battlefieldId int32, level int32) {
+func (d *ExpeditionModel) ChangeLevel(battlefieldId int32, level int32) []*pb.ExpeditionPointInfo {
 	bf := d.BattlefieldEntities[battlefieldId]
-	if bf != nil {
-		bf.BattlefieldLevel = level
-		changed := d.getBattlefieldChangedMap(battlefieldId)
-		changed["battlefield_level"] = level
+	if bf == nil {
+		return nil
 	}
+
+	changed := d.getBattlefieldChangedMap(battlefieldId)
+	if bf.BattlefieldMaxLevel <= 0 {
+		bf.BattlefieldMaxLevel = bf.BattlefieldLevel
+		if bf.BattlefieldMaxLevel <= 0 {
+			bf.BattlefieldMaxLevel = 1
+		}
+		changed["battlefield_max_level"] = bf.BattlefieldMaxLevel
+	}
+
+	firstUpgrade := level > bf.BattlefieldMaxLevel
+	bf.BattlefieldLevel = level
+	changed["battlefield_level"] = level
+
+	if !firstUpgrade {
+		return nil
+	}
+
+	bf.BattlefieldMaxLevel = level
+	changed["battlefield_max_level"] = level
+
+	pointChange := make([]*pb.ExpeditionPointInfo, 0)
+	cfg := gameConfig.GetCityDispatchCfg(battlefieldId, level)
+	if cfg != nil && d.refreshBattlefieldIdleAndEmptyPoints(bf, cfg, &pointChange) {
+		d.markBattlefieldPointInfosChanged(battlefieldId)
+	}
+	return pointChange
 }
 
 func (d *ExpeditionModel) SpeedUpSlot(slotId int32, speedTime int64) *ExpeditionSlotEntity {

@@ -1,0 +1,26 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+message GetTokenShopInfoReq {
+  int32 shopId= 1;
+}
+
+message GetTokenShopInfoResp {
+  repeated TokenShopItemInfo itemInfo= 1;
+}
+
+message TokenShopItemInfo{
+  int32 itemId= 1;
+  int32 buyCount= 2;
+  int32 discount= 3;
+}
+
+message BuyTokenShopItemReq {
+  int32 itemId= 1;
+  int32 buyNum= 2;
+}
+
+message BuyTokenShopItemResp {
+
+}

@@ -392,7 +392,7 @@ func ForgeEquipmentHandle(message proto.Message, player *model.PlayerModel) {
 		useItems = append(useItems, &gameConfig.ItemConfig{ID: itemCfg.ID, Num: itemCfg.Num * int64(num)})
 	}
 	if paperCfg.Star > 1 {
-		useItems = append(useItems, &gameConfig.ItemConfig{ID: paperCfg.Id, Num: int64(num)})
+		useItems = append(useItems, &gameConfig.ItemConfig{ID: paperCfg.ItemId, Num: int64(num)})
 	}
 	equipmentItemCfg := gameConfig.GetItemCfg(paperCfg.Equipment)
 	if equipmentItemCfg == nil {

@@ -4,7 +4,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 30 # 文件数
         onlyConsole: true
       httpConfig:
@@ -44,7 +44,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 30 # 文件数
         onlyConsole: false
       httpConfig:
@@ -84,7 +84,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 30 # 文件数
         onlyConsole: true
       httpConfig:
@@ -124,7 +124,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       httpConfig:
@@ -165,7 +165,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       httpConfig:
@@ -209,7 +209,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       httpConfig:
@@ -253,7 +253,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       httpConfig:
@@ -298,7 +298,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: true
       netConfig:
@@ -341,11 +341,16 @@ configs:
             tickInterval: 50ms
             messageCountPerTick: 25
             messageBufferSize: 1024
+          sideway:
+            routineNum: 40
+            tickInterval: 50ms
+            messageCountPerTick: 25
+            messageBufferSize: 1024
     test:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       netConfig:
@@ -388,11 +393,16 @@ configs:
             tickInterval: 50ms
             messageCountPerTick: 25
             messageBufferSize: 1024
+          sideway:
+            routineNum: 40
+            tickInterval: 50ms
+            messageCountPerTick: 25
+            messageBufferSize: 1024
     stress:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: true
       netConfig:
@@ -435,11 +445,16 @@ configs:
             tickInterval: 50ms
             messageCountPerTick: 25
             messageBufferSize: 1024
+          sideway:
+            routineNum: 40
+            tickInterval: 50ms
+            messageCountPerTick: 25
+            messageBufferSize: 1024
     stage:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       netConfig:
@@ -482,11 +497,16 @@ configs:
             tickInterval: 50ms
             messageCountPerTick: 25
             messageBufferSize: 1024
+          sideway:
+            routineNum: 40
+            tickInterval: 50ms
+            messageCountPerTick: 25
+            messageBufferSize: 1024
     prodTest:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       netConfig:
@@ -529,11 +549,16 @@ configs:
             tickInterval: 50ms
             messageCountPerTick: 25
             messageBufferSize: 1024
+          sideway:
+            routineNum: 40
+            tickInterval: 50ms
+            messageCountPerTick: 25
+            messageBufferSize: 1024
     prodStage:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       netConfig:
@@ -576,11 +601,16 @@ configs:
             tickInterval: 50ms
             messageCountPerTick: 25
             messageBufferSize: 1024
+          sideway:
+            routineNum: 40
+            tickInterval: 50ms
+            messageCountPerTick: 25
+            messageBufferSize: 1024
     prod:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       netConfig:
@@ -623,12 +653,17 @@ configs:
             tickInterval: 50ms
             messageCountPerTick: 25
             messageBufferSize: 1024
+          sideway:
+            routineNum: 40
+            tickInterval: 50ms
+            messageCountPerTick: 25
+            messageBufferSize: 1024
   game:
     local:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: true
       serverDBConfig:
@@ -691,7 +726,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       serverDBConfig:
@@ -754,7 +789,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: true
       serverDBConfig:
@@ -817,7 +852,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       serverDBConfig:
@@ -880,7 +915,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       serverDBConfig:
@@ -943,7 +978,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       serverDBConfig:
@@ -1006,7 +1041,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       serverDBConfig:
@@ -1070,7 +1105,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: true
       serverDBConfig:
@@ -1114,7 +1149,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       serverDBConfig:
@@ -1158,7 +1193,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: true
       serverDBConfig:
@@ -1202,7 +1237,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       serverDBConfig:
@@ -1246,7 +1281,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       serverDBConfig:
@@ -1290,7 +1325,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       serverDBConfig:
@@ -1334,7 +1369,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       serverDBConfig:
@@ -1379,7 +1414,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: true
       gameDBConfig:
@@ -1413,7 +1448,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       gameDBConfig:
@@ -1447,7 +1482,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: true
       gameDBConfig:
@@ -1481,7 +1516,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       gameDBConfig:
@@ -1515,7 +1550,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       gameDBConfig:
@@ -1549,7 +1584,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       gameDBConfig:
@@ -1583,7 +1618,7 @@ configs:
       loggerConfig:
         infoFilename: "logs/info"
         errorFilename: "logs/error"
-        maxsize: 1024 # MB
+        maxsize: 2048 # MB
         maxBackups: 7 # 文件数
         onlyConsole: false
       gameDBConfig:

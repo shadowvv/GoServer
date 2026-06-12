@@ -6,6 +6,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/drop/GoServer/server/enum"
+	"github.com/drop/GoServer/server/logic/logicCommon"
 	"github.com/drop/GoServer/server/logic/model"
 	"github.com/drop/GoServer/server/logic/pb"
 	"github.com/drop/GoServer/server/logic/platform/easyDB"
@@ -48,12 +49,23 @@ func SendChatMessageHandle(message proto.Message, player *model.PlayerModel) {
 	msgDetail := req.GetChatMessage()
 	msg := msgDetail.GetMessageContent()
 
-	if msgDetail.GetSendType() == int32(enum.BROADCAST_TYPE_SERVER_ID) {
-		if tool.UnixNowMilli()-player.LastSendChatMessageTime < CHAT_CD {
-			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_SEND_CHAT_MESSAGE_RESP, pb.ERROR_CODE_SEND_MESSAGE_TIME_INTERVAL_SHORT)
+	if tool.UnixNowMilli()-player.LastSendChatMessageTime < CHAT_CD {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_SEND_CHAT_MESSAGE_RESP, pb.ERROR_CODE_SEND_MESSAGE_TIME_INTERVAL_SHORT)
+		return
+	}
+
+	switch msgDetail.GetSendType() {
+	case int32(enum.BROADCAST_TYPE_SERVER_ID):
+		msgDetail.ToObjectId = int64(player.GetUserServerId())
+	case int32(enum.BROADCAST_TYPE_ALLIANCE):
+		allianceInfo := logicCommon.GetPlayerAllianceInfoFromRedis(player.GetUserId())
+		if allianceInfo == nil {
+			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_SEND_CHAT_MESSAGE_RESP, pb.ERROR_CODE_ALLIANCE_NOT_IN_ALLIANCE)
 			return
 		}
+		msgDetail.ToObjectId = allianceInfo.AllianceId
 	}
+
 	if utf8.RuneCountInString(msg) > MAX_CHAT_LENGTH {
 		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_SEND_CHAT_MESSAGE_RESP, pb.ERROR_CODE_CONTEXT_IS_LONG_LONG)
 		return
@@ -72,6 +84,7 @@ func SendChatMessageHandle(message proto.Message, player *model.PlayerModel) {
 		platformLogger.InfoWithUser("[chat] user is banned chat", player)
 		return
 	}
+
 	player.LastSendChatMessageTime = tool.UnixNowMilli()
 	sendMsg := &pb.PushReceivedChatMessage{
 		ChatMessage: &pb.ChatMessage{
@@ -79,7 +92,7 @@ func SendChatMessageHandle(message proto.Message, player *model.PlayerModel) {
 				UserId:   player.GetUserId(),
 				NickName: player.User.GetNickname(),
 			},
-			SendType:       int32(enum.BROADCAST_TYPE_SERVER_ID),
+			SendType:       msgDetail.GetSendType(),
 			SendTime:       tool.UnixNowMilli(),
 			ToObjectId:     msgDetail.GetToObjectId(),
 			MessageContent: msgDetail.GetMessageContent(),
@@ -112,9 +125,5 @@ func SendChatMessageHandle(message proto.Message, player *model.PlayerModel) {
 
 	messageSender.SendMessage(player, pb.MESSAGE_ID_SEND_CHAT_MESSAGE_RESP, &pb.SendChatMessageResp{})
 
-	switch msgDetail.GetSendType() {
-	case int32(enum.BROADCAST_TYPE_SERVER_ID):
-		messageSender.Broadcast(pb.MESSAGE_ID_PUSH_RECEIVED_CHAT_MESSAGE, sendMsg, enum.BroadcastType(msgDetail.GetSendType()), int32(msgDetail.GetToObjectId()))
-
-	}
+	messageSender.Broadcast(pb.MESSAGE_ID_PUSH_RECEIVED_CHAT_MESSAGE, sendMsg, enum.BroadcastType(msgDetail.GetSendType()), msgDetail.GetToObjectId())
 }

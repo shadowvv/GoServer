@@ -53,21 +53,22 @@ type RaidHeartbeatService struct{}
 var _ logicCommon.PlayerHeartbeatServiceInterface = (*RaidHeartbeatService)(nil)
 
 func (r *RaidHeartbeatService) Heartbeat(player logicCommon.PlayerInterface, currentTime int64) {
-	p, ok := player.(*model.PlayerModel)
-	if !ok {
-		return
-	}
-	timeout, errorCode, winResp := CheckBattleTimeout(p, currentTime)
-	if !timeout {
-		return
-	}
-	if errorCode != pb.ERROR_CODE_SUCCESS {
-		platformLogger.ErrorWithUser("battle timeout settle failed", p, nil)
-		return
-	}
-	if winResp != nil && messageSender != nil {
-		messageSender.SendMessage(p, pb.MESSAGE_ID_PUSH_STAGE_BATTLE_WIN, winResp)
-	}
+	// TODO: 处理副本战斗超时优化
+	// p, ok := player.(*model.PlayerModel)
+	// if !ok {
+	// 	return
+	// }
+	// timeout, errorCode, winResp := CheckBattleTimeout(p, currentTime)
+	// if !timeout {
+	// 	return
+	// }
+	// if errorCode != pb.ERROR_CODE_SUCCESS {
+	// 	platformLogger.ErrorWithUser("battle timeout settle failed", p, nil)
+	// 	return
+	// }
+	// if winResp != nil && messageSender != nil {
+	// 	messageSender.SendMessage(p, pb.MESSAGE_ID_PUSH_STAGE_BATTLE_WIN, winResp)
+	// }
 }
 
 func getRaidOperator(instanceCfg *gameConfig.InstanceCfg) RaidOperatorInterface {
@@ -263,18 +264,19 @@ func OnBattlePlayerDead(player *model.PlayerModel, info *logicCommon.PlayerInsta
 	return operator.OnBattlePlayerDead(player, info, instanceModel)
 }
 
-func CheckBattleTimeout(player *model.PlayerModel, now int64) (bool, pb.ERROR_CODE, *pb.PushStageBattleWin) {
-	if player == nil || player.PlayerInstanceModel == nil || player.PlayerInstanceModel.CurrentRaidInfo == nil {
-		return false, pb.ERROR_CODE_SUCCESS, nil
-	}
-	raidInfo := player.PlayerInstanceModel.CurrentRaidInfo
-	if raidInfo.IsOver || raidInfo.BattleEndTime <= 0 || now < raidInfo.BattleEndTime {
-		return false, pb.ERROR_CODE_SUCCESS, nil
-	}
-	raidInfo.IsOver = true
-	errorCode, winResp := OnBattlePlayerDead(player, raidInfo, player.PlayerInstanceModel)
-	return true, errorCode, winResp
-}
+// TODO: 处理副本战斗超时优化
+// func CheckBattleTimeout(player *model.PlayerModel, now int64) (bool, pb.ERROR_CODE, *pb.PushStageBattleWin) {
+// 	if player == nil || player.PlayerInstanceModel == nil || player.PlayerInstanceModel.CurrentRaidInfo == nil {
+// 		return false, pb.ERROR_CODE_SUCCESS, nil
+// 	}
+// 	raidInfo := player.PlayerInstanceModel.CurrentRaidInfo
+// 	if raidInfo.IsOver || raidInfo.BattleEndTime <= 0 || now < raidInfo.BattleEndTime {
+// 		return false, pb.ERROR_CODE_SUCCESS, nil
+// 	}
+// 	raidInfo.IsOver = true
+// 	errorCode, winResp := OnBattlePlayerDead(player, raidInfo, player.PlayerInstanceModel)
+// 	return true, errorCode, winResp
+// }
 
 func BuildAllMainInstanceData(userId int64, currentStageId, CurrentSubStageId, maxStageId, maxSubStageId int32, currentInstanceInfo *logicCommon.InstanceStageInfo, privilegeDropCount int32) (current, next *logicCommon.PlayerInstanceRaid, err error) {
 	mainStageCfg := gameConfig.GetMainStageCfg(currentStageId)
@@ -506,6 +508,9 @@ func BuildRaidPB(playerModel *model.PlayerModel, raidData *logicCommon.PlayerIns
 		for _, skillId := range monsterInfo.SkillId {
 			template.SkillIds = append(template.SkillIds, skillId)
 		}
+		if monsterInfo.PetInfo != nil {
+			template.PetBattleInfo = monsterInfo.PetInfo
+		}
 		sceneBasicInfo.AllMonsterTemplate = append(sceneBasicInfo.AllMonsterTemplate, template)
 	}
 	return sceneBasicInfo
@@ -644,7 +649,7 @@ func GetComboSkillIds(player *model.PlayerModel, id pb.HeroFormationType) []int3
 			}
 		}
 	}
-	leaderIdForComboSkillMap := make(map[int32]int32)
+	allComboSkillMap := make(map[int32]*gameConfig.ComboSkillCfg)
 	for key, v := range comboSkillMap {
 		comboSkillCfg := gameConfig.GetComboSkillCfg(key)
 		if comboSkillCfg == nil {
@@ -661,20 +666,18 @@ func GetComboSkillIds(player *model.PlayerModel, id pb.HeroFormationType) []int3
 			}
 		}
 		if flag {
-			if _, ok := leaderIdForComboSkillMap[comboSkillCfg.LeaderId]; ok {
-				lastComboSkillCfg := gameConfig.GetComboSkillCfg(leaderIdForComboSkillMap[comboSkillCfg.LeaderId])
-				if lastComboSkillCfg != nil {
-					if lastComboSkillCfg.Level <= comboSkillCfg.Level {
-						leaderIdForComboSkillMap[comboSkillCfg.LeaderId] = comboSkillCfg.Id
-					}
+			comboGroup := comboSkillCfg.Group
+			if _, ok := allComboSkillMap[comboGroup]; ok {
+				if comboSkillCfg.Level > allComboSkillMap[comboGroup].Level {
+					allComboSkillMap[comboGroup] = comboSkillCfg
 				}
 			} else {
-				leaderIdForComboSkillMap[comboSkillCfg.LeaderId] = comboSkillCfg.Id
+				allComboSkillMap[comboGroup] = comboSkillCfg
 			}
 		}
 	}
-	for _, v := range leaderIdForComboSkillMap {
-		comboSkillIds = append(comboSkillIds, v)
+	for _, v := range allComboSkillMap {
+		comboSkillIds = append(comboSkillIds, v.Id)
 	}
 	return comboSkillIds
 }

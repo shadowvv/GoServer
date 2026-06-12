@@ -1,0 +1,123 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+import "commonMessage.proto";
+
+message TaskDetailsReq {
+  int32 attribution =1; // 任务归属 1:主线任务 2:支线任务 3:每日任务
+}
+
+message TaskInfo {
+  int32 taskId = 1; // 任务ID
+  int32 taskState = 2; // 任务状态 0:未完成 1:已完成未领取 2:已领取
+  int32 progress = 3; // 任务进度
+}
+
+message TaskInfoStruct {
+  int32 attribution=1;//任务归属
+  repeated TaskInfo taskInfoList=2;
+  int32 dailyPoint=3;
+  int32 dailyBox=4;
+  int32 weekPoint=5;
+  int32 weekBox=6;
+}
+
+message TaskDetailsResp {
+  repeated TaskInfo taskInfoList = 1; // 任务信息列表
+  int32 dailyPoint=2;
+  int32 dailyBox=3;
+  int32 weekPoint=4;
+  int32 weekBox=5;
+}
+
+message TaskRewardReq {
+  int32 attribution =1; // 任务归属 1:主线任务 2:支线任务
+  int32 taskId = 2; // 任务ID
+  int32 rewardType = 3; // 奖励类型 1:一键领取 2:单个任务
+}
+
+message TaskRewardResp {
+  repeated ItemBasicInfo itemList = 1; // 领取道具id list
+}
+
+message PushTaskUpdate {
+  int32 attribution =1; // 任务归属 1:主线任务 2:支线任务 3:每日任务
+  int32 taskId = 2; // 任务ID
+  int32 taskState = 3; // 任务状态 0:未完成 1:已完成未领取 2:已领取
+  int32 progress = 4; // 任务进度
+}
+
+message TaskDailyRewardReq {
+  int32 rewardType =1; // 奖励类型 1:一键领取（进度条宝箱和所有已完成任务）  2：进度条宝箱 3：所有已完成任务
+}
+
+message TaskDailyRewardResp {
+  repeated ItemBasicInfo itemList = 1; // 领取道具id list
+  int32 dailyPoint=2;
+  int32 dailyBox=3;
+  int32 weekPoint=4;
+  int32 weekBox=5;
+}
+
+message BountyRewardReq{
+  int32 bountyId=1; // 悬赏令id
+  int32 taskId=2; // 任务id 0 一键领取 其他 领取某个小任务
+}
+
+message BountyRewardResp{
+  repeated ItemBasicInfo itemList = 1; // 领取道具id list
+}
+
+message BountyInfo{
+  int32 bountyId=1; // 悬赏令id
+  repeated TaskInfo taskList=2; // 任务列表
+  int64 EndTime=3; // 结束时间 毫秒时间戳
+  int32 Status=4; // 状态 0进行中 1已完成未领取 2已领取 4 超时未完成
+}
+
+message PushBountyStart{
+  BountyInfo info=1; // 悬赏令信息
+}
+
+message PushBountyEnd{
+  int32 bountyId=1;// 悬赏令id
+}
+
+message GetBountyDetailReq{
+  int32 bountyId=1;// 悬赏令id
+}
+
+message GetBountyDetailResp{
+  BountyInfo info=1;// 悬赏令信息
+}
+
+message PassCardtTaskInfo{
+  int32 taskId=1;
+  int32 progress=2;
+  int32 finishNum=3;
+}
+
+message PassCardTask{
+  int32 passCardId=1;
+  repeated PassCardtTaskInfo passCardTaskInfoList=2;
+}
+
+message AllianceDailyDetail{
+  int32 dailyBox=1; //联盟每日活跃宝箱领取阶段
+}
+
+message AllianceDailyTaskRewardReq{
+  int32 rewardType =1; // 奖励类型 1:一键领取（进度条宝箱和所有已完成任务）  2：进度条宝箱 3：所有已完成任务
+}
+
+message AllianceDailyTaskRewardResp{
+  AllianceDailyDetail allianceDailyDetail=1; // 联盟每日活跃宝箱领取阶段
+}
+
+message GetAllianceDailyTaskDetailReq{
+}
+
+message GetAllianceDailyTaskDetailResp{
+  AllianceDailyDetail allianceDailyDetail=1; // 联盟每日活跃宝箱领取阶段
+}

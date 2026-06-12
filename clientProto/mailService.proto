@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "../logic/pb;pb";
+
+import "mailMessage.proto";
+
+// ====== 邮件服务gRPC接口定义（供运营后台调用） ======
+
+// MailService 邮件服务gRPC接口
+service MailService {
+  // 发送个人邮件
+  // 供运营后台调用，向指定玩家发送邮件
+  rpc SendPlayerMail(SendPlayerMailRequest) returns (SendPlayerMailResponse);
+  
+  // 发送全服邮件
+  // 供运营后台调用，向符合条件的玩家发送全服邮件
+  rpc SendServerMail(SendServerMailRequest) returns (SendServerMailResponse);
+  
+  // 查询邮件发送记录
+  // 供运营后台查询邮件发送历史记录
+  rpc QueryMailRecords(QueryMailRecordsRequest) returns (QueryMailRecordsResponse);
+  
+  // 邮件发送统计
+  // 供运营后台查询邮件发送统计数据
+  rpc GetMailStatistics(GetMailStatisticsRequest) returns (GetMailStatisticsResponse);
+  
+  // 查询玩家邮件列表
+  // 供运营后台查询指定玩家的邮件列表
+  rpc GetPlayerMailList(GetPlayerMailListRequest) returns (GetPlayerMailListResponse);
+}
+
+// ====== RPC请求和响应消息 ======
+
+// 查询邮件记录请求
+message QueryMailRecordsRequest {
+  int64 user_id = 1;        // 玩家ID（0表示查询所有玩家）
+  int64 mail_id = 2;        // 邮件ID（0表示查询所有邮件）
+  int32 mail_type = 3;      // 邮件类型（0表示所有类型）
+  int64 start_time = 4;     // 开始时间戳
+  int64 end_time = 5;       // 结束时间戳
+  int32 page = 6;           // 页码（从1开始）
+  int32 page_size = 7;      // 每页数量
+}
+
+// 查询邮件记录响应
+message QueryMailRecordsResponse {
+  MailResult result = 1;
+  repeated MailInfo mails = 2;  // 邮件列表
+  int32 total = 3;              // 总数
+  string message = 4;            // 消息
+}
+
+// 邮件统计请求
+message GetMailStatisticsRequest {
+  int64 start_time = 1;     // 开始时间戳
+  int64 end_time = 2;       // 结束时间戳
+  int32 mail_type = 3;      // 邮件类型（0表示所有类型）
+}
+
+// 邮件统计响应
+message GetMailStatisticsResponse {
+  MailResult result = 1;
+  int32 total_sent = 2;         // 总发送数量
+  int32 total_read = 3;         // 总阅读数量
+  int32 total_claimed = 4;      // 总领取数量
+  int32 total_deleted = 5;      // 总删除数量
+  map<int32, int32> type_count = 6;  // 按类型统计的数量
+  string message = 7;            // 消息
+}
+
+// 查询玩家邮件列表请求（供运营后台使用）
+message GetPlayerMailListRequest {
+  int64 user_id = 1;        // 玩家ID
+  int32 mail_type = 2;      // 邮件类型（0表示全部）
+  int32 status = 3;         // 状态筛选（0表示全部）
+  int32 page = 4;           // 页码（从1开始）
+  int32 page_size = 5;      // 每页数量
+}
+
+// 查询玩家邮件列表响应（供运营后台使用）
+message GetPlayerMailListResponse {
+  MailResult result = 1;
+  repeated MailInfo mails = 2;  // 邮件列表
+  int32 total = 3;              // 总数
+  int32 unread_count = 4;        // 未读数量
+  string message = 5;            // 消息
+}
+

@@ -20,4 +20,5 @@ message NotifyAllianceChangeReq {
   int64 userId = 1; // 玩家id
   int32 changeOper = 2;// 联盟操作
   int64 allianceId = 3;// 联盟id
+  repeated ItemInfo items = 4;
 }

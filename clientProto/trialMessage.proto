@@ -1,0 +1,48 @@
+syntax = "proto3";
+package pb;
+option go_package = "../logic/pb;pb";
+
+import "taskMessage.proto";
+
+// ========== 子消息 ==========
+
+// 试炼某一天的信息
+message TrialDayInfo {
+  int32 dayIndex = 1;   // 第几天
+  repeated TaskInfo tasks = 2; // taskId = trial_task.id
+}
+
+// ========== 请求/响应 ==========
+
+// 请求试炼详情
+message TrialInfoReq {
+  int32 actId = 1; // 活动 ID
+}
+
+// 试炼详情响应
+message TrialInfoResp {
+  int32 actId                           = 1; // 活动 ID
+  repeated TrialDayInfo dayInfos        = 2; // 每天的详情（仅返回已解锁的天）
+  int32 claimId                         = 3; // 已领取进度奖励id（trial_reward.id）
+}
+
+// 领取任务奖励请求
+message TrialTaskRewardReq {
+  int32 actId = 1; // 活动 ID
+  int32 trialTaskId = 2; // trial_task.id
+}
+
+// 领取任务奖励响应
+message TrialTaskRewardResp {
+  bool isSuccess = 1;
+}
+
+// 领取进度奖励请求
+message TrialRewardReq {
+  int32 actId     = 1; // 活动 ID
+}
+
+// 领取进度奖励响应
+message TrialRewardResp {
+  bool isSuccess = 1;
+}

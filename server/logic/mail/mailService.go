@@ -427,11 +427,12 @@ func (s *MailService) checkAndCreateAllianceMails(userId int64) error {
 		return nil
 	}
 	allianceID := allianceInfo.AllianceId
+	joinTimeLowerBound := getUnixTimeLowerBoundInSeconds(allianceInfo.JoinTime)
 
 	// 查询符合条件的联盟邮件（复用 server_mail 表）
 	var allianceMailEntities []ServerMailEntity
 	if err := s.db.Where("alliance_id = ? AND status = ? AND expire_time > ? AND send_time >= ?",
-		allianceID, ServerMailStatusSent, time.Now().Unix(), allianceInfo.JoinTime).
+		allianceID, ServerMailStatusSent, time.Now().Unix(), joinTimeLowerBound).
 		Find(&allianceMailEntities).Error; err != nil {
 		return err
 	}
@@ -454,20 +455,22 @@ func (s *MailService) checkAndCreateAllianceMails(userId int64) error {
 
 		items, _ := allianceMailEntity.GetItems()
 		mailID := s.idGenerator.NextId()
+		contentP, _ := decodeStringSliceFromJSONColumn(allianceMailEntity.ContentParams)
 		playerMail := &Mail{
-			MailID:       mailID,
-			UserID:       userId,
-			MailType:     allianceMailEntity.MailType,
-			Title:        allianceMailEntity.Title,
-			Content:      allianceMailEntity.Content,
-			SenderAvatar: allianceMailEntity.SenderAvatar,
-			ServerMailID: allianceMailEntity.ServerMailID,
-			TemplateID:   allianceMailEntity.TemplateID,
-			Status:       MailStatusUnread,
-			IsConvenient: allianceMailEntity.IsConvenient,
-			Items:        items,
-			SendTime:     allianceMailEntity.SendTime,
-			ExpireTime:   allianceMailEntity.ExpireTime,
+			MailID:        mailID,
+			UserID:        userId,
+			MailType:      allianceMailEntity.MailType,
+			Title:         allianceMailEntity.Title,
+			Content:       allianceMailEntity.Content,
+			ContentParams: contentP,
+			SenderAvatar:  allianceMailEntity.SenderAvatar,
+			ServerMailID:  allianceMailEntity.ServerMailID,
+			TemplateID:    allianceMailEntity.TemplateID,
+			Status:        MailStatusUnread,
+			IsConvenient:  allianceMailEntity.IsConvenient,
+			Items:         items,
+			SendTime:      allianceMailEntity.SendTime,
+			ExpireTime:    allianceMailEntity.ExpireTime,
 		}
 
 		entity := MailToEntity(playerMail)
@@ -1354,7 +1357,7 @@ func (s *MailService) OnPlayerLogin(userId int64) error {
 	if allianceInfo != nil && allianceInfo.AllianceId > 0 {
 		var allianceUnread int64
 		if err := s.db.Model(&ServerMailEntity{}).
-			Where("alliance_id = ? AND status = ? AND expire_time > ? AND send_time >= ?", allianceInfo.AllianceId, ServerMailStatusSent, time.Now().Unix(), allianceInfo.JoinTime).
+			Where("alliance_id = ? AND status = ? AND expire_time > ? AND send_time >= ?", allianceInfo.AllianceId, ServerMailStatusSent, time.Now().Unix(), getUnixTimeLowerBoundInSeconds(allianceInfo.JoinTime)).
 			Count(&allianceUnread).Error; err != nil {
 			return err
 		}
@@ -1377,6 +1380,16 @@ func getRegisterTimeLowerBoundInSeconds(registerTimeMs int64) int64 {
 		return 0
 	}
 	return (registerTimeMs + 999) / 1000
+}
+
+func getUnixTimeLowerBoundInSeconds(unixTime int64) int64 {
+	if unixTime <= 0 {
+		return 0
+	}
+	if unixTime > 1_000_000_000_000 {
+		return (unixTime + 999) / 1000
+	}
+	return unixTime
 }
 
 // CleanExpiredMails 清理过期邮件

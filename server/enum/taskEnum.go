@@ -35,19 +35,21 @@ const (
 	EventTypeAdChestOpen             = "ad_chest_open"              // 限时宝箱打开
 	EventTypeMainTaskChange          = "main_task_change"           // 主线任务通过
 	EventTypeStoneAttrLevelUp        = "stone_attr_level_up"        // 石像等级提升
+	EventTypePlayerLogin             = "player_login"               // 玩家登录
+	EventTypeCityAgeChange           = "city_age_change"            // 主城时代变化
 )
 
 const (
-	TaskAffiliationMain     = 1  // 主线
-	TaskAffiliationSide     = 2  // 支线
-	TaskAffiliationDaily    = 3  // 每日
-	TaskAffiliationWeekly   = 4  // 每周
-	TaskAffiliationBounty   = 5  // 悬赏
-	TaskAffiliationPassCard = 6  // 通行证任务
-	TaskAffiliationGuild    = 7  // 宗门
-	TaskAffiliationTrial    = 8  // 七日试炼
-	TaskAffiliationCityAge  = 9  // 主城时代
-	TaskAffiliationAct      = 10 // 活动玩法任务
+	TaskAffiliationMain          = 1  // 主线
+	TaskAffiliationSide          = 2  // 支线
+	TaskAffiliationDaily         = 3  // 每日
+	TaskAffiliationWeekly        = 4  // 每周
+	TaskAffiliationBounty        = 5  // 悬赏
+	TaskAffiliationPassCard      = 6  // 通行证任务
+	TaskAffiliationDailyAlliance = 7  // 联盟每日
+	TaskAffiliationTrial         = 8  // 七日试炼
+	TaskAffiliationCityAge       = 9  // 主城时代
+	TaskAffiliationAct           = 10 // 活动玩法任务
 )
 
 const (
@@ -106,64 +108,166 @@ const (
 	ObjectiveTypeDungeonPassWhatStage                 = 56 // 常驻副本通关层数
 	ObjectiveTypeGloryArenaWinHowMany                 = 59 // 荣耀擂台胜场次数
 	ObjectiveTypeWearHowManyEquipmentLevel            = 60 // 穿戴多少装备达到指定阶数
+
+	ObjectiveTypeLoginGame                            = 61 // 登陆游戏
+	ObjectiveTypeStoneWhatClassWhatAttrLevelUpHowMany = 62 // 石像某个职业某个属性达到多少级
+	ObjectiveTypeCityAgeReachWhatStage                = 63 // 时代达到什么阶段
 )
 
-var EventToObjectiveTypes = map[string][]int32{
-	EventTypeKillMonster: {ObjectiveTypeKillAnyMonsterHowMany, ObjectiveTypeKillWhatMonsterHowMany, ObjectiveTypeWhereKillWhatMonsterHowMany},
-	EventTypeHeroLevelUp: {ObjectiveTypeAnyHeroReachWhatLevel, ObjectiveTypeAnyHeroLevelUpHowMany, ObjectiveTypeHowManyHeroReachWhatLevel},
-	EventTypeHeroStarUp:  {ObjectiveTypeHeroStarUpHowMany, ObjectiveTypeHowManyHeroReachWhatStar},
-	EventTypeItemCollect: {ObjectiveTypeGetWhatItemsHowMany, ObjectiveTypeGetTypeOrQualityItemsHowMany},
-	EventTypePassInstance: {ObjectiveTypePassWhatMainLevel, ObjectiveTypePassHowManyMainLevel, ObjectiveTypeTowerChallengePassWhatLevel,
-		ObjectiveTypeDungeonPassWhatStage, ObjectiveTypeGloryArenaWinHowMany},
-	EventTypeLuckyLottery: {ObjectiveTypeAccessoryLuckyHowMany, ObjectiveTypeHeroLotteryHowMany, ObjectiveTypeLoopBoxLotteryHowMany,
-		ObjectiveTypeAccessorySystemLevelReachWhat, ObjectiveTypeCollectionLotteryHowMany, ObjectiveTypeCollectionLotteryHowManyCumulative,
-		ObjectiveTypePetRecruitHowMany, ObjectiveTypePetRecruitHowManyCumulative},
-	EventTypeJoinInstance: {ObjectiveTypeArenaParticipateHowMany, ObjectiveTypeTowerChallengeHowMany, ObjectiveTypeAdventureParticipateHowMany,
-		ObjectiveTypeGloryArenaChallengeHowMany, ObjectiveTypeDungeonParticipateHowMany, ObjectiveTypeDungeonParticipateHowManyCumulative},
-	EventTypeQuickClaimMachineReward: {ObjectiveTypeQuickClaimMachineRewardHowMany},
-	EventTypeBuildLevelUp:            {ObjectiveTypeBuildLevelUpHowMany, ObjectiveTypeWhatBuildLevelUpWhat, ObjectiveTypeAllBuildLevelReachWhat},
-	EventTypeDispatchKillMonster:     {ObjectiveTypeDispatchKillMonsterHowMany, ObjectiveTypeCumulativeDispatchKillMonsterHowMany},
-	EventTypePlayerPowerChange:       {ObjectiveTypePlayerPowerReachWhat},
-	EventTypeAddHeroAlbum:            {ObjectiveTypeHeroQuantityReachWhat, ObjectiveTypeHowManyHeroReachWhatPotential},
-	EventTypeDispatchMapUnlock:       {ObjectiveTypeWhatDispatchMapUnlockWhatStage},
-	EventTypeLoopBoxLevelUp:          {ObjectiveTypeLoopBoxSystemLevelReachWhat},
-	EventTypeEquipmentStrong:         {ObjectiveTypeHowManyEquipStrongReachWhatLevel, ObjectiveTypeStrongEquipmentHowMany},
-	EventTypePetLevelUp:              {ObjectiveTypeHowManyPetReachWhatLevel},
-	EventTypeAllianceJoin:            {ObjectiveTypeJoinAlliance},
-	EventTypePetStarUp:               {ObjectiveTypeHowManyPetReachWhatStar},
-	EventTypeEquipmentForge:          {ObjectiveTypeEquipmentForgeHowMany},
-	EventTypeEquipmentWear:           {ObjectiveTypeWearHowManyEquipmentQuality, ObjectiveTypeWearHowManyEquipmentLevel},
-	EventTypeArenaScoreChange:        {ObjectiveTypeArenaScoreReachWhat},
-	EventTypeAdChestOpen:             {ObjectiveTypeAdChestOpenHowMany},
-	EventTypeMainTaskChange:          {ObjectiveTypeMainTaskPassWhatNum},
-	EventTypeStoneAttrLevelUp:        {ObjectiveTypeStoneClassTotalLevelReachWhat},
+//var EventToObjectiveTypes = map[string][]int32{
+//	EventTypeKillMonster: {ObjectiveTypeKillAnyMonsterHowMany, ObjectiveTypeKillWhatMonsterHowMany, ObjectiveTypeWhereKillWhatMonsterHowMany},
+//	EventTypeHeroLevelUp: {ObjectiveTypeAnyHeroReachWhatLevel, ObjectiveTypeAnyHeroLevelUpHowMany, ObjectiveTypeHowManyHeroReachWhatLevel},
+//	EventTypeHeroStarUp:  {ObjectiveTypeHeroStarUpHowMany, ObjectiveTypeHowManyHeroReachWhatStar},
+//	EventTypeItemCollect: {ObjectiveTypeGetWhatItemsHowMany, ObjectiveTypeGetTypeOrQualityItemsHowMany},
+//	EventTypePassInstance: {ObjectiveTypePassWhatMainLevel, ObjectiveTypePassHowManyMainLevel, ObjectiveTypeTowerChallengePassWhatLevel,
+//		ObjectiveTypeDungeonPassWhatStage, ObjectiveTypeGloryArenaWinHowMany},
+//	EventTypeLuckyLottery: {ObjectiveTypeAccessoryLuckyHowMany, ObjectiveTypeHeroLotteryHowMany, ObjectiveTypeLoopBoxLotteryHowMany,
+//		ObjectiveTypeAccessorySystemLevelReachWhat, ObjectiveTypeCollectionLotteryHowMany, ObjectiveTypeCollectionLotteryHowManyCumulative,
+//		ObjectiveTypePetRecruitHowMany, ObjectiveTypePetRecruitHowManyCumulative},
+//	EventTypeJoinInstance: {ObjectiveTypeArenaParticipateHowMany, ObjectiveTypeTowerChallengeHowMany, ObjectiveTypeAdventureParticipateHowMany,
+//		ObjectiveTypeGloryArenaChallengeHowMany, ObjectiveTypeDungeonParticipateHowMany, ObjectiveTypeDungeonParticipateHowManyCumulative},
+//	EventTypeQuickClaimMachineReward: {ObjectiveTypeQuickClaimMachineRewardHowMany},
+//	EventTypeBuildLevelUp:            {ObjectiveTypeBuildLevelUpHowMany, ObjectiveTypeWhatBuildLevelUpWhat, ObjectiveTypeAllBuildLevelReachWhat},
+//	EventTypeDispatchKillMonster:     {ObjectiveTypeDispatchKillMonsterHowMany, ObjectiveTypeCumulativeDispatchKillMonsterHowMany},
+//	EventTypePlayerPowerChange:       {ObjectiveTypePlayerPowerReachWhat},
+//	EventTypeAddHeroAlbum:            {ObjectiveTypeHeroQuantityReachWhat, ObjectiveTypeHowManyHeroReachWhatPotential},
+//	EventTypeDispatchMapUnlock:       {ObjectiveTypeWhatDispatchMapUnlockWhatStage},
+//	EventTypeLoopBoxLevelUp:          {ObjectiveTypeLoopBoxSystemLevelReachWhat},
+//	EventTypeEquipmentStrong:         {ObjectiveTypeHowManyEquipStrongReachWhatLevel, ObjectiveTypeStrongEquipmentHowMany},
+//	EventTypePetLevelUp:              {ObjectiveTypeHowManyPetReachWhatLevel},
+//	EventTypeAllianceJoin:            {ObjectiveTypeJoinAlliance},
+//	EventTypePetStarUp:               {ObjectiveTypeHowManyPetReachWhatStar},
+//	EventTypeEquipmentForge:          {ObjectiveTypeEquipmentForgeHowMany},
+//	EventTypeEquipmentWear:           {ObjectiveTypeWearHowManyEquipmentQuality, ObjectiveTypeWearHowManyEquipmentLevel},
+//	EventTypeArenaScoreChange:        {ObjectiveTypeArenaScoreReachWhat},
+//	EventTypeAdChestOpen:             {ObjectiveTypeAdChestOpenHowMany},
+//	EventTypeMainTaskChange:          {ObjectiveTypeMainTaskPassWhatNum},
+//	EventTypeStoneAttrLevelUp:        {ObjectiveTypeStoneClassTotalLevelReachWhat},
+//}
+//
+//var NeedCheckTasks = map[int32]bool{
+//	ObjectiveTypeAnyHeroReachWhatLevel:                true,
+//	ObjectiveTypePassWhatMainLevel:                    true,
+//	ObjectiveTypeHowManyHeroReachWhatLevel:            true,
+//	ObjectiveTypeHowManyHeroReachWhatStar:             true,
+//	ObjectiveTypeTowerChallengePassWhatLevel:          true,
+//	ObjectiveTypeWhatBuildLevelUpWhat:                 true,
+//	ObjectiveTypeCumulativeDispatchKillMonsterHowMany: true,
+//	ObjectiveTypePlayerPowerReachWhat:                 true,
+//	ObjectiveTypeAllBuildLevelReachWhat:               true,
+//	ObjectiveTypeHeroQuantityReachWhat:                true,
+//	ObjectiveTypeWhatDispatchMapUnlockWhatStage:       true,
+//	ObjectiveTypeLoopBoxSystemLevelReachWhat:          true,
+//	ObjectiveTypeAccessorySystemLevelReachWhat:        true,
+//	ObjectiveTypeHowManyHeroReachWhatPotential:        true,
+//	ObjectiveTypeHowManyEquipStrongReachWhatLevel:     true,
+//	ObjectiveTypeHowManyPetReachWhatLevel:             true,
+//	ObjectiveTypeJoinAlliance:                         true,
+//	ObjectiveTypeHowManyPetReachWhatStar:              true,
+//	ObjectiveTypeWearHowManyEquipmentQuality:          true,
+//	ObjectiveTypeArenaScoreReachWhat:                  true,
+//	ObjectiveTypeMainTaskPassWhatNum:                  true,
+//	ObjectiveTypeStoneClassTotalLevelReachWhat:        true,
+//	ObjectiveTypePetRecruitHowManyCumulative:          true,
+//	ObjectiveTypeCollectionLotteryHowManyCumulative:   true,
+//	ObjectiveTypeDungeonParticipateHowManyCumulative:  true,
+//	ObjectiveTypeWearHowManyEquipmentLevel:            true,
+//}
+
+type DispatchTarget int32
+
+const (
+	TargetPlayer   DispatchTarget = 1
+	TargetAlliance DispatchTarget = 2
+)
+
+type ObjectiveMeta struct {
+	EventType string
+	Target    DispatchTarget
+	NeedCheck bool
 }
 
-var NeedCheckTask = map[int32]bool{
-	ObjectiveTypeAnyHeroReachWhatLevel:                true,
-	ObjectiveTypePassWhatMainLevel:                    true,
-	ObjectiveTypeHowManyHeroReachWhatLevel:            true,
-	ObjectiveTypeHowManyHeroReachWhatStar:             true,
-	ObjectiveTypeTowerChallengePassWhatLevel:          true,
-	ObjectiveTypeWhatBuildLevelUpWhat:                 true,
-	ObjectiveTypeCumulativeDispatchKillMonsterHowMany: true,
-	ObjectiveTypePlayerPowerReachWhat:                 true,
-	ObjectiveTypeAllBuildLevelReachWhat:               true,
-	ObjectiveTypeHeroQuantityReachWhat:                true,
-	ObjectiveTypeWhatDispatchMapUnlockWhatStage:       true,
-	ObjectiveTypeLoopBoxSystemLevelReachWhat:          true,
-	ObjectiveTypeAccessorySystemLevelReachWhat:        true,
-	ObjectiveTypeHowManyHeroReachWhatPotential:        true,
-	ObjectiveTypeHowManyEquipStrongReachWhatLevel:     true,
-	ObjectiveTypeHowManyPetReachWhatLevel:             true,
-	ObjectiveTypeJoinAlliance:                         true,
-	ObjectiveTypeHowManyPetReachWhatStar:              true,
-	ObjectiveTypeWearHowManyEquipmentQuality:          true,
-	ObjectiveTypeArenaScoreReachWhat:                  true,
-	ObjectiveTypeMainTaskPassWhatNum:                  true,
-	ObjectiveTypeStoneClassTotalLevelReachWhat:        true,
-	ObjectiveTypePetRecruitHowManyCumulative:          true,
-	ObjectiveTypeCollectionLotteryHowManyCumulative:   true,
-	ObjectiveTypeDungeonParticipateHowManyCumulative:  true,
-	ObjectiveTypeWearHowManyEquipmentLevel:            true,
+var ObjectiveMetaList = map[int32]*ObjectiveMeta{
+	ObjectiveTypeKillAnyMonsterHowMany:        {EventType: EventTypeKillMonster, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeKillWhatMonsterHowMany:       {EventType: EventTypeKillMonster, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeWhereKillWhatMonsterHowMany:  {EventType: EventTypeKillMonster, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeGetTypeOrQualityItemsHowMany: {EventType: EventTypeItemCollect, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeGetWhatItemsHowMany:          {EventType: EventTypeItemCollect, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeAnyHeroReachWhatLevel:        {EventType: EventTypeHeroLevelUp, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeAnyHeroLevelUpHowMany:        {EventType: EventTypeHeroLevelUp, Target: TargetPlayer, NeedCheck: false},
+
+	ObjectiveTypePassWhatMainLevel:              {EventType: EventTypePassInstance, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypePassHowManyMainLevel:           {EventType: EventTypePassInstance, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeAccessoryLuckyHowMany:          {EventType: EventTypeLuckyLottery, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeHeroLotteryHowMany:             {EventType: EventTypeLuckyLottery, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeLoopBoxLotteryHowMany:          {EventType: EventTypeLuckyLottery, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeTowerChallengeHowMany:          {EventType: EventTypeJoinInstance, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeArenaParticipateHowMany:        {EventType: EventTypeJoinInstance, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeQuickClaimMachineRewardHowMany: {EventType: EventTypeQuickClaimMachineReward, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeBuildLevelUpHowMany:            {EventType: EventTypeBuildLevelUp, Target: TargetPlayer, NeedCheck: false},
+
+	ObjectiveTypeStrongEquipmentHowMany:      {EventType: EventTypeEquipmentStrong, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeHowManyHeroReachWhatLevel:   {EventType: EventTypeHeroLevelUp, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeHowManyHeroReachWhatStar:    {EventType: EventTypeHeroStarUp, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeTowerChallengePassWhatLevel: {EventType: EventTypePassInstance, Target: TargetPlayer, NeedCheck: true},
+
+	ObjectiveTypeHeroStarUpHowMany: {EventType: EventTypeHeroStarUp, Target: TargetPlayer, NeedCheck: true},
+
+	ObjectiveTypeWhatBuildLevelUpWhat:                 {EventType: EventTypeBuildLevelUp, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeDispatchKillMonsterHowMany:           {EventType: EventTypeDispatchKillMonster, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeCumulativeDispatchKillMonsterHowMany: {EventType: EventTypeDispatchKillMonster, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypePlayerPowerReachWhat:                 {EventType: EventTypePlayerPowerChange, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeAllBuildLevelReachWhat:               {EventType: EventTypeBuildLevelUp, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeHeroQuantityReachWhat:                {EventType: EventTypeAddHeroAlbum, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeWhatDispatchMapUnlockWhatStage:       {EventType: EventTypeDispatchMapUnlock, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeAccessorySystemLevelReachWhat:        {EventType: EventTypeLuckyLottery, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeHowManyHeroReachWhatPotential:        {EventType: EventTypeAddHeroAlbum, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeHowManyEquipStrongReachWhatLevel:     {EventType: EventTypeEquipmentStrong, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeHowManyPetReachWhatLevel:             {EventType: EventTypePetLevelUp, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeJoinAlliance:                         {EventType: EventTypeAllianceJoin, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeAdventureParticipateHowMany:          {EventType: EventTypeJoinInstance, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeHowManyPetReachWhatStar:              {EventType: EventTypePetStarUp, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeEquipmentForgeHowMany:                {EventType: EventTypeEquipmentForge, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeWearHowManyEquipmentQuality:          {EventType: EventTypeEquipmentWear, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeArenaScoreReachWhat:                  {EventType: EventTypeArenaScoreChange, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeAdChestOpenHowMany:                   {EventType: EventTypeAdChestOpen, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeMainTaskPassWhatNum:                  {EventType: EventTypeMainTaskChange, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeStoneClassTotalLevelReachWhat:        {EventType: EventTypeStoneAttrLevelUp, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeLoopBoxSystemLevelReachWhat:          {EventType: EventTypeLoopBoxLevelUp, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeGloryArenaChallengeHowMany:           {EventType: EventTypeJoinInstance, Target: TargetPlayer, NeedCheck: false},
+
+	ObjectiveTypePetRecruitHowMany:                   {EventType: EventTypeLuckyLottery, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypePetRecruitHowManyCumulative:         {EventType: EventTypeLuckyLottery, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeCollectionLotteryHowMany:            {EventType: EventTypeLuckyLottery, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeCollectionLotteryHowManyCumulative:  {EventType: EventTypeLuckyLottery, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeDungeonParticipateHowMany:           {EventType: EventTypeJoinInstance, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeDungeonParticipateHowManyCumulative: {EventType: EventTypeJoinInstance, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeDungeonPassWhatStage:                {EventType: EventTypeJoinInstance, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeGloryArenaWinHowMany:                {EventType: EventTypeJoinInstance, Target: TargetPlayer, NeedCheck: false},
+	ObjectiveTypeWearHowManyEquipmentLevel:           {EventType: EventTypeEquipmentWear, Target: TargetPlayer, NeedCheck: true},
+
+	ObjectiveTypeLoginGame:                            {EventType: EventTypePlayerLogin, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeStoneWhatClassWhatAttrLevelUpHowMany: {EventType: EventTypeStoneAttrLevelUp, Target: TargetPlayer, NeedCheck: true},
+	ObjectiveTypeCityAgeReachWhatStage:                {EventType: EventTypeCityAgeChange, Target: TargetPlayer, NeedCheck: true},
+}
+
+var PlayerEventTypes map[string][]int32
+var AllianceEventTypes map[string][]int32
+var NeedCheckTask map[int32]bool
+
+func init() {
+	PlayerEventTypes = make(map[string][]int32)
+	AllianceEventTypes = make(map[string][]int32)
+	NeedCheckTask = make(map[int32]bool)
+	for key, v := range ObjectiveMetaList {
+		switch v.Target {
+		case TargetPlayer:
+			PlayerEventTypes[v.EventType] = append(PlayerEventTypes[v.EventType], key)
+		case TargetAlliance:
+			AllianceEventTypes[v.EventType] = append(AllianceEventTypes[v.EventType], key)
+		}
+		if v.NeedCheck {
+			NeedCheckTask[key] = true
+		}
+	}
 }

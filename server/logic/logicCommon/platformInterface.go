@@ -1,6 +1,8 @@
 package logicCommon
 
 import (
+	"context"
+
 	"github.com/drop/GoServer/server/enum"
 	"github.com/drop/GoServer/server/logic/pb"
 	"github.com/drop/GoServer/server/logic/rpcPb"
@@ -10,7 +12,7 @@ import (
 type MessageSenderInterface interface {
 	SendMessageByPlayerId(playerId int64, msgId pb.MESSAGE_ID, message proto.Message)
 	SendMessage(player UserBaseInterface, msgId pb.MESSAGE_ID, message proto.Message)
-	Broadcast(msgId pb.MESSAGE_ID, msg proto.Message, broadcastType enum.BroadcastType, typeId int32)
+	Broadcast(msgId pb.MESSAGE_ID, msg proto.Message, broadcastType enum.BroadcastType, typeId int64)
 	SendErrorMessage(player UserBaseInterface, msgId pb.MESSAGE_ID, errorCode pb.ERROR_CODE)
 	CloseSessionWithError(player UserBaseInterface, msgId pb.MESSAGE_ID, errorCode pb.ERROR_CODE)
 }
@@ -23,10 +25,11 @@ type UnlockServiceInterface interface {
 	CheckUnlock(unlockId int32, player PlayerInterface) bool
 	CheckSystemUnlock(systemId int32, player PlayerInterface) bool
 	CheckServerInfoUnlock(unlockId int32, server ServerInfoInterface) bool
+	RecordExpedition(context context.Context, playerId int64) error
 }
 
 type SessionCloseHooker interface {
-	OnSessionClose(player PlayerInterface)
+	OnSessionClose(player PlayerInterface, isForce bool)
 }
 
 // RPC服务钩子

@@ -497,7 +497,10 @@ func NewMainTaskChangeEvent(playerID int64) *MainTaskChangeEvent {
 }
 
 type StoneAttrLevelUpEvent struct {
-	PlayerID int64
+	PlayerID   int64
+	Class      int32
+	AttrId     int32
+	LevelUpNum int32
 }
 
 func (e *StoneAttrLevelUpEvent) GetEventType() string {
@@ -508,8 +511,8 @@ func (e *StoneAttrLevelUpEvent) GetObjectID() int64 {
 	return e.PlayerID
 }
 
-func NewStoneAttrLevelUpEvent(playerID int64) *StoneAttrLevelUpEvent {
-	return &StoneAttrLevelUpEvent{PlayerID: playerID}
+func NewStoneAttrLevelUpEvent(playerID int64, class int32, attrId int32, levelUpNum int32) *StoneAttrLevelUpEvent {
+	return &StoneAttrLevelUpEvent{PlayerID: playerID, Class: class, AttrId: attrId, LevelUpNum: levelUpNum}
 }
 
 type AddHeroAlbumEvent struct {
@@ -549,5 +552,27 @@ func NewPetLevelUpEvent(playerID int64, petOwnID int64, oldLevel, newLevel int32
 		PetOwnID: petOwnID,
 		OldLevel: oldLevel,
 		NewLevel: newLevel,
+	}
+}
+
+type EventTypePlayerLogin struct {
+	ServerId int32
+}
+
+type EventTypeCityAgeChange struct {
+	PlayerID int64
+	CityAge  int32
+}
+
+func (e *EventTypeCityAgeChange) GetEventType() string {
+	return enum.EventTypeCityAgeChange
+}
+func (e *EventTypeCityAgeChange) GetObjectID() int64 {
+	return e.PlayerID
+}
+func NewEventTypeCityAgeChangeEvent(playerID int64, cityAge int32) *EventTypeCityAgeChange {
+	return &EventTypeCityAgeChange{
+		PlayerID: playerID,
+		CityAge:  cityAge,
 	}
 }

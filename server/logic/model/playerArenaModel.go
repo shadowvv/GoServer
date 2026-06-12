@@ -178,14 +178,14 @@ func (p *PlayerArenaModel) AddScore(point int32) {
 		return
 	}
 	updateRankReq := &rpcPb.NotifyUpdateRankInfo{
-		Id:    p.Player.GetUserId(),
-		Score: int64(p.entity.Score - gameConfig.GetArenaInitScore()),
+		PlayerId: p.Player.GetUserId(),
+		Score:    int64(p.entity.Score - gameConfig.GetArenaInitScore()),
 	}
 	_ = rpcMessageSender.SendMessageToRankBoard(p.Player.GetUserId(), rankId, 0, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_UPDATE_PLAYER_RANK_INFO, updateRankReq)
 
 	// alliance arena rank update request
 	allianceRankReq := &rpcPb.NotifyUpdateRankInfo{
-		Id:                p.Player.GetUserId(),
+		PlayerId:          p.Player.GetUserId(),
 		Score:             int64(point),
 		IncrementalUpdate: true,
 	}

@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -26,6 +27,7 @@ type LoggerConfig struct {
 
 var currentConfig *LoggerConfig
 var currentDate string
+var currentClosers []io.Closer
 
 func InitLoggerByConfig(config *LoggerConfig) error {
 	var err error
@@ -40,7 +42,7 @@ func InitLoggerByConfig(config *LoggerConfig) error {
 }
 
 func initLogger(config *LoggerConfig) error {
-	logger, dateStr, err := buildLogger(config)
+	logger, dateStr, closers, err := buildLogger(config)
 	if err != nil {
 		return err
 	}
@@ -48,13 +50,14 @@ func initLogger(config *LoggerConfig) error {
 	mu.Lock()
 	Logger = logger
 	currentDate = dateStr
+	currentClosers = closers
 	mu.Unlock()
 
 	zap.ReplaceGlobals(logger)
 	return nil
 }
 
-func buildLogger(config *LoggerConfig) (*zap.Logger, string, error) {
+func buildLogger(config *LoggerConfig) (*zap.Logger, string, []io.Closer, error) {
 	dateStr := time.Now().Format("2006-01-02")
 
 	if config.OnlyConsole {
@@ -76,31 +79,32 @@ func buildLogger(config *LoggerConfig) (*zap.Logger, string, error) {
 		)
 
 		logger := zap.New(consoleCore, zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zapcore.ErrorLevel))
-		return logger, dateStr, nil
+		return logger, dateStr, nil, nil
 	}
 
 	infoPath := buildDailyFilename(config.InfoFilename, dateStr)
 	errorPath := buildDailyFilename(config.ErrorFilename, dateStr)
 
-	infoWriter := zapcore.AddSync(&lumberjack.Logger{
+	infoFile := &lumberjack.Logger{
 		Filename:   infoPath,
 		MaxSize:    config.MaxSize,
 		MaxBackups: config.MaxBackups,
 		MaxAge:     7,
 		LocalTime:  true,
 		Compress:   false,
-	})
+	}
+	infoWriter := zapcore.AddSync(infoFile)
 
-	errorWriter := zapcore.AddSync(&lumberjack.Logger{
+	errorFile := &lumberjack.Logger{
 		Filename:   errorPath,
 		MaxSize:    config.MaxSize,
 		MaxBackups: config.MaxBackups,
 		MaxAge:     7,
 		LocalTime:  true,
 		Compress:   false,
-	})
-
-	// 文件(JSON)与控制台(可读)使用不同编码器配置
+	}
+	errorWriter := zapcore.AddSync(errorFile)
+	// File logs use JSON encoding.
 	infoFileEncoderCfg := zap.NewProductionEncoderConfig()
 	infoFileEncoderCfg.TimeKey = "time"
 	infoFileEncoderCfg.LevelKey = "level"
@@ -135,7 +139,7 @@ func buildLogger(config *LoggerConfig) (*zap.Logger, string, error) {
 	core := zapcore.NewTee(infoFileCore, errorFileCore)
 	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zapcore.ErrorLevel))
 
-	return logger, dateStr, nil
+	return logger, dateStr, []io.Closer{infoFile, errorFile}, nil
 }
 
 func buildDailyFilename(base string, dateStr string) string {
@@ -145,6 +149,17 @@ func buildDailyFilename(base string, dateStr string) string {
 		ext = ".log"
 	}
 	return fmt.Sprintf("%s-%s%s", nameWithoutExt, dateStr, ext)
+}
+
+func closeLoggerOutputs(closers []io.Closer) {
+	for _, closer := range closers {
+		if closer == nil {
+			continue
+		}
+		if err := closer.Close(); err != nil {
+			fmt.Printf("[ERROR] close logger output failed: %v\n", err)
+		}
+	}
 }
 
 func startDailyRotateWatcher() {
@@ -164,7 +179,7 @@ func startDailyRotateWatcher() {
 				continue
 			}
 
-			newLogger, newDate, err := buildLogger(cfg)
+			newLogger, newDate, newClosers, err := buildLogger(cfg)
 			if err != nil {
 				fmt.Printf("[ERROR] rebuild logger failed: %v\n", err)
 				continue
@@ -172,8 +187,10 @@ func startDailyRotateWatcher() {
 
 			mu.Lock()
 			oldLogger := Logger
+			oldClosers := currentClosers
 			Logger = newLogger
 			currentDate = newDate
+			currentClosers = newClosers
 			mu.Unlock()
 
 			zap.ReplaceGlobals(newLogger)
@@ -181,6 +198,7 @@ func startDailyRotateWatcher() {
 			if oldLogger != nil {
 				_ = oldLogger.Sync()
 			}
+			closeLoggerOutputs(oldClosers)
 
 			newLogger.Info(fmt.Sprintf("[logger] daily rotate success, new date=%s", newDate))
 		}

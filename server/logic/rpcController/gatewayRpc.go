@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/drop/GoServer/server/logic/gameServerInfoService"
+	"github.com/drop/GoServer/server/logic/logicCommon"
 	"github.com/drop/GoServer/server/logic/model"
 	"github.com/drop/GoServer/server/logic/platform/easyDB"
 	"google.golang.org/protobuf/proto"
@@ -22,8 +23,9 @@ import (
 
 var gateServerService *gameServerInfoService.GameServerInfoService
 
-func InitGateRpc(serverInfoService *gameServerInfoService.GameServerInfoService) {
+func InitGateRpc(serverInfoService *gameServerInfoService.GameServerInfoService, activity logicCommon.GameActivityServiceInterface) {
 	gateServerService = serverInfoService
+	activityService = activity
 }
 
 func RegisterGatewayRpcServer(s *grpc.Server) {
@@ -74,15 +76,15 @@ func OnReceiveBackwardClientMessage(resp *rpcPb.BackwardClientMessage) {
 	}
 	user := sessionManager.GetPlayerBasicInfoBySessionId(resp.GetSessionId())
 	if user == nil {
-		logger.ErrorBySprintf("[rpc] send message to game error user == nil: sessionId:%d,msg:%+v,user:%+v", resp.GetSessionId(), resp, user)
+		logger.ErrorBySprintf("[rpc] send message to game error user == nil: sessionId:%d,msgId:%d", resp.GetSessionId(), resp.MsgId)
 		return
 	}
 	if user.GetSession() == nil {
-		logger.ErrorBySprintf("[rpc] send message to game error user.GetSession() == nil: sessionId:%d,msg:%+v,user:%+v", resp.GetSessionId(), resp, user)
+		logger.ErrorBySprintf("[rpc] send message to game error user.GetSession() == nil: sessionId:%d,msgId:%d,userId:%d", resp.GetSessionId(), resp.MsgId, user.GetUserId())
 		return
 	}
 	if user.GetSession().GetID() != resp.GetSessionId() {
-		logger.ErrorBySprintf("[rpc] send message to game error user.GetSession().GetID() != resp.GetSessionId(): sessionId:%d,msg:%+v,user:%+v", resp.GetSessionId(), resp, user)
+		logger.ErrorBySprintf("[rpc] send message to game error user.GetSession().GetID() != resp.GetSessionId(): sessionId:%d,msgId:%d,userId:%d", resp.GetSessionId(), resp.MsgId, user.GetUserId())
 		return
 	}
 	if resp.CloseSession {
@@ -174,23 +176,58 @@ func (g *GatewayRpcServer) NotifyServerOperationHandler(ctx context.Context, req
 				continue
 			}
 		}
-	default:
-		clients := ServerNodeService.GetAllGameClient()
-		for nodeId, client := range clients {
-			_, err := client.NotifyServerOperationHandler(context.Background(), req)
-			if err != nil {
-				logger.ErrorBySprintf("[gateway] NotifyServerOperationHandler req:%v error: %v,nodeId：%d", req, err, nodeId)
-				continue
-			}
+	case rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_KICK_PLAYER_OUT:
+		gatewaySessionManager := sessionManager.(*logicSessionManager.GatewaySessionManager)
+		gatewaySessionManager.KickOutPlayer(req.OperationParam, func(player logicCommon.UserBaseInterface) {
+			logger.ErrorBySprintf("[platform] kick out node player Id:%d", player.GetUserId())
+			messageSender.CloseSessionWithError(player, pb.MESSAGE_ID_LOGIN_RESP, pb.ERROR_CODE_PLAYER_IS_KICK_OUT)
+		})
+		nodeId, err := ServerNodeService.GetGameNodeIdByUserId(req.OperationParam)
+		if err != nil {
+			logger.ErrorBySprintf("[platform] kick out node player Id:%d,err:%v]", req.OperationParam, err)
+			return &rpcPb.EmptyResp{}, nil
 		}
+		client, err := ServerNodeService.GetGameClientWithId(nodeId)
+		if err != nil {
+			logger.ErrorBySprintf("[platform] kick out node player Id:%d,err:%v]", req.OperationParam, err)
+			return &rpcPb.EmptyResp{}, nil
+		}
+		_, err = client.NotifyServerOperationHandler(context.Background(), req)
+		if err != nil {
+			logger.ErrorBySprintf("[gateway] NotifyServerOperationHandler req:%v error: %v,nodeId：%d", req, err, nodeId)
+		}
+
+	case rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_KICK_SERVER_PLAYER_OFFLINE:
+		gatewaySessionManager := sessionManager.(*logicSessionManager.GatewaySessionManager)
+		gatewaySessionManager.KickOutServerPlayer(int32(req.OperationParam), func(player logicCommon.UserBaseInterface) {
+			logger.ErrorBySprintf("[platform] kick out node player Id:%d", player.GetUserId())
+			messageSender.CloseSessionWithError(player, pb.MESSAGE_ID_LOGIN_RESP, pb.ERROR_CODE_PLAYER_IS_KICK_OUT)
+		})
+		broadcastToGameNode(req)
+	case rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_KICK_ALL_PLAYER_OFFLINE:
+		gatewaySessionManager := sessionManager.(*logicSessionManager.GatewaySessionManager)
+		gatewaySessionManager.KickOutAllPlayer(func(player logicCommon.UserBaseInterface) {
+			logger.ErrorBySprintf("[platform] kick out node player Id:%d", player.GetUserId())
+			messageSender.CloseSessionWithError(player, pb.MESSAGE_ID_LOGIN_RESP, pb.ERROR_CODE_PLAYER_IS_KICK_OUT)
+		})
+		broadcastToGameNode(req)
+	case rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_RELOAD_ACTIVITY_CONFIG:
+		activityService.Reload()
+	default:
+		broadcastToGameNode(req)
 	}
 	return &rpcPb.EmptyResp{}, nil
 }
 
-func (g *GatewayRpcServer) GmKickPlayer(ctx context.Context, req *rpcPb.GmKickPlayerReq) (*rpcPb.EmptyResp, error) {
-	gatewaySessionManager := sessionManager.(*logicSessionManager.GatewaySessionManager)
-	gatewaySessionManager.KickOutPlayer(req.UserId, req.ServerId)
-	return &rpcPb.EmptyResp{}, nil
+func broadcastToGameNode(req *rpcPb.NotifyOperationMessage) {
+	clients := ServerNodeService.GetAllGameClient()
+	for nodeId, client := range clients {
+		_, err := client.NotifyServerOperationHandler(context.Background(), req)
+		if err != nil {
+			logger.ErrorBySprintf("[gateway] NotifyServerOperationHandler req:%v error: %v,nodeId：%d", req, err, nodeId)
+			continue
+		}
+	}
 }
 
 func (g *GatewayRpcServer) NotifyAllianceChange(ctx context.Context, req *rpcPb.NotifyAllianceChangeReq) (*rpcPb.EmptyResp, error) {
@@ -205,6 +242,14 @@ func (g *GatewayRpcServer) NotifyAllianceChange(ctx context.Context, req *rpcPb.
 	resp := &pb.PushAllianceChange{
 		Oper:       pb.ALLIANCE_CHANGE_OPER(req.ChangeOper),
 		AllianceId: req.AllianceId,
+	}
+	if resp.Oper == pb.ALLIANCE_CHANGE_OPER_ITEM_CHANGE {
+		for _, v := range req.GetItems() {
+			resp.ItemList = append(resp.ItemList, &pb.ItemBasicInfo{
+				ItemId: v.ItemId,
+				Count:  v.Count,
+			})
+		}
 	}
 	data, err := proto.Marshal(resp)
 	if err != nil {

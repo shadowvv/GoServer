@@ -1,12 +1,13 @@
 package webService
 
 import (
-	"golang.org/x/net/context"
+	"context"
+	"errors"
 	"net/http"
 	"time"
 )
 
-var workerLimiter = make(chan struct{}, 1024) // 最大并发 1024
+const defaultWorkerLimit = 1024
 
 type HttpConfig struct {
 	Address        string        `yaml:"address"`
@@ -21,6 +22,7 @@ type HttpWebService struct {
 	srv             *http.Server
 	mux             *http.ServeMux
 	defaultMaxBytes int64
+	workerLimiter   chan struct{}
 }
 
 func NewHttpWebService(cfg *HttpConfig) *HttpWebService {
@@ -30,6 +32,7 @@ func NewHttpWebService(cfg *HttpConfig) *HttpWebService {
 		addr:            cfg.Address,
 		mux:             mux,
 		defaultMaxBytes: cfg.MaxBodySize,
+		workerLimiter:   make(chan struct{}, defaultWorkerLimit),
 	}
 
 	var handler http.Handler = mux
@@ -45,7 +48,6 @@ func NewHttpWebService(cfg *HttpConfig) *HttpWebService {
 	return s
 }
 
-// maxBytesMiddleware 在请求进入业务 handler 前限制 Body 大小，maxBytes <= 0 表示不限制。
 func maxBytesMiddleware(next http.HandlerFunc, maxBytes int64) http.HandlerFunc {
 	if maxBytes <= 0 {
 		return next
@@ -56,14 +58,12 @@ func maxBytesMiddleware(next http.HandlerFunc, maxBytes int64) http.HandlerFunc 
 	}
 }
 
-func limitMiddleware(next http.HandlerFunc) http.HandlerFunc {
+func limitMiddleware(next http.HandlerFunc, workerLimiter chan struct{}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		select {
 		case workerLimiter <- struct{}{}:
 			defer func() { <-workerLimiter }()
 			next(w, r)
-
 		default:
 			http.Error(w, "server busy", http.StatusTooManyRequests)
 		}
@@ -72,7 +72,6 @@ func limitMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		origin := r.Header.Get("Origin")
 		if origin != "" {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
@@ -91,24 +90,23 @@ func corsMiddleware(next http.Handler) http.Handler {
 }
 
 func (s *HttpWebService) RegisterRoutes(path string, handler http.HandlerFunc) {
-	s.mux.HandleFunc(path, limitMiddleware(maxBytesMiddleware(handler, s.defaultMaxBytes)))
+	s.mux.HandleFunc(path, limitMiddleware(maxBytesMiddleware(handler, s.defaultMaxBytes), s.workerLimiter))
 }
 
-// RegisterRoutesWithMaxBody 为单条路由设置独立的 Body 上限，maxBytes <= 0 表示不限制。
 func (s *HttpWebService) RegisterRoutesWithMaxBody(path string, handler http.HandlerFunc, maxBytes int64) {
-	s.mux.HandleFunc(path, limitMiddleware(maxBytesMiddleware(handler, maxBytes)))
+	s.mux.HandleFunc(path, limitMiddleware(maxBytesMiddleware(handler, maxBytes), s.workerLimiter))
 }
 
 func (s *HttpWebService) Start() {
 	err := s.srv.ListenAndServe()
-	if err != nil && err != http.ErrServerClosed {
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		panic(err)
 	}
 }
 
 func (s *HttpWebService) Shutdown(ctx context.Context) error {
 	if s.srv != nil {
-		_ = s.srv.Shutdown(ctx)
+		return s.srv.Shutdown(ctx)
 	}
 	return nil
 }

@@ -21,7 +21,7 @@ message BackwardClientMessage {
   int32 msgId = 2; // msgId
   bytes payload = 3; // 原始pb二进制
   int32 broadcastType = 4; // 广播类型
-  int32 broadcastId = 5; // 广播id
+  int64 broadcastId = 5; // 广播id
   bool closeSession = 6; // 关闭session
 }
 

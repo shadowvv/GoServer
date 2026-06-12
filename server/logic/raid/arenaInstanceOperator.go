@@ -176,7 +176,7 @@ func (a *ArenaInstanceRaid) ChangeOpponentScore(player *model.PlayerChallengeBas
 		return 0
 	}
 	updateRankReq := &rpcPb.NotifyUpdateRankInfo{
-		Id:                player.UserId,
+		PlayerId:          player.UserId,
 		Score:             int64(changePoint),
 		IncrementalUpdate: true,
 	}
@@ -402,6 +402,15 @@ func (a *ArenaInstanceRaid) BuildRaidWithPlayer(raidInfo *logicCommon.PlayerInst
 				BasicSkill:  heroInfo.NormalAtk,
 				AttrInfo:    heroInfo.Attr,
 				SkillId:     heroInfo.Skill,
+			}
+			if heroInfo.PetInfo != nil {
+				monsterTemplate.PetInfo = &pb.PetBattleInfo{
+					PetId:     heroInfo.PetInfo.PetId,
+					Level:     heroInfo.PetInfo.Level,
+					Star:      heroInfo.PetInfo.Star,
+					SkillList: make([]int32, 0),
+				}
+				copy(monsterTemplate.PetInfo.SkillList, heroInfo.PetInfo.SkillList)
 			}
 			for id, attr := range heroInfo.Attr {
 				monsterTemplate.AttrInfo[id] = attr

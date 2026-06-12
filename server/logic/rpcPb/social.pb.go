@@ -21,6 +21,58 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type AllianceWarehouseInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ItemId        int32                  `protobuf:"varint,1,opt,name=itemId,proto3" json:"itemId,omitempty"`
+	Count         int64                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AllianceWarehouseInfo) Reset() {
+	*x = AllianceWarehouseInfo{}
+	mi := &file_social_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AllianceWarehouseInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AllianceWarehouseInfo) ProtoMessage() {}
+
+func (x *AllianceWarehouseInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_social_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AllianceWarehouseInfo.ProtoReflect.Descriptor instead.
+func (*AllianceWarehouseInfo) Descriptor() ([]byte, []int) {
+	return file_social_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *AllianceWarehouseInfo) GetItemId() int32 {
+	if x != nil {
+		return x.ItemId
+	}
+	return 0
+}
+
+func (x *AllianceWarehouseInfo) GetCount() int64 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
 type ForwardSocialMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        int64                  `protobuf:"varint,1,opt,name=userId,proto3" json:"userId,omitempty"`
@@ -34,7 +86,7 @@ type ForwardSocialMessage struct {
 
 func (x *ForwardSocialMessage) Reset() {
 	*x = ForwardSocialMessage{}
-	mi := &file_social_proto_msgTypes[0]
+	mi := &file_social_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -46,7 +98,7 @@ func (x *ForwardSocialMessage) String() string {
 func (*ForwardSocialMessage) ProtoMessage() {}
 
 func (x *ForwardSocialMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[0]
+	mi := &file_social_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -59,7 +111,7 @@ func (x *ForwardSocialMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ForwardSocialMessage.ProtoReflect.Descriptor instead.
 func (*ForwardSocialMessage) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{0}
+	return file_social_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ForwardSocialMessage) GetUserId() int64 {
@@ -110,7 +162,7 @@ type BackwardSocialMessage struct {
 
 func (x *BackwardSocialMessage) Reset() {
 	*x = BackwardSocialMessage{}
-	mi := &file_social_proto_msgTypes[1]
+	mi := &file_social_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -122,7 +174,7 @@ func (x *BackwardSocialMessage) String() string {
 func (*BackwardSocialMessage) ProtoMessage() {}
 
 func (x *BackwardSocialMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[1]
+	mi := &file_social_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -135,7 +187,7 @@ func (x *BackwardSocialMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BackwardSocialMessage.ProtoReflect.Descriptor instead.
 func (*BackwardSocialMessage) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{1}
+	return file_social_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *BackwardSocialMessage) GetUserId() int64 {
@@ -186,7 +238,6 @@ type AllianceInfo struct {
 	Announce            string                 `protobuf:"bytes,9,opt,name=announce,proto3" json:"announce,omitempty"`
 	BadgeId             int32                  `protobuf:"varint,10,opt,name=badgeId,proto3" json:"badgeId,omitempty"`
 	Level               int32                  `protobuf:"varint,11,opt,name=level,proto3" json:"level,omitempty"`
-	Exp                 int32                  `protobuf:"varint,12,opt,name=exp,proto3" json:"exp,omitempty"`
 	ApplyType           int32                  `protobuf:"varint,13,opt,name=applyType,proto3" json:"applyType,omitempty"`
 	PowerApplyCondition int64                  `protobuf:"varint,14,opt,name=powerApplyCondition,proto3" json:"powerApplyCondition,omitempty"`
 	CityLevel           int32                  `protobuf:"varint,15,opt,name=cityLevel,proto3" json:"cityLevel,omitempty"`
@@ -197,7 +248,7 @@ type AllianceInfo struct {
 
 func (x *AllianceInfo) Reset() {
 	*x = AllianceInfo{}
-	mi := &file_social_proto_msgTypes[2]
+	mi := &file_social_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -209,7 +260,7 @@ func (x *AllianceInfo) String() string {
 func (*AllianceInfo) ProtoMessage() {}
 
 func (x *AllianceInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[2]
+	mi := &file_social_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -222,7 +273,7 @@ func (x *AllianceInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AllianceInfo.ProtoReflect.Descriptor instead.
 func (*AllianceInfo) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{2}
+	return file_social_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *AllianceInfo) GetAllianceId() int64 {
@@ -302,13 +353,6 @@ func (x *AllianceInfo) GetLevel() int32 {
 	return 0
 }
 
-func (x *AllianceInfo) GetExp() int32 {
-	if x != nil {
-		return x.Exp
-	}
-	return 0
-}
-
 func (x *AllianceInfo) GetApplyType() int32 {
 	if x != nil {
 		return x.ApplyType
@@ -354,7 +398,7 @@ type AllianceMember struct {
 
 func (x *AllianceMember) Reset() {
 	*x = AllianceMember{}
-	mi := &file_social_proto_msgTypes[3]
+	mi := &file_social_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -366,7 +410,7 @@ func (x *AllianceMember) String() string {
 func (*AllianceMember) ProtoMessage() {}
 
 func (x *AllianceMember) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[3]
+	mi := &file_social_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -379,7 +423,7 @@ func (x *AllianceMember) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AllianceMember.ProtoReflect.Descriptor instead.
 func (*AllianceMember) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{3}
+	return file_social_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *AllianceMember) GetUserId() int64 {
@@ -458,7 +502,7 @@ type CreateAllianceReq struct {
 
 func (x *CreateAllianceReq) Reset() {
 	*x = CreateAllianceReq{}
-	mi := &file_social_proto_msgTypes[4]
+	mi := &file_social_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -470,7 +514,7 @@ func (x *CreateAllianceReq) String() string {
 func (*CreateAllianceReq) ProtoMessage() {}
 
 func (x *CreateAllianceReq) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[4]
+	mi := &file_social_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -483,7 +527,7 @@ func (x *CreateAllianceReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAllianceReq.ProtoReflect.Descriptor instead.
 func (*CreateAllianceReq) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{4}
+	return file_social_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CreateAllianceReq) GetUserId() int64 {
@@ -531,7 +575,7 @@ type CreateAllianceResp struct {
 
 func (x *CreateAllianceResp) Reset() {
 	*x = CreateAllianceResp{}
-	mi := &file_social_proto_msgTypes[5]
+	mi := &file_social_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -543,7 +587,7 @@ func (x *CreateAllianceResp) String() string {
 func (*CreateAllianceResp) ProtoMessage() {}
 
 func (x *CreateAllianceResp) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[5]
+	mi := &file_social_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -556,7 +600,7 @@ func (x *CreateAllianceResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAllianceResp.ProtoReflect.Descriptor instead.
 func (*CreateAllianceResp) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{5}
+	return file_social_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *CreateAllianceResp) GetAlliance() *AllianceInfo {
@@ -594,7 +638,7 @@ type ChangeAllianceBasicInfoReq struct {
 
 func (x *ChangeAllianceBasicInfoReq) Reset() {
 	*x = ChangeAllianceBasicInfoReq{}
-	mi := &file_social_proto_msgTypes[6]
+	mi := &file_social_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -606,7 +650,7 @@ func (x *ChangeAllianceBasicInfoReq) String() string {
 func (*ChangeAllianceBasicInfoReq) ProtoMessage() {}
 
 func (x *ChangeAllianceBasicInfoReq) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[6]
+	mi := &file_social_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -619,7 +663,7 @@ func (x *ChangeAllianceBasicInfoReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangeAllianceBasicInfoReq.ProtoReflect.Descriptor instead.
 func (*ChangeAllianceBasicInfoReq) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{6}
+	return file_social_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ChangeAllianceBasicInfoReq) GetOperatorUserId() int64 {
@@ -722,7 +766,7 @@ type ChangeAllianceBasicInfoResp struct {
 
 func (x *ChangeAllianceBasicInfoResp) Reset() {
 	*x = ChangeAllianceBasicInfoResp{}
-	mi := &file_social_proto_msgTypes[7]
+	mi := &file_social_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -734,7 +778,7 @@ func (x *ChangeAllianceBasicInfoResp) String() string {
 func (*ChangeAllianceBasicInfoResp) ProtoMessage() {}
 
 func (x *ChangeAllianceBasicInfoResp) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[7]
+	mi := &file_social_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -747,7 +791,7 @@ func (x *ChangeAllianceBasicInfoResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangeAllianceBasicInfoResp.ProtoReflect.Descriptor instead.
 func (*ChangeAllianceBasicInfoResp) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{7}
+	return file_social_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ChangeAllianceBasicInfoResp) GetErrorCode() int32 {
@@ -768,7 +812,7 @@ type GetAllianceInfoReq struct {
 
 func (x *GetAllianceInfoReq) Reset() {
 	*x = GetAllianceInfoReq{}
-	mi := &file_social_proto_msgTypes[8]
+	mi := &file_social_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -780,7 +824,7 @@ func (x *GetAllianceInfoReq) String() string {
 func (*GetAllianceInfoReq) ProtoMessage() {}
 
 func (x *GetAllianceInfoReq) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[8]
+	mi := &file_social_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -793,7 +837,7 @@ func (x *GetAllianceInfoReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllianceInfoReq.ProtoReflect.Descriptor instead.
 func (*GetAllianceInfoReq) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{8}
+	return file_social_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetAllianceInfoReq) GetUserId() int64 {
@@ -818,16 +862,17 @@ func (x *GetAllianceInfoReq) GetIncludeApply() bool {
 }
 
 type GetAllianceInfoResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Alliance      *AllianceInfo          `protobuf:"bytes,1,opt,name=alliance,proto3" json:"alliance,omitempty"`
-	Members       []*AllianceMember      `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Alliance      *AllianceInfo            `protobuf:"bytes,1,opt,name=alliance,proto3" json:"alliance,omitempty"`
+	Members       []*AllianceMember        `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
+	Warehouse     []*AllianceWarehouseInfo `protobuf:"bytes,3,rep,name=warehouse,proto3" json:"warehouse,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetAllianceInfoResp) Reset() {
 	*x = GetAllianceInfoResp{}
-	mi := &file_social_proto_msgTypes[9]
+	mi := &file_social_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -839,7 +884,7 @@ func (x *GetAllianceInfoResp) String() string {
 func (*GetAllianceInfoResp) ProtoMessage() {}
 
 func (x *GetAllianceInfoResp) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[9]
+	mi := &file_social_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -852,7 +897,7 @@ func (x *GetAllianceInfoResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllianceInfoResp.ProtoReflect.Descriptor instead.
 func (*GetAllianceInfoResp) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{9}
+	return file_social_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GetAllianceInfoResp) GetAlliance() *AllianceInfo {
@@ -869,6 +914,13 @@ func (x *GetAllianceInfoResp) GetMembers() []*AllianceMember {
 	return nil
 }
 
+func (x *GetAllianceInfoResp) GetWarehouse() []*AllianceWarehouseInfo {
+	if x != nil {
+		return x.Warehouse
+	}
+	return nil
+}
+
 type ApplyAllianceReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        int64                  `protobuf:"varint,1,opt,name=userId,proto3" json:"userId,omitempty"`
@@ -880,7 +932,7 @@ type ApplyAllianceReq struct {
 
 func (x *ApplyAllianceReq) Reset() {
 	*x = ApplyAllianceReq{}
-	mi := &file_social_proto_msgTypes[10]
+	mi := &file_social_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -892,7 +944,7 @@ func (x *ApplyAllianceReq) String() string {
 func (*ApplyAllianceReq) ProtoMessage() {}
 
 func (x *ApplyAllianceReq) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[10]
+	mi := &file_social_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -905,7 +957,7 @@ func (x *ApplyAllianceReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApplyAllianceReq.ProtoReflect.Descriptor instead.
 func (*ApplyAllianceReq) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{10}
+	return file_social_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ApplyAllianceReq) GetUserId() int64 {
@@ -939,7 +991,7 @@ type ApplyAllianceResp struct {
 
 func (x *ApplyAllianceResp) Reset() {
 	*x = ApplyAllianceResp{}
-	mi := &file_social_proto_msgTypes[11]
+	mi := &file_social_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -951,7 +1003,7 @@ func (x *ApplyAllianceResp) String() string {
 func (*ApplyAllianceResp) ProtoMessage() {}
 
 func (x *ApplyAllianceResp) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[11]
+	mi := &file_social_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -964,7 +1016,7 @@ func (x *ApplyAllianceResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApplyAllianceResp.ProtoReflect.Descriptor instead.
 func (*ApplyAllianceResp) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{11}
+	return file_social_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ApplyAllianceResp) GetAlliance() *AllianceInfo {
@@ -993,7 +1045,7 @@ type ApproveAllianceApplyReq struct {
 
 func (x *ApproveAllianceApplyReq) Reset() {
 	*x = ApproveAllianceApplyReq{}
-	mi := &file_social_proto_msgTypes[12]
+	mi := &file_social_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1005,7 +1057,7 @@ func (x *ApproveAllianceApplyReq) String() string {
 func (*ApproveAllianceApplyReq) ProtoMessage() {}
 
 func (x *ApproveAllianceApplyReq) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[12]
+	mi := &file_social_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1018,7 +1070,7 @@ func (x *ApproveAllianceApplyReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApproveAllianceApplyReq.ProtoReflect.Descriptor instead.
 func (*ApproveAllianceApplyReq) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{12}
+	return file_social_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *ApproveAllianceApplyReq) GetOperatorUserId() int64 {
@@ -1057,7 +1109,7 @@ type ApproveAllianceApplyResp struct {
 
 func (x *ApproveAllianceApplyResp) Reset() {
 	*x = ApproveAllianceApplyResp{}
-	mi := &file_social_proto_msgTypes[13]
+	mi := &file_social_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1069,7 +1121,7 @@ func (x *ApproveAllianceApplyResp) String() string {
 func (*ApproveAllianceApplyResp) ProtoMessage() {}
 
 func (x *ApproveAllianceApplyResp) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[13]
+	mi := &file_social_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1082,7 +1134,7 @@ func (x *ApproveAllianceApplyResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApproveAllianceApplyResp.ProtoReflect.Descriptor instead.
 func (*ApproveAllianceApplyResp) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{13}
+	return file_social_proto_rawDescGZIP(), []int{14}
 }
 
 type KickAllianceMemberReq struct {
@@ -1096,7 +1148,7 @@ type KickAllianceMemberReq struct {
 
 func (x *KickAllianceMemberReq) Reset() {
 	*x = KickAllianceMemberReq{}
-	mi := &file_social_proto_msgTypes[14]
+	mi := &file_social_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1108,7 +1160,7 @@ func (x *KickAllianceMemberReq) String() string {
 func (*KickAllianceMemberReq) ProtoMessage() {}
 
 func (x *KickAllianceMemberReq) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[14]
+	mi := &file_social_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1121,7 +1173,7 @@ func (x *KickAllianceMemberReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use KickAllianceMemberReq.ProtoReflect.Descriptor instead.
 func (*KickAllianceMemberReq) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{14}
+	return file_social_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *KickAllianceMemberReq) GetOperatorUserId() int64 {
@@ -1153,7 +1205,7 @@ type KickAllianceMemberResp struct {
 
 func (x *KickAllianceMemberResp) Reset() {
 	*x = KickAllianceMemberResp{}
-	mi := &file_social_proto_msgTypes[15]
+	mi := &file_social_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1165,7 +1217,7 @@ func (x *KickAllianceMemberResp) String() string {
 func (*KickAllianceMemberResp) ProtoMessage() {}
 
 func (x *KickAllianceMemberResp) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[15]
+	mi := &file_social_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1178,7 +1230,7 @@ func (x *KickAllianceMemberResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use KickAllianceMemberResp.ProtoReflect.Descriptor instead.
 func (*KickAllianceMemberResp) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{15}
+	return file_social_proto_rawDescGZIP(), []int{16}
 }
 
 type QuitAllianceReq struct {
@@ -1191,7 +1243,7 @@ type QuitAllianceReq struct {
 
 func (x *QuitAllianceReq) Reset() {
 	*x = QuitAllianceReq{}
-	mi := &file_social_proto_msgTypes[16]
+	mi := &file_social_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1203,7 +1255,7 @@ func (x *QuitAllianceReq) String() string {
 func (*QuitAllianceReq) ProtoMessage() {}
 
 func (x *QuitAllianceReq) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[16]
+	mi := &file_social_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1216,7 +1268,7 @@ func (x *QuitAllianceReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use QuitAllianceReq.ProtoReflect.Descriptor instead.
 func (*QuitAllianceReq) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{16}
+	return file_social_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *QuitAllianceReq) GetUserId() int64 {
@@ -1241,7 +1293,7 @@ type QuitAllianceResp struct {
 
 func (x *QuitAllianceResp) Reset() {
 	*x = QuitAllianceResp{}
-	mi := &file_social_proto_msgTypes[17]
+	mi := &file_social_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1253,7 +1305,7 @@ func (x *QuitAllianceResp) String() string {
 func (*QuitAllianceResp) ProtoMessage() {}
 
 func (x *QuitAllianceResp) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[17]
+	mi := &file_social_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1266,7 +1318,7 @@ func (x *QuitAllianceResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use QuitAllianceResp.ProtoReflect.Descriptor instead.
 func (*QuitAllianceResp) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{17}
+	return file_social_proto_rawDescGZIP(), []int{18}
 }
 
 type ChangeMemberPositionReq struct {
@@ -1281,7 +1333,7 @@ type ChangeMemberPositionReq struct {
 
 func (x *ChangeMemberPositionReq) Reset() {
 	*x = ChangeMemberPositionReq{}
-	mi := &file_social_proto_msgTypes[18]
+	mi := &file_social_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1293,7 +1345,7 @@ func (x *ChangeMemberPositionReq) String() string {
 func (*ChangeMemberPositionReq) ProtoMessage() {}
 
 func (x *ChangeMemberPositionReq) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[18]
+	mi := &file_social_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1306,7 +1358,7 @@ func (x *ChangeMemberPositionReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangeMemberPositionReq.ProtoReflect.Descriptor instead.
 func (*ChangeMemberPositionReq) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{18}
+	return file_social_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ChangeMemberPositionReq) GetOperatorUserId() int64 {
@@ -1345,7 +1397,7 @@ type ChangeMemberPositionResp struct {
 
 func (x *ChangeMemberPositionResp) Reset() {
 	*x = ChangeMemberPositionResp{}
-	mi := &file_social_proto_msgTypes[19]
+	mi := &file_social_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1357,7 +1409,7 @@ func (x *ChangeMemberPositionResp) String() string {
 func (*ChangeMemberPositionResp) ProtoMessage() {}
 
 func (x *ChangeMemberPositionResp) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[19]
+	mi := &file_social_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1370,7 +1422,7 @@ func (x *ChangeMemberPositionResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangeMemberPositionResp.ProtoReflect.Descriptor instead.
 func (*ChangeMemberPositionResp) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{19}
+	return file_social_proto_rawDescGZIP(), []int{20}
 }
 
 type PushAllianceChanged struct {
@@ -1384,7 +1436,7 @@ type PushAllianceChanged struct {
 
 func (x *PushAllianceChanged) Reset() {
 	*x = PushAllianceChanged{}
-	mi := &file_social_proto_msgTypes[20]
+	mi := &file_social_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1396,7 +1448,7 @@ func (x *PushAllianceChanged) String() string {
 func (*PushAllianceChanged) ProtoMessage() {}
 
 func (x *PushAllianceChanged) ProtoReflect() protoreflect.Message {
-	mi := &file_social_proto_msgTypes[20]
+	mi := &file_social_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1409,7 +1461,7 @@ func (x *PushAllianceChanged) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PushAllianceChanged.ProtoReflect.Descriptor instead.
 func (*PushAllianceChanged) Descriptor() ([]byte, []int) {
-	return file_social_proto_rawDescGZIP(), []int{20}
+	return file_social_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *PushAllianceChanged) GetUserId() int64 {
@@ -1433,11 +1485,170 @@ func (x *PushAllianceChanged) GetAllianceName() string {
 	return ""
 }
 
+type AllianceItemsOperationReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AllianceId    int64                  `protobuf:"varint,1,opt,name=allianceId,proto3" json:"allianceId,omitempty"`
+	Items         []*ItemInfo            `protobuf:"bytes,2,rep,name=items,proto3" json:"items,omitempty"`
+	Operation     int32                  `protobuf:"varint,3,opt,name=operation,proto3" json:"operation,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AllianceItemsOperationReq) Reset() {
+	*x = AllianceItemsOperationReq{}
+	mi := &file_social_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AllianceItemsOperationReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AllianceItemsOperationReq) ProtoMessage() {}
+
+func (x *AllianceItemsOperationReq) ProtoReflect() protoreflect.Message {
+	mi := &file_social_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AllianceItemsOperationReq.ProtoReflect.Descriptor instead.
+func (*AllianceItemsOperationReq) Descriptor() ([]byte, []int) {
+	return file_social_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *AllianceItemsOperationReq) GetAllianceId() int64 {
+	if x != nil {
+		return x.AllianceId
+	}
+	return 0
+}
+
+func (x *AllianceItemsOperationReq) GetItems() []*ItemInfo {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+func (x *AllianceItemsOperationReq) GetOperation() int32 {
+	if x != nil {
+		return x.Operation
+	}
+	return 0
+}
+
+type GetAllianceActivityItemNumReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AllianceId    int64                  `protobuf:"varint,1,opt,name=allianceId,proto3" json:"allianceId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAllianceActivityItemNumReq) Reset() {
+	*x = GetAllianceActivityItemNumReq{}
+	mi := &file_social_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAllianceActivityItemNumReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAllianceActivityItemNumReq) ProtoMessage() {}
+
+func (x *GetAllianceActivityItemNumReq) ProtoReflect() protoreflect.Message {
+	mi := &file_social_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAllianceActivityItemNumReq.ProtoReflect.Descriptor instead.
+func (*GetAllianceActivityItemNumReq) Descriptor() ([]byte, []int) {
+	return file_social_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *GetAllianceActivityItemNumReq) GetAllianceId() int64 {
+	if x != nil {
+		return x.AllianceId
+	}
+	return 0
+}
+
+type GetAllianceActivityItemNumResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ItemNum       int64                  `protobuf:"varint,1,opt,name=itemNum,proto3" json:"itemNum,omitempty"`
+	ErrorCode     int32                  `protobuf:"varint,2,opt,name=errorCode,proto3" json:"errorCode,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAllianceActivityItemNumResp) Reset() {
+	*x = GetAllianceActivityItemNumResp{}
+	mi := &file_social_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAllianceActivityItemNumResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAllianceActivityItemNumResp) ProtoMessage() {}
+
+func (x *GetAllianceActivityItemNumResp) ProtoReflect() protoreflect.Message {
+	mi := &file_social_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAllianceActivityItemNumResp.ProtoReflect.Descriptor instead.
+func (*GetAllianceActivityItemNumResp) Descriptor() ([]byte, []int) {
+	return file_social_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *GetAllianceActivityItemNumResp) GetItemNum() int64 {
+	if x != nil {
+		return x.ItemNum
+	}
+	return 0
+}
+
+func (x *GetAllianceActivityItemNumResp) GetErrorCode() int32 {
+	if x != nil {
+		return x.ErrorCode
+	}
+	return 0
+}
+
 var File_social_proto protoreflect.FileDescriptor
 
 const file_social_proto_rawDesc = "" +
 	"\n" +
-	"\fsocial.proto\x12\x05rpcPb\x1a\fcommon.proto\"\xbb\x01\n" +
+	"\fsocial.proto\x12\x05rpcPb\x1a\fcommon.proto\"E\n" +
+	"\x15AllianceWarehouseInfo\x12\x16\n" +
+	"\x06itemId\x18\x01 \x01(\x05R\x06itemId\x12\x14\n" +
+	"\x05count\x18\x02 \x01(\x03R\x05count\"\xbb\x01\n" +
 	"\x14ForwardSocialMessage\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\x03R\x06userId\x12+\n" +
 	"\x05msgId\x18\x02 \x01(\x0e2\x15.rpcPb.RPC_MESSAGE_IDR\x05msgId\x12$\n" +
@@ -1451,7 +1662,7 @@ const file_social_proto_rawDesc = "" +
 	"\x05msgId\x18\x02 \x01(\x0e2\x15.rpcPb.RPC_MESSAGE_IDR\x05msgId\x12$\n" +
 	"\rbackMessageId\x18\x03 \x01(\x05R\rbackMessageId\x12\x1c\n" +
 	"\terrorCode\x18\x04 \x01(\x05R\terrorCode\x12\x18\n" +
-	"\apayload\x18\x05 \x01(\fR\apayload\"\xf6\x03\n" +
+	"\apayload\x18\x05 \x01(\fR\apayload\"\xe4\x03\n" +
 	"\fAllianceInfo\x12\x1e\n" +
 	"\n" +
 	"allianceId\x18\x01 \x01(\x03R\n" +
@@ -1468,8 +1679,7 @@ const file_social_proto_rawDesc = "" +
 	"\bannounce\x18\t \x01(\tR\bannounce\x12\x18\n" +
 	"\abadgeId\x18\n" +
 	" \x01(\x05R\abadgeId\x12\x14\n" +
-	"\x05level\x18\v \x01(\x05R\x05level\x12\x10\n" +
-	"\x03exp\x18\f \x01(\x05R\x03exp\x12\x1c\n" +
+	"\x05level\x18\v \x01(\x05R\x05level\x12\x1c\n" +
 	"\tapplyType\x18\r \x01(\x05R\tapplyType\x120\n" +
 	"\x13powerApplyCondition\x18\x0e \x01(\x03R\x13powerApplyCondition\x12\x1c\n" +
 	"\tcityLevel\x18\x0f \x01(\x05R\tcityLevel\x12.\n" +
@@ -1521,10 +1731,11 @@ const file_social_proto_rawDesc = "" +
 	"\n" +
 	"allianceId\x18\x02 \x01(\x03R\n" +
 	"allianceId\x12\"\n" +
-	"\fincludeApply\x18\x03 \x01(\bR\fincludeApply\"w\n" +
+	"\fincludeApply\x18\x03 \x01(\bR\fincludeApply\"\xb3\x01\n" +
 	"\x13GetAllianceInfoResp\x12/\n" +
 	"\balliance\x18\x01 \x01(\v2\x13.rpcPb.AllianceInfoR\balliance\x12/\n" +
-	"\amembers\x18\x02 \x03(\v2\x15.rpcPb.AllianceMemberR\amembers\"f\n" +
+	"\amembers\x18\x02 \x03(\v2\x15.rpcPb.AllianceMemberR\amembers\x12:\n" +
+	"\twarehouse\x18\x03 \x03(\v2\x1c.rpcPb.AllianceWarehouseInfoR\twarehouse\"f\n" +
 	"\x10ApplyAllianceReq\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\x03R\x06userId\x12\x1a\n" +
 	"\bserverId\x18\x02 \x01(\x05R\bserverId\x12\x1e\n" +
@@ -1570,7 +1781,20 @@ const file_social_proto_rawDesc = "" +
 	"\n" +
 	"allianceId\x18\x02 \x01(\x03R\n" +
 	"allianceId\x12\"\n" +
-	"\fallianceName\x18\x03 \x01(\tR\fallianceName2\x9c\x01\n" +
+	"\fallianceName\x18\x03 \x01(\tR\fallianceName\"\x80\x01\n" +
+	"\x19AllianceItemsOperationReq\x12\x1e\n" +
+	"\n" +
+	"allianceId\x18\x01 \x01(\x03R\n" +
+	"allianceId\x12%\n" +
+	"\x05items\x18\x02 \x03(\v2\x0f.rpcPb.ItemInfoR\x05items\x12\x1c\n" +
+	"\toperation\x18\x03 \x01(\x05R\toperation\"?\n" +
+	"\x1dGetAllianceActivityItemNumReq\x12\x1e\n" +
+	"\n" +
+	"allianceId\x18\x01 \x01(\x03R\n" +
+	"allianceId\"X\n" +
+	"\x1eGetAllianceActivityItemNumResp\x12\x18\n" +
+	"\aitemNum\x18\x01 \x01(\x03R\aitemNum\x12\x1c\n" +
+	"\terrorCode\x18\x02 \x01(\x05R\terrorCode2\x9c\x01\n" +
 	"\rSocialService\x12-\n" +
 	"\bSayHello\x12\x0f.rpcPb.HelloReq\x1a\x10.rpcPb.HelloResp\x12\\\n" +
 	"\x1bForwardSocialMessageHandler\x12\x1b.rpcPb.ForwardSocialMessage\x1a\x1c.rpcPb.BackwardSocialMessage(\x010\x01B3Z1github.com/drop/GoServer/server/logic/rpcPb;rpcPbb\x06proto3"
@@ -1587,49 +1811,56 @@ func file_social_proto_rawDescGZIP() []byte {
 	return file_social_proto_rawDescData
 }
 
-var file_social_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_social_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
 var file_social_proto_goTypes = []any{
-	(*ForwardSocialMessage)(nil),        // 0: rpcPb.ForwardSocialMessage
-	(*BackwardSocialMessage)(nil),       // 1: rpcPb.BackwardSocialMessage
-	(*AllianceInfo)(nil),                // 2: rpcPb.AllianceInfo
-	(*AllianceMember)(nil),              // 3: rpcPb.AllianceMember
-	(*CreateAllianceReq)(nil),           // 4: rpcPb.CreateAllianceReq
-	(*CreateAllianceResp)(nil),          // 5: rpcPb.CreateAllianceResp
-	(*ChangeAllianceBasicInfoReq)(nil),  // 6: rpcPb.ChangeAllianceBasicInfoReq
-	(*ChangeAllianceBasicInfoResp)(nil), // 7: rpcPb.ChangeAllianceBasicInfoResp
-	(*GetAllianceInfoReq)(nil),          // 8: rpcPb.GetAllianceInfoReq
-	(*GetAllianceInfoResp)(nil),         // 9: rpcPb.GetAllianceInfoResp
-	(*ApplyAllianceReq)(nil),            // 10: rpcPb.ApplyAllianceReq
-	(*ApplyAllianceResp)(nil),           // 11: rpcPb.ApplyAllianceResp
-	(*ApproveAllianceApplyReq)(nil),     // 12: rpcPb.ApproveAllianceApplyReq
-	(*ApproveAllianceApplyResp)(nil),    // 13: rpcPb.ApproveAllianceApplyResp
-	(*KickAllianceMemberReq)(nil),       // 14: rpcPb.KickAllianceMemberReq
-	(*KickAllianceMemberResp)(nil),      // 15: rpcPb.KickAllianceMemberResp
-	(*QuitAllianceReq)(nil),             // 16: rpcPb.QuitAllianceReq
-	(*QuitAllianceResp)(nil),            // 17: rpcPb.QuitAllianceResp
-	(*ChangeMemberPositionReq)(nil),     // 18: rpcPb.ChangeMemberPositionReq
-	(*ChangeMemberPositionResp)(nil),    // 19: rpcPb.ChangeMemberPositionResp
-	(*PushAllianceChanged)(nil),         // 20: rpcPb.PushAllianceChanged
-	(RPC_MESSAGE_ID)(0),                 // 21: rpcPb.RPC_MESSAGE_ID
-	(*HelloReq)(nil),                    // 22: rpcPb.HelloReq
-	(*HelloResp)(nil),                   // 23: rpcPb.HelloResp
+	(*AllianceWarehouseInfo)(nil),          // 0: rpcPb.AllianceWarehouseInfo
+	(*ForwardSocialMessage)(nil),           // 1: rpcPb.ForwardSocialMessage
+	(*BackwardSocialMessage)(nil),          // 2: rpcPb.BackwardSocialMessage
+	(*AllianceInfo)(nil),                   // 3: rpcPb.AllianceInfo
+	(*AllianceMember)(nil),                 // 4: rpcPb.AllianceMember
+	(*CreateAllianceReq)(nil),              // 5: rpcPb.CreateAllianceReq
+	(*CreateAllianceResp)(nil),             // 6: rpcPb.CreateAllianceResp
+	(*ChangeAllianceBasicInfoReq)(nil),     // 7: rpcPb.ChangeAllianceBasicInfoReq
+	(*ChangeAllianceBasicInfoResp)(nil),    // 8: rpcPb.ChangeAllianceBasicInfoResp
+	(*GetAllianceInfoReq)(nil),             // 9: rpcPb.GetAllianceInfoReq
+	(*GetAllianceInfoResp)(nil),            // 10: rpcPb.GetAllianceInfoResp
+	(*ApplyAllianceReq)(nil),               // 11: rpcPb.ApplyAllianceReq
+	(*ApplyAllianceResp)(nil),              // 12: rpcPb.ApplyAllianceResp
+	(*ApproveAllianceApplyReq)(nil),        // 13: rpcPb.ApproveAllianceApplyReq
+	(*ApproveAllianceApplyResp)(nil),       // 14: rpcPb.ApproveAllianceApplyResp
+	(*KickAllianceMemberReq)(nil),          // 15: rpcPb.KickAllianceMemberReq
+	(*KickAllianceMemberResp)(nil),         // 16: rpcPb.KickAllianceMemberResp
+	(*QuitAllianceReq)(nil),                // 17: rpcPb.QuitAllianceReq
+	(*QuitAllianceResp)(nil),               // 18: rpcPb.QuitAllianceResp
+	(*ChangeMemberPositionReq)(nil),        // 19: rpcPb.ChangeMemberPositionReq
+	(*ChangeMemberPositionResp)(nil),       // 20: rpcPb.ChangeMemberPositionResp
+	(*PushAllianceChanged)(nil),            // 21: rpcPb.PushAllianceChanged
+	(*AllianceItemsOperationReq)(nil),      // 22: rpcPb.AllianceItemsOperationReq
+	(*GetAllianceActivityItemNumReq)(nil),  // 23: rpcPb.GetAllianceActivityItemNumReq
+	(*GetAllianceActivityItemNumResp)(nil), // 24: rpcPb.GetAllianceActivityItemNumResp
+	(RPC_MESSAGE_ID)(0),                    // 25: rpcPb.RPC_MESSAGE_ID
+	(*ItemInfo)(nil),                       // 26: rpcPb.ItemInfo
+	(*HelloReq)(nil),                       // 27: rpcPb.HelloReq
+	(*HelloResp)(nil),                      // 28: rpcPb.HelloResp
 }
 var file_social_proto_depIdxs = []int32{
-	21, // 0: rpcPb.ForwardSocialMessage.msgId:type_name -> rpcPb.RPC_MESSAGE_ID
-	21, // 1: rpcPb.BackwardSocialMessage.msgId:type_name -> rpcPb.RPC_MESSAGE_ID
-	2,  // 2: rpcPb.CreateAllianceResp.alliance:type_name -> rpcPb.AllianceInfo
-	2,  // 3: rpcPb.GetAllianceInfoResp.alliance:type_name -> rpcPb.AllianceInfo
-	3,  // 4: rpcPb.GetAllianceInfoResp.members:type_name -> rpcPb.AllianceMember
-	2,  // 5: rpcPb.ApplyAllianceResp.alliance:type_name -> rpcPb.AllianceInfo
-	22, // 6: rpcPb.SocialService.SayHello:input_type -> rpcPb.HelloReq
-	0,  // 7: rpcPb.SocialService.ForwardSocialMessageHandler:input_type -> rpcPb.ForwardSocialMessage
-	23, // 8: rpcPb.SocialService.SayHello:output_type -> rpcPb.HelloResp
-	1,  // 9: rpcPb.SocialService.ForwardSocialMessageHandler:output_type -> rpcPb.BackwardSocialMessage
-	8,  // [8:10] is the sub-list for method output_type
-	6,  // [6:8] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	25, // 0: rpcPb.ForwardSocialMessage.msgId:type_name -> rpcPb.RPC_MESSAGE_ID
+	25, // 1: rpcPb.BackwardSocialMessage.msgId:type_name -> rpcPb.RPC_MESSAGE_ID
+	3,  // 2: rpcPb.CreateAllianceResp.alliance:type_name -> rpcPb.AllianceInfo
+	3,  // 3: rpcPb.GetAllianceInfoResp.alliance:type_name -> rpcPb.AllianceInfo
+	4,  // 4: rpcPb.GetAllianceInfoResp.members:type_name -> rpcPb.AllianceMember
+	0,  // 5: rpcPb.GetAllianceInfoResp.warehouse:type_name -> rpcPb.AllianceWarehouseInfo
+	3,  // 6: rpcPb.ApplyAllianceResp.alliance:type_name -> rpcPb.AllianceInfo
+	26, // 7: rpcPb.AllianceItemsOperationReq.items:type_name -> rpcPb.ItemInfo
+	27, // 8: rpcPb.SocialService.SayHello:input_type -> rpcPb.HelloReq
+	1,  // 9: rpcPb.SocialService.ForwardSocialMessageHandler:input_type -> rpcPb.ForwardSocialMessage
+	28, // 10: rpcPb.SocialService.SayHello:output_type -> rpcPb.HelloResp
+	2,  // 11: rpcPb.SocialService.ForwardSocialMessageHandler:output_type -> rpcPb.BackwardSocialMessage
+	10, // [10:12] is the sub-list for method output_type
+	8,  // [8:10] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_social_proto_init() }
@@ -1644,7 +1875,7 @@ func file_social_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_social_proto_rawDesc), len(file_social_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   21,
+			NumMessages:   25,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

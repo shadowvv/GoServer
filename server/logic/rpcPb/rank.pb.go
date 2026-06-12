@@ -27,7 +27,7 @@ type ForwardRankBoardMessage struct {
 	MsgId         RPC_MESSAGE_ID         `protobuf:"varint,2,opt,name=msgId,proto3,enum=rpcPb.RPC_MESSAGE_ID" json:"msgId,omitempty"`         // 发送的rpc协议id
 	RespMsgId     RPC_MESSAGE_ID         `protobuf:"varint,3,opt,name=respMsgId,proto3,enum=rpcPb.RPC_MESSAGE_ID" json:"respMsgId,omitempty"` // 回复的rpc协议id，这样可以相同请求不同的回复
 	BackMessageId int32                  `protobuf:"varint,4,opt,name=backMessageId,proto3" json:"backMessageId,omitempty"`                   // 请求rpc的客户端协议，用来返回协议的错误码
-	RankId        string                 `protobuf:"bytes,5,opt,name=rankId,proto3" json:"rankId,omitempty"`                                  // 排行榜id
+	RankId        []string               `protobuf:"bytes,5,rep,name=rankId,proto3" json:"rankId,omitempty"`                                  // 排行榜id
 	Payload       []byte                 `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -91,11 +91,11 @@ func (x *ForwardRankBoardMessage) GetBackMessageId() int32 {
 	return 0
 }
 
-func (x *ForwardRankBoardMessage) GetRankId() string {
+func (x *ForwardRankBoardMessage) GetRankId() []string {
 	if x != nil {
 		return x.RankId
 	}
-	return ""
+	return nil
 }
 
 func (x *ForwardRankBoardMessage) GetPayload() []byte {
@@ -225,6 +225,7 @@ type GetRankInfoResp struct {
 	ActRankId     int32                  `protobuf:"varint,4,opt,name=actRankId,proto3" json:"actRankId,omitempty"`
 	MyRank        int32                  `protobuf:"varint,5,opt,name=myRank,proto3" json:"myRank,omitempty"`
 	RankId        string                 `protobuf:"bytes,6,opt,name=rankId,proto3" json:"rankId,omitempty"`
+	RankPageInfos []*RankPageInfo        `protobuf:"bytes,7,rep,name=rankPageInfos,proto3" json:"rankPageInfos,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -301,6 +302,97 @@ func (x *GetRankInfoResp) GetRankId() string {
 	return ""
 }
 
+func (x *GetRankInfoResp) GetRankPageInfos() []*RankPageInfo {
+	if x != nil {
+		return x.RankPageInfos
+	}
+	return nil
+}
+
+type RankPageInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RankInfos     []*RankInfo            `protobuf:"bytes,1,rep,name=rankInfos,proto3" json:"rankInfos,omitempty"`
+	CommonId      int32                  `protobuf:"varint,2,opt,name=commonId,proto3" json:"commonId,omitempty"`
+	ActivityId    int32                  `protobuf:"varint,3,opt,name=activityId,proto3" json:"activityId,omitempty"`
+	ActRankId     int32                  `protobuf:"varint,4,opt,name=actRankId,proto3" json:"actRankId,omitempty"`
+	MyRank        int32                  `protobuf:"varint,5,opt,name=myRank,proto3" json:"myRank,omitempty"`
+	RankId        string                 `protobuf:"bytes,6,opt,name=rankId,proto3" json:"rankId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RankPageInfo) Reset() {
+	*x = RankPageInfo{}
+	mi := &file_rank_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RankPageInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RankPageInfo) ProtoMessage() {}
+
+func (x *RankPageInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_rank_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RankPageInfo.ProtoReflect.Descriptor instead.
+func (*RankPageInfo) Descriptor() ([]byte, []int) {
+	return file_rank_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *RankPageInfo) GetRankInfos() []*RankInfo {
+	if x != nil {
+		return x.RankInfos
+	}
+	return nil
+}
+
+func (x *RankPageInfo) GetCommonId() int32 {
+	if x != nil {
+		return x.CommonId
+	}
+	return 0
+}
+
+func (x *RankPageInfo) GetActivityId() int32 {
+	if x != nil {
+		return x.ActivityId
+	}
+	return 0
+}
+
+func (x *RankPageInfo) GetActRankId() int32 {
+	if x != nil {
+		return x.ActRankId
+	}
+	return 0
+}
+
+func (x *RankPageInfo) GetMyRank() int32 {
+	if x != nil {
+		return x.MyRank
+	}
+	return 0
+}
+
+func (x *RankPageInfo) GetRankId() string {
+	if x != nil {
+		return x.RankId
+	}
+	return ""
+}
+
 type RankInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RankId        string                 `protobuf:"bytes,1,opt,name=rankId,proto3" json:"rankId,omitempty"`
@@ -315,7 +407,7 @@ type RankInfo struct {
 
 func (x *RankInfo) Reset() {
 	*x = RankInfo{}
-	mi := &file_rank_proto_msgTypes[4]
+	mi := &file_rank_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -327,7 +419,7 @@ func (x *RankInfo) String() string {
 func (*RankInfo) ProtoMessage() {}
 
 func (x *RankInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_rank_proto_msgTypes[4]
+	mi := &file_rank_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -340,7 +432,7 @@ func (x *RankInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RankInfo.ProtoReflect.Descriptor instead.
 func (*RankInfo) Descriptor() ([]byte, []int) {
-	return file_rank_proto_rawDescGZIP(), []int{4}
+	return file_rank_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *RankInfo) GetRankId() string {
@@ -387,16 +479,17 @@ func (x *RankInfo) GetEnterRankTime() int64 {
 
 type NotifyUpdateRankInfo struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
-	Id                int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                               // id:当前有可能时玩家id或者联盟id
+	PlayerId          int64                  `protobuf:"varint,1,opt,name=playerId,proto3" json:"playerId,omitempty"`                   // 玩家id
 	Score             int64                  `protobuf:"varint,2,opt,name=score,proto3" json:"score,omitempty"`                         // 分数
 	IncrementalUpdate bool                   `protobuf:"varint,3,opt,name=incrementalUpdate,proto3" json:"incrementalUpdate,omitempty"` // 增量更新
+	AllianceId        int64                  `protobuf:"varint,4,opt,name=allianceId,proto3" json:"allianceId,omitempty"`               // 联盟id，仅联盟榜直接更新时传入
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
 
 func (x *NotifyUpdateRankInfo) Reset() {
 	*x = NotifyUpdateRankInfo{}
-	mi := &file_rank_proto_msgTypes[5]
+	mi := &file_rank_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -408,7 +501,7 @@ func (x *NotifyUpdateRankInfo) String() string {
 func (*NotifyUpdateRankInfo) ProtoMessage() {}
 
 func (x *NotifyUpdateRankInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_rank_proto_msgTypes[5]
+	mi := &file_rank_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -421,12 +514,12 @@ func (x *NotifyUpdateRankInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotifyUpdateRankInfo.ProtoReflect.Descriptor instead.
 func (*NotifyUpdateRankInfo) Descriptor() ([]byte, []int) {
-	return file_rank_proto_rawDescGZIP(), []int{5}
+	return file_rank_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *NotifyUpdateRankInfo) GetId() int64 {
+func (x *NotifyUpdateRankInfo) GetPlayerId() int64 {
 	if x != nil {
-		return x.Id
+		return x.PlayerId
 	}
 	return 0
 }
@@ -445,6 +538,13 @@ func (x *NotifyUpdateRankInfo) GetIncrementalUpdate() bool {
 	return false
 }
 
+func (x *NotifyUpdateRankInfo) GetAllianceId() int64 {
+	if x != nil {
+		return x.AllianceId
+	}
+	return 0
+}
+
 type ThumbUpRankInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`           // id:当前有可能时玩家id或者联盟id
@@ -455,7 +555,7 @@ type ThumbUpRankInfo struct {
 
 func (x *ThumbUpRankInfo) Reset() {
 	*x = ThumbUpRankInfo{}
-	mi := &file_rank_proto_msgTypes[6]
+	mi := &file_rank_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -467,7 +567,7 @@ func (x *ThumbUpRankInfo) String() string {
 func (*ThumbUpRankInfo) ProtoMessage() {}
 
 func (x *ThumbUpRankInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_rank_proto_msgTypes[6]
+	mi := &file_rank_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -480,7 +580,7 @@ func (x *ThumbUpRankInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ThumbUpRankInfo.ProtoReflect.Descriptor instead.
 func (*ThumbUpRankInfo) Descriptor() ([]byte, []int) {
-	return file_rank_proto_rawDescGZIP(), []int{6}
+	return file_rank_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ThumbUpRankInfo) GetId() int64 {
@@ -506,7 +606,7 @@ type CheckRankIsFullReq struct {
 
 func (x *CheckRankIsFullReq) Reset() {
 	*x = CheckRankIsFullReq{}
-	mi := &file_rank_proto_msgTypes[7]
+	mi := &file_rank_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -518,7 +618,7 @@ func (x *CheckRankIsFullReq) String() string {
 func (*CheckRankIsFullReq) ProtoMessage() {}
 
 func (x *CheckRankIsFullReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rank_proto_msgTypes[7]
+	mi := &file_rank_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -531,7 +631,7 @@ func (x *CheckRankIsFullReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckRankIsFullReq.ProtoReflect.Descriptor instead.
 func (*CheckRankIsFullReq) Descriptor() ([]byte, []int) {
-	return file_rank_proto_rawDescGZIP(), []int{7}
+	return file_rank_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *CheckRankIsFullReq) GetUserId() int64 {
@@ -551,7 +651,7 @@ type CheckRankIsFullResp struct {
 
 func (x *CheckRankIsFullResp) Reset() {
 	*x = CheckRankIsFullResp{}
-	mi := &file_rank_proto_msgTypes[8]
+	mi := &file_rank_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -563,7 +663,7 @@ func (x *CheckRankIsFullResp) String() string {
 func (*CheckRankIsFullResp) ProtoMessage() {}
 
 func (x *CheckRankIsFullResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rank_proto_msgTypes[8]
+	mi := &file_rank_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -576,7 +676,7 @@ func (x *CheckRankIsFullResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckRankIsFullResp.ProtoReflect.Descriptor instead.
 func (*CheckRankIsFullResp) Descriptor() ([]byte, []int) {
-	return file_rank_proto_rawDescGZIP(), []int{8}
+	return file_rank_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *CheckRankIsFullResp) GetUserId() int64 {
@@ -601,7 +701,7 @@ type GetMyRankReq struct {
 
 func (x *GetMyRankReq) Reset() {
 	*x = GetMyRankReq{}
-	mi := &file_rank_proto_msgTypes[9]
+	mi := &file_rank_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -613,7 +713,7 @@ func (x *GetMyRankReq) String() string {
 func (*GetMyRankReq) ProtoMessage() {}
 
 func (x *GetMyRankReq) ProtoReflect() protoreflect.Message {
-	mi := &file_rank_proto_msgTypes[9]
+	mi := &file_rank_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -626,7 +726,7 @@ func (x *GetMyRankReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMyRankReq.ProtoReflect.Descriptor instead.
 func (*GetMyRankReq) Descriptor() ([]byte, []int) {
-	return file_rank_proto_rawDescGZIP(), []int{9}
+	return file_rank_proto_rawDescGZIP(), []int{10}
 }
 
 type GetMyRankResp struct {
@@ -639,7 +739,7 @@ type GetMyRankResp struct {
 
 func (x *GetMyRankResp) Reset() {
 	*x = GetMyRankResp{}
-	mi := &file_rank_proto_msgTypes[10]
+	mi := &file_rank_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -651,7 +751,7 @@ func (x *GetMyRankResp) String() string {
 func (*GetMyRankResp) ProtoMessage() {}
 
 func (x *GetMyRankResp) ProtoReflect() protoreflect.Message {
-	mi := &file_rank_proto_msgTypes[10]
+	mi := &file_rank_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -664,7 +764,7 @@ func (x *GetMyRankResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMyRankResp.ProtoReflect.Descriptor instead.
 func (*GetMyRankResp) Descriptor() ([]byte, []int) {
-	return file_rank_proto_rawDescGZIP(), []int{10}
+	return file_rank_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetMyRankResp) GetRankId() string {
@@ -691,7 +791,7 @@ type MyRankData struct {
 
 func (x *MyRankData) Reset() {
 	*x = MyRankData{}
-	mi := &file_rank_proto_msgTypes[11]
+	mi := &file_rank_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -703,7 +803,7 @@ func (x *MyRankData) String() string {
 func (*MyRankData) ProtoMessage() {}
 
 func (x *MyRankData) ProtoReflect() protoreflect.Message {
-	mi := &file_rank_proto_msgTypes[11]
+	mi := &file_rank_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -716,7 +816,7 @@ func (x *MyRankData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MyRankData.ProtoReflect.Descriptor instead.
 func (*MyRankData) Descriptor() ([]byte, []int) {
-	return file_rank_proto_rawDescGZIP(), []int{11}
+	return file_rank_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *MyRankData) GetScore() int64 {
@@ -744,7 +844,7 @@ const file_rank_proto_rawDesc = "" +
 	"\x05msgId\x18\x02 \x01(\x0e2\x15.rpcPb.RPC_MESSAGE_IDR\x05msgId\x123\n" +
 	"\trespMsgId\x18\x03 \x01(\x0e2\x15.rpcPb.RPC_MESSAGE_IDR\trespMsgId\x12$\n" +
 	"\rbackMessageId\x18\x04 \x01(\x05R\rbackMessageId\x12\x16\n" +
-	"\x06rankId\x18\x05 \x01(\tR\x06rankId\x12\x18\n" +
+	"\x06rankId\x18\x05 \x03(\tR\x06rankId\x12\x18\n" +
 	"\apayload\x18\x06 \x01(\fR\apayload\"\xbd\x01\n" +
 	"\x18BackwardRankBoardMessage\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\x03R\x06userId\x12+\n" +
@@ -752,8 +852,18 @@ const file_rank_proto_rawDesc = "" +
 	"\rbackMessageId\x18\x03 \x01(\x05R\rbackMessageId\x12\x1c\n" +
 	"\terrorCode\x18\x04 \x01(\x05R\terrorCode\x12\x18\n" +
 	"\apayload\x18\x05 \x01(\fR\apayload\"\x10\n" +
-	"\x0eGetRankInfoReq\"\xca\x01\n" +
+	"\x0eGetRankInfoReq\"\x85\x02\n" +
 	"\x0fGetRankInfoResp\x12-\n" +
+	"\trankInfos\x18\x01 \x03(\v2\x0f.rpcPb.RankInfoR\trankInfos\x12\x1a\n" +
+	"\bcommonId\x18\x02 \x01(\x05R\bcommonId\x12\x1e\n" +
+	"\n" +
+	"activityId\x18\x03 \x01(\x05R\n" +
+	"activityId\x12\x1c\n" +
+	"\tactRankId\x18\x04 \x01(\x05R\tactRankId\x12\x16\n" +
+	"\x06myRank\x18\x05 \x01(\x05R\x06myRank\x12\x16\n" +
+	"\x06rankId\x18\x06 \x01(\tR\x06rankId\x129\n" +
+	"\rrankPageInfos\x18\a \x03(\v2\x13.rpcPb.RankPageInfoR\rrankPageInfos\"\xc7\x01\n" +
+	"\fRankPageInfo\x12-\n" +
 	"\trankInfos\x18\x01 \x03(\v2\x0f.rpcPb.RankInfoR\trankInfos\x12\x1a\n" +
 	"\bcommonId\x18\x02 \x01(\x05R\bcommonId\x12\x1e\n" +
 	"\n" +
@@ -768,11 +878,14 @@ const file_rank_proto_rawDesc = "" +
 	"\x05score\x18\x03 \x01(\x03R\x05score\x12\x12\n" +
 	"\x04rank\x18\x04 \x01(\x05R\x04rank\x12\"\n" +
 	"\fthumbUpCount\x18\x05 \x01(\x05R\fthumbUpCount\x12$\n" +
-	"\renterRankTime\x18\x06 \x01(\x03R\renterRankTime\"j\n" +
-	"\x14NotifyUpdateRankInfo\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x14\n" +
+	"\renterRankTime\x18\x06 \x01(\x03R\renterRankTime\"\x96\x01\n" +
+	"\x14NotifyUpdateRankInfo\x12\x1a\n" +
+	"\bplayerId\x18\x01 \x01(\x03R\bplayerId\x12\x14\n" +
 	"\x05score\x18\x02 \x01(\x03R\x05score\x12,\n" +
-	"\x11incrementalUpdate\x18\x03 \x01(\bR\x11incrementalUpdate\";\n" +
+	"\x11incrementalUpdate\x18\x03 \x01(\bR\x11incrementalUpdate\x12\x1e\n" +
+	"\n" +
+	"allianceId\x18\x04 \x01(\x03R\n" +
+	"allianceId\";\n" +
 	"\x0fThumbUpRankInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x18\n" +
 	"\athumbUp\x18\x02 \x01(\x05R\athumbUp\",\n" +
@@ -805,39 +918,42 @@ func file_rank_proto_rawDescGZIP() []byte {
 	return file_rank_proto_rawDescData
 }
 
-var file_rank_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_rank_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_rank_proto_goTypes = []any{
 	(*ForwardRankBoardMessage)(nil),  // 0: rpcPb.ForwardRankBoardMessage
 	(*BackwardRankBoardMessage)(nil), // 1: rpcPb.BackwardRankBoardMessage
 	(*GetRankInfoReq)(nil),           // 2: rpcPb.GetRankInfoReq
 	(*GetRankInfoResp)(nil),          // 3: rpcPb.GetRankInfoResp
-	(*RankInfo)(nil),                 // 4: rpcPb.RankInfo
-	(*NotifyUpdateRankInfo)(nil),     // 5: rpcPb.NotifyUpdateRankInfo
-	(*ThumbUpRankInfo)(nil),          // 6: rpcPb.ThumbUpRankInfo
-	(*CheckRankIsFullReq)(nil),       // 7: rpcPb.CheckRankIsFullReq
-	(*CheckRankIsFullResp)(nil),      // 8: rpcPb.CheckRankIsFullResp
-	(*GetMyRankReq)(nil),             // 9: rpcPb.GetMyRankReq
-	(*GetMyRankResp)(nil),            // 10: rpcPb.GetMyRankResp
-	(*MyRankData)(nil),               // 11: rpcPb.MyRankData
-	(RPC_MESSAGE_ID)(0),              // 12: rpcPb.RPC_MESSAGE_ID
-	(*HelloReq)(nil),                 // 13: rpcPb.HelloReq
-	(*HelloResp)(nil),                // 14: rpcPb.HelloResp
+	(*RankPageInfo)(nil),             // 4: rpcPb.RankPageInfo
+	(*RankInfo)(nil),                 // 5: rpcPb.RankInfo
+	(*NotifyUpdateRankInfo)(nil),     // 6: rpcPb.NotifyUpdateRankInfo
+	(*ThumbUpRankInfo)(nil),          // 7: rpcPb.ThumbUpRankInfo
+	(*CheckRankIsFullReq)(nil),       // 8: rpcPb.CheckRankIsFullReq
+	(*CheckRankIsFullResp)(nil),      // 9: rpcPb.CheckRankIsFullResp
+	(*GetMyRankReq)(nil),             // 10: rpcPb.GetMyRankReq
+	(*GetMyRankResp)(nil),            // 11: rpcPb.GetMyRankResp
+	(*MyRankData)(nil),               // 12: rpcPb.MyRankData
+	(RPC_MESSAGE_ID)(0),              // 13: rpcPb.RPC_MESSAGE_ID
+	(*HelloReq)(nil),                 // 14: rpcPb.HelloReq
+	(*HelloResp)(nil),                // 15: rpcPb.HelloResp
 }
 var file_rank_proto_depIdxs = []int32{
-	12, // 0: rpcPb.ForwardRankBoardMessage.msgId:type_name -> rpcPb.RPC_MESSAGE_ID
-	12, // 1: rpcPb.ForwardRankBoardMessage.respMsgId:type_name -> rpcPb.RPC_MESSAGE_ID
-	12, // 2: rpcPb.BackwardRankBoardMessage.msgId:type_name -> rpcPb.RPC_MESSAGE_ID
-	4,  // 3: rpcPb.GetRankInfoResp.rankInfos:type_name -> rpcPb.RankInfo
-	11, // 4: rpcPb.GetMyRankResp.rank:type_name -> rpcPb.MyRankData
-	13, // 5: rpcPb.RankService.SayHello:input_type -> rpcPb.HelloReq
-	0,  // 6: rpcPb.RankService.ForwardRankBoardMessageHandler:input_type -> rpcPb.ForwardRankBoardMessage
-	14, // 7: rpcPb.RankService.SayHello:output_type -> rpcPb.HelloResp
-	1,  // 8: rpcPb.RankService.ForwardRankBoardMessageHandler:output_type -> rpcPb.BackwardRankBoardMessage
-	7,  // [7:9] is the sub-list for method output_type
-	5,  // [5:7] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	13, // 0: rpcPb.ForwardRankBoardMessage.msgId:type_name -> rpcPb.RPC_MESSAGE_ID
+	13, // 1: rpcPb.ForwardRankBoardMessage.respMsgId:type_name -> rpcPb.RPC_MESSAGE_ID
+	13, // 2: rpcPb.BackwardRankBoardMessage.msgId:type_name -> rpcPb.RPC_MESSAGE_ID
+	5,  // 3: rpcPb.GetRankInfoResp.rankInfos:type_name -> rpcPb.RankInfo
+	4,  // 4: rpcPb.GetRankInfoResp.rankPageInfos:type_name -> rpcPb.RankPageInfo
+	5,  // 5: rpcPb.RankPageInfo.rankInfos:type_name -> rpcPb.RankInfo
+	12, // 6: rpcPb.GetMyRankResp.rank:type_name -> rpcPb.MyRankData
+	14, // 7: rpcPb.RankService.SayHello:input_type -> rpcPb.HelloReq
+	0,  // 8: rpcPb.RankService.ForwardRankBoardMessageHandler:input_type -> rpcPb.ForwardRankBoardMessage
+	15, // 9: rpcPb.RankService.SayHello:output_type -> rpcPb.HelloResp
+	1,  // 10: rpcPb.RankService.ForwardRankBoardMessageHandler:output_type -> rpcPb.BackwardRankBoardMessage
+	9,  // [9:11] is the sub-list for method output_type
+	7,  // [7:9] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_rank_proto_init() }
@@ -852,7 +968,7 @@ func file_rank_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rank_proto_rawDesc), len(file_rank_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

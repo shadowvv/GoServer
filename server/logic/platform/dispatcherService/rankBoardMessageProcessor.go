@@ -162,12 +162,12 @@ func (l *RankBoardMessageProcessor) PushMessage(session serviceInterface.Session
 	}
 	index := tool.RandInt32(0, int32(l.processorNum)-1)
 	if index < 0 || int(index) >= l.processorNum {
-		logger.ErrorBySprintf(fmt.Sprintf("[rankBoardProcessor] RankBoard index out of range sessionId:%d,msgId:%d", session.GetID(), msgID))
+		logger.ErrorBySprintf("[rankBoardProcessor] RankBoard index out of range sessionId:%d,msgId:%d", session.GetID(), msgID)
 		return
 	}
 	handler := l.messageHandlerMap[msgID]
 	if handler == nil {
-		logger.ErrorBySprintf(fmt.Sprintf("[rankBoardProcessor] no handler for msgId:%d", msgID))
+		logger.ErrorBySprintf("[rankBoardProcessor] no handler for msgId:%d", msgID)
 		return
 	}
 	l.processors[index].PutTask(session, msgID, rankBoardSession.RankBoardId, msg, handler)

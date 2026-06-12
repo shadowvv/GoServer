@@ -126,20 +126,20 @@ func GetAttrMapPower(level int32, attrs map[int32]int64) float64 {
 	if attrRatio == nil {
 		attrRatio = GetCombatCoefficientCfg(1)
 	}
-	power := float64(0)
+	power := int64(0)
 	for attrId, attr := range attrs {
 		if _, ok := attrRatio[attrId]; !ok {
 			continue
 		}
 		// 攻击速度默认初始值为10000，超过10000的部分才算战力
 		if attrId == enum.AttributeBasicAttackSpeed && attr >= 10000 {
-			power += float64(attr-10000) * (attrRatio[attrId] / 10000)
+			power += (attr - 10000) * (attrRatio[attrId])
 		} else {
-			power += float64(attr) * (attrRatio[attrId] / 10000)
+			power += (attr) * (attrRatio[attrId])
 		}
 	}
 
-	return power
+	return float64(power) / 10000.0
 }
 
 func GetRoleLevelCfg(id int32) *RoleLevelCfg {

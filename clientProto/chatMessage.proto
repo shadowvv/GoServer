@@ -1,0 +1,23 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+import "commonMessage.proto";
+
+message ChatMessage{
+  PlayerBasicInfo playerInfo=1; // 发送者玩家信息
+  int32 sendType=2; // 聊天类型  0 私聊 1 全服通知 2 世界 3 工会
+  int64 toObjectId=3; // 世界/工会/私聊对象ID
+  string messageContent=4; // 消息内容
+  int64 sendTime=5; // 发送时间
+}
+
+message SendChatMessageReq{
+  ChatMessage chatMessage=1; // 聊天消息
+}
+
+message SendChatMessageResp{}
+
+message PushReceivedChatMessage{
+  ChatMessage chatMessage=1; // 聊天消息
+}

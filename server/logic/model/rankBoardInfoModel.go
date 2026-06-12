@@ -6,6 +6,7 @@ type RankBoardInfoEntity struct {
 	Score        int64 `gorm:"column:score;comment:积分"`
 	ThumbUpCount int32 `gorm:"column:thumb_up_count;comment:点赞数"`
 	EnterTime    int64 `gorm:"column:enter_time;comment:进榜时间"`
+	UpdateTime   int64 `gorm:"column:update_time;comment:更新时间"`
 }
 
 type RankSettleTaskEntity struct {

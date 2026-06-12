@@ -1,6 +1,7 @@
 package gameController
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/drop/GoServer/server/enum"
@@ -41,11 +42,11 @@ func (p *RankBoardController) RegisterLogicMessage() {
 }
 
 func RegisterRankBoardMessage() {
-	RegisterRankBoardMessageHandler(enum.MSG_TYPE_RANKBOARD, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_RANK_INFO_REQ, &rpcPb.GetRankInfoReq{}, GetRankListFromRankBoardNode)
-	RegisterRankBoardMessageHandler(enum.MSG_TYPE_RANKBOARD, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_THUMB_UP_RANK_INFO, &rpcPb.ThumbUpRankInfo{}, OnThumbUpRankInfoOnRankBoardNode)
-	RegisterRankBoardMessageHandler(enum.MSG_TYPE_RANKBOARD, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_CHECK_RANK_FULL_REQ, &rpcPb.CheckRankIsFullReq{}, CheckRankIsFullOnRankBoardNode)
-	RegisterRankBoardMessageHandler(enum.MSG_TYPE_RANKBOARD, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_MY_RANK_REQ, &rpcPb.GetMyRankReq{}, GetMyRankFromRankBoardNode)
-	RegisterRankBoardMessageHandler(enum.MSG_TYPE_RANKBOARD, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_UPDATE_PLAYER_RANK_INFO, &rpcPb.NotifyUpdateRankInfo{}, OnUpdatePlayerRankInfoOnRankBoardNode)
+	RegisterRankBoardMessageHandler(enum.MSG_TYPE_RANK_BOARD, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_RANK_INFO_REQ, &rpcPb.GetRankInfoReq{}, GetRankListFromRankBoardNode)
+	RegisterRankBoardMessageHandler(enum.MSG_TYPE_RANK_BOARD, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_THUMB_UP_RANK_INFO, &rpcPb.ThumbUpRankInfo{}, OnThumbUpRankInfoOnRankBoardNode)
+	RegisterRankBoardMessageHandler(enum.MSG_TYPE_RANK_BOARD, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_CHECK_RANK_FULL_REQ, &rpcPb.CheckRankIsFullReq{}, CheckRankIsFullOnRankBoardNode)
+	RegisterRankBoardMessageHandler(enum.MSG_TYPE_RANK_BOARD, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_MY_RANK_REQ, &rpcPb.GetMyRankReq{}, GetMyRankFromRankBoardNode)
+	RegisterRankBoardMessageHandler(enum.MSG_TYPE_RANK_BOARD, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_UPDATE_PLAYER_RANK_INFO, &rpcPb.NotifyUpdateRankInfo{}, OnUpdateRankInfoOnRankBoardNode)
 }
 func GetRankList(message proto.Message, player *model.PlayerModel) {
 	req, ok := message.(*pb.RankListReq)
@@ -53,10 +54,22 @@ func GetRankList(message proto.Message, player *model.PlayerModel) {
 		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_RANK_LIST_RESP, pb.ERROR_CODE_PB_CONV_ERROR)
 		return
 	}
+	if req.CommonRankId == 0 && req.ActId == 0 {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_RANK_LIST_RESP, pb.ERROR_CODE_INVALID_REQUEST_PARAM)
+		return
+	}
+	if req.ActId != 0 && len(req.ActTargetId) == 0 {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_RANK_LIST_RESP, pb.ERROR_CODE_INVALID_REQUEST_PARAM)
+		return
+	}
+	if req.CommonRankId != 0 && len(req.ActTargetId) > 0 {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_RANK_LIST_RESP, pb.ERROR_CODE_INVALID_REQUEST_PARAM)
+		return
+	}
 	version := ""
 	if req.ActId != 0 {
 		if ok, version = player.PlayerActivityModel.CheckActivityOpen(req.ActId); !ok {
-			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_RANK_LIKE_RESP, pb.ERROR_CODE_ACTIVITY_NOT_OPEN)
+			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_RANK_LIST_RESP, pb.ERROR_CODE_ACTIVITY_NOT_OPEN)
 			return
 		}
 	} else if req.CommonRankId != 0 {
@@ -80,20 +93,66 @@ func GetRankList(message proto.Message, player *model.PlayerModel) {
 		}
 	}
 
-	rankId, err := logicCommon.GetRankUniqueId(req.CommonRankId, req.ActId, req.ActTargetId, player.User.GetServerId(), version)
-	if err != nil {
-		logger.ErrorBySprintf("arena GetRankUniqueId error:%+v", err)
-		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_RANK_LIST_RESP, pb.ERROR_CODE_SYSTEM_ERROR)
+	actTargetIds := req.ActTargetId
+	if req.CommonRankId != 0 {
+		actTargetIds = []int32{0}
+	}
+	rankIds := make([]string, 0, len(actTargetIds))
+	seenRankIds := make(map[string]struct{}, len(actTargetIds))
+	for _, actTargetId := range actTargetIds {
+		rankId, err := logicCommon.GetRankUniqueId(req.CommonRankId, req.ActId, actTargetId, player.User.GetServerId(), version)
+		if err != nil {
+			logger.ErrorBySprintf("arena GetRankUniqueId error:%+v", err)
+			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_RANK_LIST_RESP, pb.ERROR_CODE_SYSTEM_ERROR)
+			return
+		}
+		if _, ok = seenRankIds[rankId]; ok {
+			continue
+		}
+		seenRankIds[rankId] = struct{}{}
+		rankIds = append(rankIds, rankId)
+	}
+	if len(rankIds) == 0 {
+		messageSender.SendMessage(player, pb.MESSAGE_ID_RANK_LIST_RESP, &pb.RankListResp{})
 		return
 	}
-	rpcReq := &rpcPb.GetRankInfoReq{}
-	err = rpcController.SendMessageToRankBoard(player.GetUserId(), rankId, int32(pb.MESSAGE_ID_RANK_LIST_RESP), rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_RANK_INFO_REQ, rpcReq)
+	err := rpcController.SendMessageToRankBoardBatch(player.GetUserId(), rankIds, int32(pb.MESSAGE_ID_RANK_LIST_RESP), rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_RANK_INFO_REQ, &rpcPb.GetRankInfoReq{})
 	if err != nil {
 		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_RANK_LIST_RESP, pb.ERROR_CODE_RANK_BOARD_NOT_FOUND)
 		return
 	}
 }
+
 func GetRankListFromRankBoardNode(message proto.Message, rankId string, session serviceInterface.SessionInterface) {
+	rankSession, ok := session.(*logicSessionManager.RankBoardSession)
+	if !ok {
+		rankBoardPlatform.SendErrorMessageBySession(session, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_RANK_INFO_RESP, pb.ERROR_CODE_SYSTEM_ERROR)
+		return
+	}
+	rankIds := rankSession.GetRankBoardInfoIds
+	if len(rankIds) == 0 {
+		rankIds = []string{rankId}
+	}
+	resp := &rpcPb.GetRankInfoResp{
+		RankPageInfos: make([]*rpcPb.RankPageInfo, 0, len(rankIds)),
+	}
+	for _, currentRankId := range rankIds {
+		page := buildRpcRankPageInfo(currentRankId, rankSession.UserId)
+		resp.RankPageInfos = append(resp.RankPageInfos, page)
+	}
+	if len(resp.RankPageInfos) == 1 {
+		page := resp.RankPageInfos[0]
+		resp.RankInfos = page.RankInfos
+		resp.CommonId = page.CommonId
+		resp.ActivityId = page.ActivityId
+		resp.ActRankId = page.ActRankId
+		resp.MyRank = page.MyRank
+		resp.RankId = page.RankId
+	}
+	rankBoardPlatform.SendMessageBySession(session, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_RANK_INFO_RESP, resp)
+}
+
+func buildRpcRankPageInfo(rankId string, userId int64) *rpcPb.RankPageInfo {
 	commonId, activityId, actRankId, _ := logicCommon.GetRankRealIdFromUniqueId(rankId)
 	maxNum := int32(100)
 	rankPointType := int32(enum.RANK_BOARD_SCORE_TYPE_LEVEL)
@@ -106,16 +165,10 @@ func GetRankListFromRankBoardNode(message proto.Message, rankId string, session 
 		rankPointType = cfg.PointType
 	}
 
-	rankSession, ok := session.(*logicSessionManager.RankBoardSession)
-	if !ok {
-		rankBoardPlatform.SendErrorMessageBySession(session, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_RANK_INFO_RESP, pb.ERROR_CODE_SYSTEM_ERROR)
-		return
-	}
-
-	queryUserId := rankSession.UserId
+	queryUserId := userId
 	if rankPointType == int32(enum.RANK_BOARD_SCORE_TYPE_ALLIANCE_ARENA) ||
 		rankPointType == int32(enum.RANK_BOARD_SCORE_TYPE_ALLIANCE_GLORY_ARENA_ROUND_WIN_COUNT) {
-		allianceInfo := logicCommon.GetPlayerAllianceInfoFromRedis(rankSession.UserId)
+		allianceInfo := logicCommon.GetPlayerAllianceInfoFromRedis(userId)
 		if allianceInfo != nil && allianceInfo.AllianceId > 0 {
 			queryUserId = allianceInfo.AllianceId
 		} else {
@@ -124,7 +177,7 @@ func GetRankListFromRankBoardNode(message proto.Message, rankId string, session 
 	}
 
 	rankDetailInfo, playerRank, _ := rankboardService.GetRankInfo(rankId, int(maxNum), queryUserId)
-	resp := &rpcPb.GetRankInfoResp{
+	page := &rpcPb.RankPageInfo{
 		CommonId:   commonId,
 		ActivityId: activityId,
 		ActRankId:  actRankId,
@@ -141,8 +194,8 @@ func GetRankListFromRankBoardNode(message proto.Message, rankId string, session 
 			EnterRankTime: info.EnterTime,
 		}
 	}
-	resp.RankInfos = detail
-	rankBoardPlatform.SendMessageBySession(session, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_GET_RANK_INFO_RESP, resp)
+	page.RankInfos = detail
+	return page
 }
 
 func BackRankListFromRankBoardNode(message proto.Message, player *model.PlayerModel) {
@@ -151,12 +204,39 @@ func BackRankListFromRankBoardNode(message proto.Message, player *model.PlayerMo
 		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_RANK_LIST_RESP, pb.ERROR_CODE_PB_CONV_ERROR)
 		return
 	}
+	if len(rpcMessage.RankPageInfos) > 0 {
+		rankInfos := make([]*pb.RankInfo, 0, len(rpcMessage.RankPageInfos))
+		for _, page := range rpcMessage.RankPageInfos {
+			rankInfos = append(rankInfos, buildRankInfoFromRankPageInfo(page, player))
+		}
+		messageSender.SendMessage(player, pb.MESSAGE_ID_RANK_LIST_RESP, &pb.RankListResp{
+			RankInfo: rankInfos,
+		})
+		return
+	}
+	messageSender.SendMessage(player, pb.MESSAGE_ID_RANK_LIST_RESP, &pb.RankListResp{
+		RankInfo: []*pb.RankInfo{buildRankInfoFromRankBoardResp(rpcMessage, player)},
+	})
+}
+
+func buildRankInfoFromRankPageInfo(page *rpcPb.RankPageInfo, player *model.PlayerModel) *pb.RankInfo {
+	return buildRankInfoFromRankBoardResp(&rpcPb.GetRankInfoResp{
+		RankInfos:  page.RankInfos,
+		CommonId:   page.CommonId,
+		ActivityId: page.ActivityId,
+		ActRankId:  page.ActRankId,
+		MyRank:     page.MyRank,
+		RankId:     page.RankId,
+	}, player)
+}
+
+func buildRankInfoFromRankBoardResp(rpcMessage *rpcPb.GetRankInfoResp, player *model.PlayerModel) *pb.RankInfo {
 	_, activityId, _, _ := logicCommon.GetRankRealIdFromUniqueId(rpcMessage.RankId)
 	isLiked := false
 	log := &model.PlayerRankThumbUpLog{
 		RankId:       strconv.FormatInt(int64(activityId), 10),
 		FromPlayerId: player.User.GetUserId(),
-		ThumbUpTime:  tool.TodayZero().UnixMilli(),
+		ThumbUpTime:  tool.GetTodayZeroByTimeStamp(tool.UnixNowMilli()),
 	}
 	_, err := easyDB.GetPlayerEntityByWhere[model.PlayerRankThumbUpLog](map[string]interface{}{"rank_id": log.RankId, "from_player_id": log.FromPlayerId, "thumb_up_time": log.ThumbUpTime})
 	if err == nil {
@@ -188,19 +268,44 @@ func BackRankListFromRankBoardNode(message proto.Message, player *model.PlayerMo
 	if rankPointType == int32(enum.RANK_BOARD_SCORE_TYPE_ARENA) && rankLen < rankMaxNum {
 		rankLen = rankMaxNum
 	}
-	detail := make([]*pb.RankDetailInfo, rankLen)
-	if rankLen == 0 {
-		messageSender.SendMessage(player, pb.MESSAGE_ID_RANK_LIST_RESP, &pb.RankListResp{})
-		return
+	isAllianceRank := rankPointType == int32(enum.RANK_BOARD_SCORE_TYPE_ALLIANCE_ARENA) ||
+		rankPointType == int32(enum.RANK_BOARD_SCORE_TYPE_ALLIANCE_TOTAL_POWER) ||
+		rankPointType == int32(enum.RANK_BOARD_SCORE_TYPE_ALLIANCE_GLORY_ARENA_ROUND_WIN_COUNT)
+	if isAllianceRank {
+		allianceDetails := make([]*pb.RankAllianceDetailInfo, len(rpcMessage.RankInfos))
+		for index, info := range rpcMessage.RankInfos {
+			allianceDetails[index] = &pb.RankAllianceDetailInfo{
+				AllianceId: info.Id,
+				Rank:       info.Rank,
+				LikeNum:    info.ThumbUpCount,
+				RankScore:  info.Score,
+				RankedOn:   info.EnterRankTime,
+			}
+			alliance, code := LoadAllianceBasicInfoFromRedis(info.Id)
+			if code != pb.ERROR_CODE_SUCCESS || alliance == nil {
+				continue
+			}
+			allianceDetails[index].AllianceName = alliance.Name
+			allianceDetails[index].Icon = alliance.BadgeId
+			allianceDetails[index].BattlePower = alliance.AllianceTotalPower
+		}
+		return &pb.RankInfo{
+			CommonRankId:    rpcMessage.CommonId,
+			ActId:           rpcMessage.ActivityId,
+			ActTargetId:     rpcMessage.ActRankId,
+			ChestClaimed:    isClaim,
+			IsLiked:         isLiked,
+			MyRank:          rpcMessage.MyRank,
+			AllianceDetails: allianceDetails,
+		}
 	}
+	detail := make([]*pb.RankDetailInfo, rankLen)
 
 	index := int32(0)
 	originalScore := int64(0)
 	if rankPointType == int32(enum.RANK_BOARD_SCORE_TYPE_ARENA) {
 		originalScore = int64(gameConfig.GetArenaInitScore())
 	}
-	isAllianceRank := rankPointType == int32(enum.RANK_BOARD_SCORE_TYPE_ALLIANCE_ARENA) ||
-		rankPointType == int32(enum.RANK_BOARD_SCORE_TYPE_ALLIANCE_GLORY_ARENA_ROUND_WIN_COUNT)
 	for ; index < int32(len(rpcMessage.RankInfos)); index++ {
 		info := rpcMessage.RankInfos[index]
 		detail[index] = &pb.RankDetailInfo{
@@ -210,19 +315,7 @@ func BackRankListFromRankBoardNode(message proto.Message, player *model.PlayerMo
 			RankScore: info.Score + originalScore,
 			RankedOn:  info.EnterRankTime,
 		}
-		if isAllianceRank {
-			alliance, code := LoadAllianceBasicInfoFromRedis(info.Id)
-			if code != pb.ERROR_CODE_SUCCESS || alliance == nil {
-				continue
-			}
-			detail[index].NickName = alliance.Name
-			detail[index].Head = 0
-			detail[index].FrameId = 0
-			detail[index].BattlePower = make(map[int32]int64)
-			detail[index].Title = 0
-			detail[index].BubbleId = 0
-			detail[index].ImageId = 0
-		} else if info.Id != player.User.GetUserId() {
+		if info.Id != player.User.GetUserId() {
 			playerRedisInfo := logicCommon.GetPlayerRedisInfo(info.Id)
 			if playerRedisInfo == nil {
 				continue
@@ -264,10 +357,7 @@ func BackRankListFromRankBoardNode(message proto.Message, player *model.PlayerMo
 		MyRank:       rpcMessage.MyRank,
 		Details:      detail,
 	}
-	resp := &pb.RankListResp{
-		RankInfo: rankInfo,
-	}
-	messageSender.SendMessage(player, pb.MESSAGE_ID_RANK_LIST_RESP, resp)
+	return rankInfo
 }
 
 func OnRankLike(message proto.Message, player *model.PlayerModel) {
@@ -304,7 +394,7 @@ func OnRankLike(message proto.Message, player *model.PlayerModel) {
 	log := &model.PlayerRankThumbUpLog{
 		RankId:       strconv.FormatInt(int64(req.ActId), 10),
 		FromPlayerId: player.User.GetUserId(),
-		ThumbUpTime:  tool.TodayZero().UnixMilli(),
+		ThumbUpTime:  tool.GetTodayZeroByTimeStamp(tool.UnixNowMilli()),
 	}
 	err = easyDB.CreatePlayerEntity[model.PlayerRankThumbUpLog](log)
 	if err != nil {
@@ -469,7 +559,7 @@ func GetMyRankFromRankBoardNode(message proto.Message, rankId string, session se
 	rankBoardPlatform.SendMessageBySession(session, rankSession.RespMsgId, resp)
 }
 
-func OnUpdatePlayerRankInfoOnRankBoardNode(message proto.Message, rankId string, session serviceInterface.SessionInterface) {
+func OnUpdateRankInfoOnRankBoardNode(message proto.Message, rankId string, session serviceInterface.SessionInterface) {
 	req, ok := message.(*rpcPb.NotifyUpdateRankInfo)
 	if !ok {
 		return
@@ -491,18 +581,15 @@ func OnUpdatePlayerRankInfoOnRankBoardNode(message proto.Message, rankId string,
 	if commonRankCfg.RankType == int32(enum.RANK_BOARD_RANK_RULE_ENTER_TIME) {
 		resort = false
 	}
-	if commonRankCfg.RankThreshold > req.Score {
-		return
-	}
-
-	score := req.Score
-	targetId, err := checkIsAllianceRankBoard(commonRankCfg, req)
+	targetId, score, incrementalUpdate, err := checkIsAllianceRankBoard(rankId, commonRankCfg, req)
 	if err != nil {
-		logger.ErrorBySprintf("checkIsAllianceRankBoard err: %v", err)
+		return
+	}
+	if commonRankCfg.RankThreshold > 0 && commonRankCfg.RankThreshold > score {
 		return
 	}
 
-	isEnter, rank := rankboardService.UpdatePlayerRankInfo(rankId, targetId, score, req.IncrementalUpdate, maxNum, resort)
+	isEnter, rank := rankboardService.UpdatePlayerRankInfo(rankId, targetId, score, incrementalUpdate, maxNum, resort)
 	if rank == -1 {
 		logger.ErrorBySprintf("rankBoardNode update player rank info error, rankId: %s, userId: %d", rankId, targetId)
 		return
@@ -510,11 +597,15 @@ func OnUpdatePlayerRankInfoOnRankBoardNode(message proto.Message, rankId string,
 	// TODO: 之后移动到其它地方 Keep glory-arena pools up-to-date by appending users that newly satisfy topN on rank updates.
 	if score > 0 && rank > 0 {
 		now := tool.UnixNowMilli()
-		if _, err = gloryArenaService.TryAppendByBattlePowerRankUpdate(rankId, targetId, rank, score, now); err != nil {
-			logger.ErrorBySprintf("gloryArena TryAppendByBattlePowerRankUpdate error, rankId: %s, userId: %d, rank: %d, score: %d, err: %v", rankId, targetId, rank, score, err)
+		if commonRankCfg.PointType == int32(enum.RANK_BOARD_SCORE_TYPE_BATTLE_POWER) {
+			if _, err = gloryArenaService.TryAppendByBattlePowerRankUpdate(rankId, targetId, rank, score, now); err != nil {
+				logger.ErrorBySprintf("gloryArena TryAppendByBattlePowerRankUpdate error, rankId: %s, userId: %d, rank: %d, score: %d, err: %v", rankId, targetId, rank, score, err)
+			}
 		}
-		if _, err = gloryArenaService.TryAppendByArenaRankUpdate(rankId, targetId, rank, score, now); err != nil {
-			logger.ErrorBySprintf("gloryArena TryAppendByArenaRankUpdate error, rankId: %s, userId: %d, rank: %d, score: %d, err: %v", rankId, targetId, rank, score, err)
+		if commonRankCfg.PointType == int32(enum.RANK_BOARD_SCORE_TYPE_ARENA) {
+			if _, err = gloryArenaService.TryAppendByArenaRankUpdate(rankId, targetId, rank, score, now); err != nil {
+				logger.ErrorBySprintf("gloryArena TryAppendByArenaRankUpdate error, rankId: %s, userId: %d, rank: %d, score: %d, err: %v", rankId, targetId, rank, score, err)
+			}
 		}
 	}
 
@@ -526,36 +617,78 @@ func OnUpdatePlayerRankInfoOnRankBoardNode(message proto.Message, rankId string,
 				dropItem = gameConfig.Drop(dropId)
 			}
 			if len(dropItem) > 0 {
-				rankBoardPlatform.SendRankBoardRewardMail(commonRankCfg.MailId[0], req.Id, dropItem, rank)
+				rankBoardPlatform.SendRankBoardRewardMail(commonRankCfg.MailId[0], targetId, dropItem, rank)
 			}
 		}
 	}
 }
 
-func checkIsAllianceRankBoard(cfg *gameConfig.CommonRankCfg, req *rpcPb.NotifyUpdateRankInfo) (id int64, err error) {
-	finalId := req.Id
+func checkIsAllianceRankBoard(rankId string, cfg *gameConfig.CommonRankCfg, req *rpcPb.NotifyUpdateRankInfo) (id int64, score int64, incrementalUpdate bool, err error) {
+	if cfg == nil || req == nil {
+		return 0, 0, false, fmt.Errorf("invalid rank update args")
+	}
+	finalId := req.PlayerId
+	finalScore := req.Score
+	finalIncrementalUpdate := req.IncrementalUpdate
 	switch cfg.PointType {
 	case int32(enum.RANK_BOARD_SCORE_TYPE_ALLIANCE_ARENA):
-		allianceInfo := logicCommon.GetPlayerAllianceInfoFromRedis(req.Id)
-		if allianceInfo != nil && allianceInfo.AllianceId > 0 {
-			finalId = allianceInfo.AllianceId
-			// TODO:联盟因为临时屏蔽，之后再处理这个情况
-			//if !allianceInfo.ArenaJoined {
-			//	playerBasicInfo := logicCommon.GetPlayerBasicInfoFromRedis(req.Id)
-			//	if playerBasicInfo == nil {
-			//		return
-			//	}
-			//	score = int64(playerBasicInfo.ArenaScore)
-			//	incrementalUpdate = true
-			//	allianceInfo.ArenaJoined = true
-			//	logicCommon.UpdatePlayerAllianceInfo(allianceInfo)
-			//}
+		if req.AllianceId > 0 {
+			if err = checkAllianceRankServer(rankId, req.AllianceId); err != nil {
+				return 0, 0, false, err
+			}
+			finalId = req.AllianceId
+			break
+		}
+		if req.PlayerId <= 0 {
+			return 0, 0, false, fmt.Errorf("alliance arena rank update missing playerId/allianceId")
+		}
+		allianceInfo := logicCommon.GetPlayerAllianceInfoFromRedis(req.PlayerId)
+		if allianceInfo == nil || allianceInfo.AllianceId <= 0 {
+			return 0, 0, false, fmt.Errorf("player not in alliance, userId:%d", req.PlayerId)
+		}
+		if err = checkAllianceRankServer(rankId, allianceInfo.AllianceId); err != nil {
+			return 0, 0, false, err
+		}
+		finalId = allianceInfo.AllianceId
+		if !allianceInfo.ArenaJoined {
+			playerBasicInfo := logicCommon.GetPlayerBasicInfoFromRedis(req.PlayerId)
+			if playerBasicInfo == nil {
+				return 0, 0, false, fmt.Errorf("player basic info is nil, userId:%d", req.PlayerId)
+			}
+			finalScore = int64(playerBasicInfo.ArenaScore)
+			finalIncrementalUpdate = true
+			allianceInfo.ArenaJoined = true
+			logicCommon.UpdatePlayerAllianceInfo(allianceInfo)
 		}
 	case int32(enum.RANK_BOARD_SCORE_TYPE_ALLIANCE_GLORY_ARENA_ROUND_WIN_COUNT):
-		allianceInfo := logicCommon.GetPlayerAllianceInfoFromRedis(req.Id)
-		if allianceInfo != nil && allianceInfo.AllianceId > 0 {
-			finalId = allianceInfo.AllianceId
+		if req.AllianceId > 0 {
+			finalId = req.AllianceId
+			break
 		}
+		if req.PlayerId <= 0 {
+			return 0, 0, false, fmt.Errorf("alliance glory arena rank update missing playerId/allianceId")
+		}
+		allianceInfo := logicCommon.GetPlayerAllianceInfoFromRedis(req.PlayerId)
+		if allianceInfo == nil || allianceInfo.AllianceId <= 0 {
+			return 0, 0, false, fmt.Errorf("player not in alliance, userId:%d", req.PlayerId)
+		}
+		finalId = allianceInfo.AllianceId
 	}
-	return finalId, nil
+	if finalId <= 0 {
+		return 0, 0, false, fmt.Errorf("invalid rank update target, playerId:%d allianceId:%d", req.PlayerId, req.AllianceId)
+	}
+	return finalId, finalScore, finalIncrementalUpdate, nil
+}
+
+func checkAllianceRankServer(rankId string, allianceId int64) error {
+	alliance, code := LoadAllianceBasicInfoFromRedis(allianceId)
+	if code != pb.ERROR_CODE_SUCCESS || alliance == nil || alliance.AllianceId <= 0 {
+		return fmt.Errorf("alliance basic info not found, allianceId:%d", allianceId)
+	}
+	_, _, rankServerId, ok := logicCommon.ParseCommonArenaRankTableMeta(rankId)
+	if ok && rankServerId > 0 && alliance.ServerId > 0 && alliance.ServerId != rankServerId {
+		return fmt.Errorf("alliance server mismatch, rankId:%s allianceId:%d allianceServerId:%d rankServerId:%d",
+			rankId, allianceId, alliance.ServerId, rankServerId)
+	}
+	return nil
 }

@@ -1,0 +1,44 @@
+syntax = "proto3";
+package pb;
+option go_package = "github.com/drop/GoServer/server/logic/pb;pb";
+
+// 广告宝箱奖励物品（与 ItemBasicInfo 结构一致）
+message AdChestRewardItem {
+  int32 itemId = 1;
+  int64 count = 2;
+}
+
+// 广告宝箱信息
+message AdChestInfo {
+  string uniqueId = 1;
+  int32 itemId = 2;
+  int32 cfgIndex = 3;
+  int64 createTime = 4;
+  int64 expireTime = 5;  // 过期时间戳(毫秒)
+}
+
+// 获取广告宝箱列表请求
+message GetAdChestListReq {}
+
+// 获取广告宝箱列表响应
+message GetAdChestListResp {
+  repeated AdChestInfo chestList = 1;
+  int32 todayOpenCount = 2;   // 今日已开启次数
+  int32 todayOpenLimit = 3;   // 今日开启上限
+}
+
+// 开启广告宝箱请求
+message OpenAdChestReq {
+  string uniqueId = 1;
+  bool watchAd = 2;  // 是否看了广告
+}
+
+// 开启广告宝箱响应
+message OpenAdChestResp {
+  repeated AdChestRewardItem itemList = 1;
+}
+
+// 推送新广告宝箱
+message PushAdChestNew {
+  AdChestInfo chest = 1;
+}

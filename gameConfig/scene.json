@@ -24,11 +24,221 @@
       "isPlayerHide": "",
       "sceneType": "1"
     },
+    "1001": {
+      "disableItem": "",
+      "id": "1001",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1002": {
+      "disableItem": "",
+      "id": "1002",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1003": {
+      "disableItem": "",
+      "id": "1003",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1004": {
+      "disableItem": "",
+      "id": "1004",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1005": {
+      "disableItem": "",
+      "id": "1005",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
     "101": {
       "disableItem": "",
       "id": "101",
       "isPlayerHide": "",
       "sceneType": "1"
+    },
+    "1201": {
+      "disableItem": "",
+      "id": "1201",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1202": {
+      "disableItem": "",
+      "id": "1202",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1203": {
+      "disableItem": "",
+      "id": "1203",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1204": {
+      "disableItem": "",
+      "id": "1204",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1205": {
+      "disableItem": "",
+      "id": "1205",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1301": {
+      "disableItem": "",
+      "id": "1301",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1302": {
+      "disableItem": "",
+      "id": "1302",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1303": {
+      "disableItem": "",
+      "id": "1303",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1304": {
+      "disableItem": "",
+      "id": "1304",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1305": {
+      "disableItem": "",
+      "id": "1305",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1401": {
+      "disableItem": "",
+      "id": "1401",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1402": {
+      "disableItem": "",
+      "id": "1402",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1403": {
+      "disableItem": "",
+      "id": "1403",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1404": {
+      "disableItem": "",
+      "id": "1404",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1405": {
+      "disableItem": "",
+      "id": "1405",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1501": {
+      "disableItem": "",
+      "id": "1501",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1502": {
+      "disableItem": "",
+      "id": "1502",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1503": {
+      "disableItem": "",
+      "id": "1503",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1504": {
+      "disableItem": "",
+      "id": "1504",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1505": {
+      "disableItem": "",
+      "id": "1505",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1601": {
+      "disableItem": "",
+      "id": "1601",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1602": {
+      "disableItem": "",
+      "id": "1602",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1603": {
+      "disableItem": "",
+      "id": "1603",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1604": {
+      "disableItem": "",
+      "id": "1604",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1605": {
+      "disableItem": "",
+      "id": "1605",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1701": {
+      "disableItem": "",
+      "id": "1701",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1702": {
+      "disableItem": "",
+      "id": "1702",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1703": {
+      "disableItem": "",
+      "id": "1703",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1704": {
+      "disableItem": "",
+      "id": "1704",
+      "isPlayerHide": "",
+      "sceneType": ""
+    },
+    "1705": {
+      "disableItem": "",
+      "id": "1705",
+      "isPlayerHide": "",
+      "sceneType": ""
     }
   }
 }

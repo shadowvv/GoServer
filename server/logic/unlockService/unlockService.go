@@ -21,6 +21,10 @@ type UnlockService struct {
 	activityService   logicCommon.GameActivityServiceInterface
 }
 
+func (u *UnlockService) RecordExpedition(ctx context.Context, playerId int64) error {
+	return DailyCache.RecordExpedition(ctx, playerId)
+}
+
 var _ logicCommon.UnlockServiceInterface = (*UnlockService)(nil)
 
 func NewUnlockService(serverInfoService *gameServerInfoService.GameServerInfoService) *UnlockService {
@@ -173,6 +177,12 @@ func (u *UnlockService) CheckUnlock(unlockId int32, p logicCommon.PlayerInterfac
 		return u.checkUnlockTypeGloryArenaEnrollWinCount(cfg, player)
 	case enum.UNLOCK_TYPE_PLAYER_GLORY_ARENA_FIRST_ENTER:
 		return u.checkUnlockTypeGloryArenaFirstEnter(cfg, player)
+	case enum.UNLOCK_TYPE_PLAYER_PET_LOTTERY_DRAW_COUNT:
+		return u.checkUnlockTypePlayerPetLotteryDrawCount(cfg, player)
+	case enum.UNLOCK_TYPE_PLAYER_COLLECTION_LOTTERY_DRAW_COUNT:
+		return u.checkUnlockTypePlayerCollectionLotteryDrawCount(cfg, player)
+	case enum.UNLOCK_TYPE_PLAYER_EXPEDITION_COUNT:
+		return u.checkUnlockTypeExpeditionCount(cfg, player)
 	default:
 		return false
 	}
@@ -280,7 +290,7 @@ func (u *UnlockService) checkUnlockTypePlayerFinishMainTask(cfg gameConfig.Unloc
 	taskId := unlock.UnlockValue
 	for _, v := range player.TaskModel.TaskEntity[enum.TaskAffiliationMain] {
 		for id, _ := range v {
-			if id >= taskId {
+			if id > taskId {
 				return true
 			}
 		}
@@ -704,6 +714,9 @@ func (u *UnlockService) checkUnlockTypePlayerArchitectureLevel(cfg gameConfig.Un
 	if arType == 0 {
 		return false
 	}
+	if player.ArchitectureModel.Entities[arType] == nil {
+		return false
+	}
 	return player.ArchitectureModel.Entities[arType].Level >= level
 }
 
@@ -714,4 +727,35 @@ func (u *UnlockService) checkUnlockTypePlayerCollectionNum(cfg gameConfig.Unlock
 		return false
 	}
 	return int32(len(player.CollectionModel.CollectionEntity)) >= collectionNum
+}
+
+func (u *UnlockService) checkUnlockTypePlayerPetLotteryDrawCount(cfg gameConfig.UnlockInterface, player *model.PlayerModel) bool {
+	unlock := cfg.(*gameConfig.UnlockIntValueBase)
+	if unlock.UnlockParam == 0 {
+		count, _ := DailyCache.GetDailyPetRecruitCount(context.Background(), player.GetUserId())
+		return count >= unlock.UnlockValue
+	}
+	return player.StaticData.GetPetRecruitCount() >= unlock.UnlockValue
+}
+
+func (u *UnlockService) checkUnlockTypePlayerCollectionLotteryDrawCount(cfg gameConfig.UnlockInterface, player *model.PlayerModel) bool {
+	unlock := cfg.(*gameConfig.UnlockIntValueBase)
+	if unlock.UnlockParam == 0 {
+		count, _ := DailyCache.GetDailyCollectionLotteryCount(context.Background(), player.GetUserId())
+		return count >= unlock.UnlockValue
+	}
+	return player.StaticData.GetCollectionLotteryDrawCount() >= unlock.UnlockValue
+}
+
+func (u *UnlockService) checkUnlockTypeExpeditionCount(cfg gameConfig.UnlockInterface, player *model.PlayerModel) bool {
+	unlock := cfg.(*gameConfig.UnlockIntValueBase)
+	if unlock.UnlockParam == 0 {
+		count, err := DailyCache.GetDailyExpeditionCount(context.Background(), player.GetUserId())
+		if err != nil {
+			return false
+		}
+		return count >= unlock.UnlockValue
+	}
+
+	return player.StaticData.GetExpeditionNum() >= unlock.UnlockValue
 }

@@ -1,0 +1,35 @@
+syntax = "proto3";
+package pb;
+option go_package = "../logic/pb;pb";
+
+import "commonMessage.proto";
+
+message SignInfo{
+  int32 sign_id = 1; // 表格第一列id
+  int32 act_id = 2; // 活动id
+  int32 signed_day = 3;  // 已签到多少天
+  int32 claimed_id = 4; // 已领取到哪天的奖励
+}
+  
+message SignInfoReq {
+  repeated int32 act_ids = 1; // 活动id列表
+}
+
+message SignInfoResp {
+  map<int32,SignInfo> SignMap = 1;
+}
+
+// 点击领取签到奖励
+message SignClaimReq {
+  int32 sign_id = 1; // 同上
+}
+
+// 成功后返回：成功返回正确码
+message SignClaimResp {
+  repeated ItemBasicInfo rewards = 1; // 领取的奖励
+}
+
+// 推送变化签到信息，主要用于过天刷新
+message PushSignInfoChange {
+  map<int32, SignInfo> sign_map = 1;
+}

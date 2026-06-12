@@ -24,6 +24,7 @@ const (
 	FUNCTION_ID_MYSTICREALM                                   = 17   // 奇遇秘境
 	FUNCTION_ID_CITYAGE                                       = 18   // 主城时代
 	FUNCTION_ID_TRIAL                                         = 19   // 七日试炼
+	FUNCTION_ID_BATTLE_SPEED                                  = 20   // 加速符
 	FUNCTION_ID_HERO_LEVEL_UP                                 = 101  // 英雄升级
 	FUNCTION_ID_HERO_FORMATION                                = 102  // 英雄编队
 	FUNCTION_ID_HERO_PACK                                     = 103  // 英雄背包
@@ -79,6 +80,7 @@ var AllFunctionId = map[int32]FunctionIdEnum{
 	int32(FUNCTION_ID_MYSTICREALM):                    FUNCTION_ID_MYSTICREALM,
 	int32(FUNCTION_ID_CITYAGE):                        FUNCTION_ID_CITYAGE,
 	int32(FUNCTION_ID_TRIAL):                          FUNCTION_ID_TRIAL,
+	int32(FUNCTION_ID_BATTLE_SPEED):                   FUNCTION_ID_BATTLE_SPEED,
 	int32(FUNCTION_ID_HERO_LEVEL_UP):                  FUNCTION_ID_HERO_LEVEL_UP,
 	int32(FUNCTION_ID_HERO_FORMATION):                 FUNCTION_ID_HERO_FORMATION,
 	int32(FUNCTION_ID_HERO_PACK):                      FUNCTION_ID_HERO_PACK,
@@ -157,3 +159,11 @@ func GetSystemIdByInstanceId(instanceTyp InstanceTypeEnum) FunctionIdEnum {
 		return FUNCTION_ID_LOCK_SYSTEM
 	}
 }
+
+type FunctionStatusEnum int32
+
+const (
+	FUNCTION_STATUS_LOCK   FunctionStatusEnum = 0 // 锁定
+	FUNCTION_STATUS_SHOW   FunctionStatusEnum = 1 // 可见
+	FUNCTION_STATUS_UNLOCK FunctionStatusEnum = 2 // 解锁
+)

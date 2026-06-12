@@ -3,10 +3,10 @@ package dbService
 import (
 	"context"
 	"errors"
-	"gorm.io/gorm"
 	"time"
 
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/utils"
 )
@@ -14,20 +14,18 @@ import (
 var SLOW_THRESHOLD = 5 * time.Millisecond
 
 type ZapGormLogger struct {
-	zapLogger     *zap.Logger
 	logLevel      logger.LogLevel
 	slowThreshold time.Duration
 }
 
-func NewZapGormLogger(zapLogger *zap.Logger, level logger.LogLevel) *ZapGormLogger {
+func NewZapGormLogger(_ *zap.Logger, level logger.LogLevel) *ZapGormLogger {
 	return &ZapGormLogger{
-		zapLogger:     zapLogger,
 		logLevel:      level,
-		slowThreshold: SLOW_THRESHOLD, // 慢查询阈值
+		slowThreshold: SLOW_THRESHOLD,
 	}
 }
 
-// 实现接口方法
+// LogMode implements gorm logger.Interface.
 func (l *ZapGormLogger) LogMode(level logger.LogLevel) logger.Interface {
 	newLogger := *l
 	newLogger.logLevel = level
@@ -36,19 +34,19 @@ func (l *ZapGormLogger) LogMode(level logger.LogLevel) logger.Interface {
 
 func (l *ZapGormLogger) Info(ctx context.Context, msg string, data ...interface{}) {
 	if l.logLevel >= logger.Info {
-		l.zapLogger.Sugar().Infof(msg, data...)
+		zap.S().Infof(msg, data...)
 	}
 }
 
 func (l *ZapGormLogger) Warn(ctx context.Context, msg string, data ...interface{}) {
 	if l.logLevel >= logger.Warn {
-		l.zapLogger.Sugar().Warnf(msg, data...)
+		zap.S().Warnf(msg, data...)
 	}
 }
 
 func (l *ZapGormLogger) Error(ctx context.Context, msg string, data ...interface{}) {
 	if l.logLevel >= logger.Error {
-		l.zapLogger.Sugar().Errorf(msg, data...)
+		zap.S().Errorf(msg, data...)
 	}
 }
 
@@ -61,8 +59,7 @@ func (l *ZapGormLogger) Trace(ctx context.Context, begin time.Time, fc func() (s
 	sql, rows := fc()
 	switch {
 	case err != nil && errors.Is(err, gorm.ErrRecordNotFound) && l.logLevel >= logger.Info:
-		// 1️⃣ NoRecord → Info
-		l.zapLogger.Info("SQL Record Not Found",
+		zap.L().Info("SQL Record Not Found",
 			zap.String("sql", sql),
 			zap.Int64("rows", rows),
 			zap.Duration("elapsed", elapsed),
@@ -70,8 +67,7 @@ func (l *ZapGormLogger) Trace(ctx context.Context, begin time.Time, fc func() (s
 		)
 
 	case err != nil && l.logLevel >= logger.Error:
-		// 2️⃣ 其他错误 → Error
-		l.zapLogger.Error("SQL Error",
+		zap.L().Error("SQL Error",
 			zap.Error(err),
 			zap.String("sql", sql),
 			zap.Int64("rows", rows),
@@ -80,8 +76,7 @@ func (l *ZapGormLogger) Trace(ctx context.Context, begin time.Time, fc func() (s
 		)
 
 	case elapsed > l.slowThreshold && l.logLevel >= logger.Warn:
-		// 3️⃣ 慢 SQL → Warn
-		l.zapLogger.Warn("Slow SQL",
+		zap.L().Warn("Slow SQL",
 			zap.String("sql", sql),
 			zap.Int64("rows", rows),
 			zap.Duration("elapsed", elapsed),
@@ -89,13 +84,11 @@ func (l *ZapGormLogger) Trace(ctx context.Context, begin time.Time, fc func() (s
 		)
 
 	case l.logLevel >= logger.Info:
-		// 4️⃣ 普通 SQL → Info
-		l.zapLogger.Info("SQL",
+		zap.L().Info("SQL",
 			zap.String("sql", sql),
 			zap.Int64("rows", rows),
 			zap.Duration("elapsed", elapsed),
 			zap.String("caller", utils.FileWithLineNum()),
 		)
 	}
-
 }

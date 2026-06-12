@@ -123,19 +123,19 @@ func (v *VipCardModel) markChanged(itemId int32, field string, value interface{}
 	v.Changed[itemId][field] = value
 }
 
-// AddVipCardHours 添加/续期特权卡（hours 单位：小时）
+// AddVipCardMinute 添加/续期特权卡（minute 单位：分钟）
 // 规则：
-// - hours >= VIP_CARD_PERMANENT_HOURS：置为永久（ExpireTime=-1）
+// - minute/60 >= VIP_CARD_PERMANENT_HOURS：置为永久（ExpireTime=-1）
 // - 已永久：不变
 // - 已非永久：在 max(now, oldExpire) 的基础上续期 hours
-func (v *VipCardModel) AddVipCardHours(itemId int32, hours int64) *VipCardEntity {
+func (v *VipCardModel) AddVipCardMinute(itemId int32, minute int64) *VipCardEntity {
 	now := time.Now().UnixMilli()
-	if hours <= 0 {
+	if minute <= 0 {
 		return v.VipCards[itemId]
 	}
 
 	// 永久阈值
-	if hours >= enum.VIP_CARD_PERMANENT_HOURS {
+	if minute/60 >= enum.VIP_CARD_PERMANENT_HOURS {
 		entity := v.VipCards[itemId]
 		if entity == nil {
 			// 新建
@@ -169,7 +169,7 @@ func (v *VipCardModel) AddVipCardHours(itemId int32, hours int64) *VipCardEntity
 	if entity.ExpireTime > base {
 		base = entity.ExpireTime
 	}
-	expireTime := base + hours*3600*1000
+	expireTime := base + minute*60*1000
 	entity.ExpireTime = expireTime
 
 	// 更新已存在的实体，只标记变更的字段

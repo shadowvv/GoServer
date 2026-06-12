@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "../logic/pb;pb";
+
+import "commonMessage.proto";
+
+message GetHonorArenaInfoReq {
+}
+
+message GetHonorArenaInfoResp {
+    int64 startTime = 1; //开赛时间
+    int32 arenaRank = 2; //当前竞技场排名
+    int32 winCount = 3; // 胜利次数
+    int32 hpCount = 4; // 血量
+    int32 isCompete = 5; //是否报名
+    int32 maxWinCount = 6; // 最大胜利次数
+    int32 gotBoxCount = 7; // 已获得宝箱个数
+    int32 round = 8; //第几轮
+    int64 endTime = 9;//截止时间
+    int32 season = 10;//赛季类型 0:季前赛 1:第一赛季 2:第二赛季 3:季后赛
+    repeated HonorArenaHeroInfo hero = 11;//已经拿到 别人的英雄
+    repeated HonorArenaHeroInfo heroSelect = 12;//等待选择 别人的英雄
+    int32 isFree = 13;//每轮一次报名免费 是否使用
+}
+
+message HonorArenaStartReq {
+}
+
+message HonorArenaStartResp {
+}
+
+message HonorArenaGetBoxRewardReq {
+}
+
+message HonorArenaGetBoxRewardResp {
+    int32 gotBoxCount = 1; // 已获得宝箱个数
+}
+
+message HonorPlayerBasicInfo {
+  PlayerBasicInfo opponent = 1;
+  int64 power = 2;
+  repeated HeroShowInfo heroes = 3;
+}
+
+message HonorArenaChallengeListReq {
+    int32 isRefresh = 1;
+}
+
+message HonorArenaChallengeListResp {
+    repeated HonorPlayerBasicInfo players = 1;
+}
+
+message StartHonorArenaBattleReq {
+  int64 opponentId = 1;
+}
+
+message StartHonorArenaBattleResp {
+  SceneBasicInfo data = 1;
+}
+
+message HonorArenaSelectHeroReq {
+  int64 heroId = 1;
+}
+
+message HonorArenaSelectHeroResp {
+  HonorArenaHeroInfo hero = 1;
+}
+
+//英雄信息
+message HonorArenaHeroInfo {
+    int64 heroId = 1;//唯一id
+    int32 cid = 2;//配置id
+    int32 level = 3;
+    int32 star = 4;
+    int32 job = 5;
+    int64 fight = 6;  //战力
+}
+
+message PushHonorArenaWinMessage{
+  int32 WinCount = 1; // 本轮胜利次数
+  repeated HonorArenaHeroInfo hero = 2;//别人的英雄
+}

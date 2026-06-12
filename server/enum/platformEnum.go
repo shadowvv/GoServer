@@ -49,6 +49,7 @@ type BroadcastType int32
 const (
 	BROADCAST_TYPE_ALL       BroadcastType = iota + 1 // 广播给所有玩家
 	BROADCAST_TYPE_SERVER_ID                          // 广播给指定服务器
+	BROADCAST_TYPE_ALLIANCE                           // 广播给联盟
 )
 
 // 节点状态枚举
@@ -86,7 +87,7 @@ const (
 	RECHARGE_ORDER_STATUS_CREATED   RechargeOrderStatus = iota + 1 // 订单创建
 	RECHARGE_ORDER_STATUS_PAYED                                    // 支付成功
 	RECHARGE_ORDER_STATUS_DELIVERED                                // 发货成功
-	RECHARGE_ORDER_STATUS_FAILED                                   // 支付失败
+	RECHARGE_ORDER_STATUS_FAILED                                   // 发货失败
 )
 
 type RechargeType int32

@@ -8,6 +8,7 @@ import (
 	"github.com/drop/GoServer/server/logic/model"
 	"github.com/drop/GoServer/server/logic/operationLogService"
 	"github.com/drop/GoServer/server/logic/pb"
+	"github.com/drop/GoServer/server/logic/platform/dispatcherService"
 	"github.com/drop/GoServer/server/logic/platform/gamePlatform"
 	"github.com/drop/GoServer/server/logic/platform/loginMutexService"
 	"github.com/drop/GoServer/server/logic/platform/platformLogger"
@@ -355,6 +356,7 @@ func KillMonsterHandler(message proto.Message, player *model.PlayerModel) {
 	}
 	// 常规副本和奇遇副本的怪物击杀掉落物品延迟到副本结算时再掉落
 	currentRaidInfo := player.PlayerInstanceModel.CurrentRaidInfo
+	currentStageId := currentRaidInfo.CurrentStageId
 	delayDropInstance := raid.DelayDropUntilSettle(int32(currentRaidInfo.InstanceID))
 	_, dropItems, errCode := raid.KillMonster(player, currentRaidInfo, req.MonsterId)
 	if errCode != pb.ERROR_CODE_SUCCESS {
@@ -377,7 +379,7 @@ func KillMonsterHandler(message proto.Message, player *model.PlayerModel) {
 			return
 		}
 		messageSender.SendMessage(player, pb.MESSAGE_ID_PUSH_STAGE_BATTLE_WIN, winResp)
-		eventBusService.SubmitPassInstanceEvent(player.GetUserId(), player.GetUserServerId(), enum.InstanceId(winResp.InstanceId), winResp.StageId)
+		eventBusService.SubmitPassInstanceEvent(player.GetUserId(), player.GetUserServerId(), enum.InstanceId(winResp.InstanceId), currentStageId)
 		return
 	}
 
@@ -468,7 +470,15 @@ func playerLogoutHandle(task serviceInterface.InnerTaskInterface) (any, error) {
 		return nil, nil
 	}
 	playerModel := p.(*model.PlayerModel)
-	gamePlatform.RemovePlayerFromGame(playerModel)
+	innerTask, ok := task.(*dispatcherService.InnerTask)
+	if !ok {
+		return nil, nil
+	}
+	isForce, ok := innerTask.ReqParameter.(bool)
+	if !ok {
+		return nil, nil
+	}
+	gamePlatform.RemovePlayerFromGame(playerModel, isForce)
 	return nil, nil
 }
 

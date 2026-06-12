@@ -35,50 +35,52 @@ type PlayerModel struct {
 	PlayerModels   []logicCommon.PlayerModelInterface
 	HeroAttrModels []logicCommon.HeroAttrInterface
 
-	User                  *UserModel
-	StaticData            *StaticDataModel
-	StoryTriggerModel     *StoryTriggerModel
-	InventoryModel        *InventoryModel
-	PlayerInstanceModel   *PlayerInstanceModel
-	HeroDetailsModel      *HeroDetailsCollectionModel   // 英雄详情集合
-	HeroAlbumModel        *HeroAlbumCollectionModel     // 英雄图鉴集合
-	AlbumRewardModel      *AlbumRewardModel             // 图鉴奖励（单记录）
-	HeroFormationModel    *HeroFormationCollectionModel // 英雄阵型集合
-	TaskModel             *TaskModel                    // 任务
-	EquipmentModel        *EquipmentCollectionModel     // 装备集合
-	LotteryModel          *LotteryModel                 // 抽卡模型
-	LoopBoxModel          *LoopBoxModel                 // 循环盒
-	AdChestModel          *AdChestModel                 // 广告宝箱
-	PlayerShopModel       *PlayerShopModel              // 商店
-	ExpeditionModel       *ExpeditionModel
-	AccessoryModel        *AccessoryModel
-	AccessoryLuckyModel   *AccessoryLuckyModel
-	PetModel              *PetModel         // 宠物集合（挂在英雄下面）
-	PetRecruitModel       *PetRecruitModel  // 宠物招募（3选1/刷新/倒计时）
-	PetAffinityModel      *PetAffinityModel // 宠物缘分（激活/升级）
-	BountyModel           *BountyModel
-	TaskActiveRewardModel *TaskActiveRewardModel
-	PlayerActivityModel   *PlayerActivityModel
-	PlayerSignModel       *PlayerSignModel // 签到模型
-	IdleModel             *IdleModel       // 挂机奖励模型
-	PlayerAdventureModel  *PlayerAdventureModel
-	VipCardModel          *VipCardModel         // 特权卡模型
-	PassModel             *PassModel            // 通行证模型
-	PassTaskModel         *PassCardTaskModel    // 通行证任务
-	PrivilegeRewardModel  *PrivilegeRewardModel // 特权奖励模型
-	ArchitectureModel     *ArchitectureModel    // 建筑信息
-	StoneModel            *StoneModel           // 传承石像信息
-	PlayerFunctionModel   *PlayerFunctionModel  // 功能状态
-	PlayerArenaModel      *PlayerArenaModel     // 竞技场
-	PlayerGloryArenaModel *PlayerGloryArenaModel
-	CollectionModel       *CollectionModel
-	PlayerTokenShopModel  *PlayerTokenShopModel
-	LumberModel           *LumberModel
-	FurnitureModel        *FurnitureModel
-	TrialModel            *TrialModel
-	CityAgeModel          *CityAgeModel
-	TurnTableModel        *TurnTableModel
-	AppearanceModel       *AppearanceModel
+	User                       *UserModel
+	StaticData                 *StaticDataModel
+	StoryTriggerModel          *StoryTriggerModel
+	InventoryModel             *InventoryModel
+	PlayerInstanceModel        *PlayerInstanceModel
+	HeroDetailsModel           *HeroDetailsCollectionModel   // 英雄详情集合
+	HeroAlbumModel             *HeroAlbumCollectionModel     // 英雄图鉴集合
+	AlbumRewardModel           *AlbumRewardModel             // 图鉴奖励（单记录）
+	HeroFormationModel         *HeroFormationCollectionModel // 英雄阵型集合
+	TaskModel                  *TaskModel                    // 任务
+	EquipmentModel             *EquipmentCollectionModel     // 装备集合
+	LotteryModel               *LotteryModel                 // 抽卡模型
+	LoopBoxModel               *LoopBoxModel                 // 循环盒
+	AdChestModel               *AdChestModel                 // 广告宝箱
+	PlayerShopModel            *PlayerShopModel              // 商店
+	ExpeditionModel            *ExpeditionModel
+	AccessoryModel             *AccessoryModel
+	AccessoryLuckyModel        *AccessoryLuckyModel
+	PetModel                   *PetModel         // 宠物集合（挂在英雄下面）
+	PetRecruitModel            *PetRecruitModel  // 宠物招募（3选1/刷新/倒计时）
+	PetAffinityModel           *PetAffinityModel // 宠物缘分（激活/升级）
+	BountyModel                *BountyModel
+	TaskActiveRewardModel      *TaskActiveRewardModel
+	PlayerActivityModel        *PlayerActivityModel
+	PlayerSignModel            *PlayerSignModel // 签到模型
+	IdleModel                  *IdleModel       // 挂机奖励模型
+	PlayerAdventureModel       *PlayerAdventureModel
+	VipCardModel               *VipCardModel         // 特权卡模型
+	PassModel                  *PassModel            // 通行证模型
+	PassTaskModel              *PassCardTaskModel    // 通行证任务
+	PrivilegeRewardModel       *PrivilegeRewardModel // 特权奖励模型
+	ArchitectureModel          *ArchitectureModel    // 建筑信息
+	StoneModel                 *StoneModel           // 传承石像信息
+	PlayerFunctionModel        *PlayerFunctionModel  // 功能状态
+	PlayerArenaModel           *PlayerArenaModel     // 竞技场
+	PlayerGloryArenaModel      *PlayerGloryArenaModel
+	CollectionModel            *CollectionModel
+	PlayerTokenShopModel       *PlayerTokenShopModel
+	LumberModel                *LumberModel
+	FurnitureModel             *FurnitureModel
+	TrialModel                 *TrialModel
+	CityAgeModel               *CityAgeModel
+	TurnTableModel             *TurnTableModel
+	AppearanceModel            *AppearanceModel
+	SignInModel                *SignInModel
+	AllianceDailyActivityModel *AllianceDailyActivityModel
 
 	SceneId           int32
 	NodeId            int32
@@ -187,7 +189,12 @@ func (p *PlayerModel) CheckAndPushHeroChange() {
 	if len(changedOwnIDs) > 0 {
 		infos := make([]*pb.HeroBagInfo, 0)
 		for ownID := range changedOwnIDs {
-			p.HeroDetailsModel.GetHero(ownID).isDirty = true
+			if heroDetail := p.HeroDetailsModel.GetHero(ownID); heroDetail != nil {
+				heroDetail.isDirty = true
+			} else {
+				logger.ErrorBySprintf("heroDetail is nil, ownID: %d", ownID)
+				continue
+			}
 			if info := p.HeroDetailsModel.GetHeroInfoByOwnID(p, ownID); info != nil {
 				infos = append(infos, info)
 			}
@@ -389,8 +396,8 @@ func (p *PlayerModel) updatePowerRank() {
 		return
 	}
 	info := &rpcPb.NotifyUpdateRankInfo{
-		Id:    p.GetUserId(),
-		Score: p.PlayerCacheInfo.BattleInfo.FormationInfo[int32(pb.HeroFormationType_HERO_FORMATION_TYPE_MAIN)].BattlePower,
+		PlayerId: p.GetUserId(),
+		Score:    p.PlayerCacheInfo.BattleInfo.FormationInfo[int32(pb.HeroFormationType_HERO_FORMATION_TYPE_MAIN)].BattlePower,
 	}
 	commonRankConfigs := gameConfig.GetAllRankCfg()
 	for _, rankCfgMap := range commonRankConfigs {

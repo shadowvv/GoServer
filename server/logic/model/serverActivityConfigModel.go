@@ -1,9 +1,10 @@
 package model
 
 import (
-	"github.com/drop/GoServer/server/logic/logicCommon"
 	"strings"
 	"sync/atomic"
+
+	"github.com/drop/GoServer/server/logic/logicCommon"
 
 	"github.com/drop/GoServer/server/logic/gameConfig"
 )
@@ -36,7 +37,7 @@ type ServerActivityConfigEntity struct {
 	MonthOpenDays   []int32         `gorm:"-"`
 	DurationTimes   []int32         `gorm:"-"`
 	IfBlockServers  []int32         `gorm:"-"`
-	LoopActivity    bool            `gorm:"-"`
+	HasPreActivity  bool            `gorm:"-"`
 }
 
 var _ logicCommon.GameActivityConfigInterface = (*ServerActivityConfigEntity)(nil)
@@ -120,7 +121,7 @@ func (s *ServerActivityConfigEntity) buildData() error {
 	s.MonthOpenDays = gameConfig.ParseIntArray(s.MonthOpen)
 	s.DurationTimes = gameConfig.ParseIntArray(s.Duration)
 	s.IfBlockServers = gameConfig.ParseIntArray(s.IfBlockServer)
-	s.LoopActivity = false
+	s.HasPreActivity = false
 	return nil
 }
 
@@ -151,8 +152,8 @@ func NewServerActivityConfigModel(entity []*ServerActivityConfigEntity) *ServerA
 	for _, e := range infoMap {
 		if e.NextId != 0 {
 			info := infoMap[e.NextId]
-			if info != nil && info.IfFirst == 1 {
-				info.LoopActivity = true
+			if info != nil && info.IfFirst != 1 {
+				info.HasPreActivity = true
 			}
 		}
 	}
@@ -196,8 +197,8 @@ func (m *ServerActivityConfigModel) ReloadServerActivityConfig(entity []*ServerA
 	for _, e := range infoMap {
 		if e.NextId != 0 {
 			info := infoMap[e.NextId]
-			if info != nil && info.IfFirst == 1 {
-				info.LoopActivity = true
+			if info != nil && info.IfFirst != 1 {
+				info.HasPreActivity = true
 			}
 		}
 	}

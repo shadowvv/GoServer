@@ -108,6 +108,38 @@ func (a *ArchitectureModel) Heartbeat(lastTickTime int64, currentTime int64, pas
 			}
 		}
 	}
+
+	// 自动解锁建筑
+	allSystemUnlockCfg := gameConfig.GetAllSystemUnlockCfg()
+	if allSystemUnlockCfg == nil {
+		return
+	}
+	for key, v := range allSystemUnlockCfg {
+		if v.ParentFunction == int32(enum.FUNCTION_ID_CAPITAL) {
+			architectureId := enum.GetArchitectureIdFormFunctionId(key)
+			if architectureId == 0 {
+				continue
+			}
+			if a.Entities[architectureId] != nil {
+				continue
+			}
+			flag := unlockService.CheckSystemUnlock(key, a.Player)
+			if flag {
+				if err := a.AddArchitectureEntity(architectureId, 0); err != nil {
+					logger.ErrorBySprintf("add architecture error")
+				}
+				if senderMsg {
+					messageSender.SendMessage(a.Player, pb.MESSAGE_ID_PUSH_ARCHITECTURE_INFO, &pb.PushArchitectureInfo{
+						ArInfo: &pb.ArchitectureInfo{
+							Type:   architectureId,
+							Level:  0,
+							Status: 0,
+						},
+					})
+				}
+			}
+		}
+	}
 }
 
 func LoadArchitecture(userId int64, player *PlayerModel) (*ArchitectureModel, error) {
@@ -218,29 +250,6 @@ func (a *ArchitectureModel) OnUpgradeComplete(archType int32, oldLevel int32, se
 					Level: a.GetMainLevel(),
 				},
 			})
-		}
-
-		arCfg := gameConfig.GetCityCenterCfg(oldLevel + 1)
-		if arCfg != nil {
-			for _, effectType := range arCfg.EffectType {
-				if effectType == cityCenterEffectTypeUnlockArchitecture {
-					for _, v := range arCfg.EffectPara {
-						err := a.AddArchitectureEntity(v, 0)
-						if err != nil {
-							logger.ErrorBySprintf("add architecture error")
-						}
-						if senderMsg {
-							messageSender.SendMessage(a.Player, pb.MESSAGE_ID_PUSH_ARCHITECTURE_INFO, &pb.PushArchitectureInfo{
-								ArInfo: &pb.ArchitectureInfo{
-									Type:   v,
-									Level:  0,
-									Status: 0,
-								},
-							})
-						}
-					}
-				}
-			}
 		}
 
 		// 推送英雄战力变化

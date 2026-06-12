@@ -3,6 +3,7 @@ package payService
 import (
 	"context"
 	"errors"
+
 	"github.com/drop/GoServer/server/service/logger"
 	"google.golang.org/api/androidpublisher/v3"
 	"google.golang.org/api/option"
@@ -23,7 +24,7 @@ func NewGooglePay(credentialFile, packageName string) (*GooglePay, error) {
 		return nil, err
 	}
 	if svc == nil {
-		logger.ErrorBySprintf("[payService] NewGooglePay error")
+		logger.ErrorBySprintf("[recharge] NewGooglePay error")
 	}
 	client := &GooglePay{
 		client:         svc,

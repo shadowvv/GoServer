@@ -386,6 +386,13 @@ func (s *TurnTableService) ClaimTaskReward(player *model.PlayerModel, actTaskId 
 	}
 	player.TaskModel.UpdateTaskStatus(actTaskId, coreCfg.TaskType, enum.TaskAffiliationAct, enum.TaskStatusFinishAndReward)
 	player.TaskModel.UpdateUpdateTime(actTaskId, coreCfg.TaskType, enum.TaskAffiliationAct, tool.UnixNowMilli())
+	player.TaskModel.DeteleTaskEntityFormMemory(entity)
+	for i := len(player.TaskModel.NeedCheckTaskList) - 1; i >= 0; i-- {
+		if player.TaskModel.NeedCheckTaskList[i] != entity {
+			continue
+		}
+		player.TaskModel.NeedCheckTaskList = append(player.TaskModel.NeedCheckTaskList[:i], player.TaskModel.NeedCheckTaskList[i+1:]...)
+	}
 	return &pb.PushTaskUpdate{
 		Attribution: enum.TaskAffiliationAct,
 		TaskId:      actTaskId,
@@ -419,12 +426,16 @@ func (s *TurnTableService) prepare(player *model.PlayerModel, modId int32) (*mod
 	if needReset {
 		player.TurnTableModel.Reset(modId)
 	}
-	pushes, err := player.TurnTableModel.SyncActTasks(modId, created || needReset)
-	if err != nil {
-		return nil, nil, err
-	}
-	for _, push := range pushes {
-		s.messageSender.SendMessage(player, pb.MESSAGE_ID_PUSH_TASK_UPDATE, push)
+	if tool.UnixNowMilli() >= act.GetSettleTime() {
+		player.TurnTableModel.FreezeActTasks(modId)
+	} else {
+		pushes, err := player.TurnTableModel.SyncActTasks(modId, created || needReset)
+		if err != nil {
+			return nil, nil, err
+		}
+		for _, push := range pushes {
+			s.messageSender.SendMessage(player, pb.MESSAGE_ID_PUSH_TASK_UPDATE, push)
+		}
 	}
 	return entity, mainCfg, nil
 }

@@ -1,6 +1,6 @@
 # 排行榜实现说明（当前代码）
 
-更新时间：2026-05-19
+更新时间：2026-06-06
 
 本文只描述当前实现行为（以 `dhs_server` 现有代码为准）。
 
@@ -20,11 +20,11 @@
 ### 1.2 Game 侧入口
 
 - 客户端请求入口：`server/logic/gameController/rankBoardController.go`
-  - `RANK_LIST_REQ`（查榜）
+  - `RANK_LIST_REQ`（查榜；活动榜支持一次传入多个 `actTargetId`）
   - `RANK_LIKE_REQ`（点赞）
   - `RANK_RECEIVE_BOX_REWARD_REQ`（领取满榜宝箱）
 - Rank 节点 RPC 入口（同文件）：
-  - `GET_RANK_INFO_REQ`
+  - `GET_RANK_INFO_REQ`（支持一次请求携带多个 `rankId`）
   - `UPDATE_PLAYER_RANK_INFO`
   - `THUMB_UP_RANK_INFO`
   - `CHECK_RANK_FULL_REQ`
@@ -96,21 +96,48 @@
 
 ### 4.1 查榜
 
-1. Game 服根据请求计算 `rankId`，RPC 到 Rank 节点。
-2. Rank 节点返回 `rpcPb.GetRankInfoResp`（`rankInfos` + `myRank`）。
-3. Game 服补全展示信息后回包 `pb.RankListResp`。
+协议形态：
+- `pb.RankListReq.actTargetId` 当前为 `repeated int32`。
+- `pb.RankListResp.rankInfo` 当前为 `repeated RankInfo`。
+- `rpcPb.ForwardRankBoardMessage.rankId` 当前为 `repeated string`。
+- `rpcPb.GetRankInfoResp` 保留单页字段（`rankInfos` / `myRank` / `rankId` 等），并新增 `rankPageInfos` 用于批量查榜返回多页。
+- `rpcPb.NotifyUpdateRankInfo` 当前字段语义：
+  - `playerId`：玩家 ID，用于个人榜更新，或联盟榜中由玩家映射到联盟。
+  - `allianceId`：联盟 ID，仅联盟榜直接更新时传入。
+  - `score`：分数。
+  - `incrementalUpdate`：是否增量更新。
+
+链路：
+1. Game 服校验请求参数。
+   - 常驻榜：使用 `commonRankId` 生成 1 个 `rankId`。
+   - 活动榜：遍历 `actTargetId` 生成多个 `rankId`，并按生成顺序去重。
+2. Game 服通过 `SendMessageToRankBoardBatch` 一次 RPC 到 Rank 节点。
+3. RPC 转发消息 `ForwardRankBoardMessage.rankId` 携带多个榜单唯一 ID；路由 hash 当前使用第一个 `rankId`。
+4. Rank 节点在 `GetRankListFromRankBoardNode` 中按 `RankBoardSession.RankBoardIds` 顺序逐个查询榜。
+5. Rank 节点返回 `rpcPb.GetRankInfoResp.rankPageInfos`。
+   - 只有 1 页时，同时回填旧单页字段，兼容旧处理路径。
+6. Game 服逐页补全玩家/联盟展示信息后，回包 `pb.RankListResp.rankInfo`。
 
 联盟榜特殊点：
 - `ALLIANCE_ARENA`、`ALLIANCE_GLORY_ARENA_ROUND_WIN_COUNT` 查询 `MyRank` 时，使用玩家当前联盟ID查询。
 
 ### 4.2 更新分数（Rank 节点）
 
-入口：`OnUpdatePlayerRankInfoOnRankBoardNode`
+入口：`OnUpdateRankInfoOnRankBoardNode`
 
 - 更新前校验：配置存在、阈值满足、PNMax 限制。
+  - `RankThreshold > 0` 时才做阈值拦截；`RankThreshold = 0` 或空配置不拦截。
 - 联盟榜映射：
-  - `ALLIANCE_ARENA`：玩家分映射到联盟分（首次入盟会补一次绝对分同步）
-  - `ALLIANCE_GLORY_ARENA_ROUND_WIN_COUNT`：按联盟ID累计
+  - 普通个人榜使用 `NotifyUpdateRankInfo.playerId` 作为榜实体 ID。
+  - `ALLIANCE_ARENA`：
+    - 若 `allianceId > 0`，直接按联盟 ID 更新，并校验联盟基础信息存在、联盟所属服与 `rankId` 中解析出的服务器一致。
+    - 若 `allianceId == 0`，必须传 `playerId`，Rank 节点用玩家 Redis 中的 `PlayerAllianceInfo` 映射到联盟 ID。
+    - 玩家路径下若玩家无有效联盟信息，直接拒绝更新；不再回退使用玩家 ID 写入联盟榜。
+    - 玩家首次以当前联盟参与联盟竞技场榜时，按玩家 Redis 中的 `ArenaScore` 做一次增量补分，并标记 `ArenaJoined=true`。
+  - `ALLIANCE_GLORY_ARENA_ROUND_WIN_COUNT`：
+    - 若 `allianceId > 0`，直接按联盟 ID 更新。
+    - 若 `allianceId == 0`，必须传 `playerId`，Rank 节点用玩家 Redis 中的 `PlayerAllianceInfo` 映射到联盟 ID。
+    - 玩家路径下若玩家无有效联盟信息，直接拒绝更新；不再回退使用玩家 ID 写入联盟榜。
 - 更新后调用：
   - `gloryArenaService.TryAppendByBattlePowerRankUpdate`
   - `gloryArenaService.TryAppendByArenaRankUpdate`
@@ -178,7 +205,12 @@
   - 表不存在：自动 `CreateRankTable` 后创建空榜
 
 注意（当前代码行为）：
-- `ARENA/ALLIANCE_ARENA` 与荣耀擂台相关榜的“是否加载”会先做版本解析；解析失败会回退为“加载”。
+- `ARENA/ALLIANCE_ARENA` 使用 `ParseArenaRankVersionDateInt` 解析 `s{sid}:t{yyyyMMdd}` 周版本。
+- 荣耀擂台相关榜使用 `ParseGloryArenaRankVersionDateInt` 解析轮次/赛季版本。
+- 版本解析失败会回退为“加载”。
+- 已过结算窗口的 `ARENA/ALLIANCE_ARENA`、荣耀擂台相关历史榜，当前代码会计算该榜理论应结算日期；只要任一应结算任务已是 `reward_done`，启动时仍会加载该历史榜。
+  - 这会导致部分历史榜在 Rank 重启后继续进入结算检测，但已完成任务会被幂等跳过。
+  - 如果理论应结算任务都没有 `reward_done`，当前启动加载判断会返回不加载。
 
 ---
 
@@ -190,7 +222,8 @@
 
 - 心跳每 30 秒。
 - 结算扫描至少每 1 分钟一次。
-- 当天结算任务仅在 `00:15` 之后执行。
+- 结算扫描在 `00:15` 之后执行；`DAY/WEEK` 只生成已完成日期的任务，不生成当天任务。
+- `00:00~00:14:59` 内如果算出的结算日期等于当天，会被 `before_daily_settle_window` 跳过。
 
 ### 7.2 扫描范围
 
@@ -206,9 +239,13 @@
 
 函数：`logicCommon.GetRankSettleTaskSettleDates`
 
-- `DAY`：起始日到当前日逐日。
-- `WEEK`：起始日到当前日逐周日。
+- `DAY`：起始日到“当前日前一日”逐日。
+- `WEEK`：起始日到“当前日前一日”逐周日。
 - 同时配置 `DAY + WEEK`：周日只算周结算（日结算跳过周日）。
+- `ARENA / ALLIANCE_ARENA`：从 `s{sid}:t{yyyyMMdd}` 解析周开始/结束时间，结算日期最多截断到该周周日，不会跨周继续生成旧周榜日结任务。
+- `ARENA / ALLIANCE_ARENA` 的起始日还会和服务器开服日期取较大值；当前实现允许从开服当天开始结算，不再强制跳过开服当天。
+- 例：当前时间为 `2026-06-06 00:15` 后，日结算最多只会生成到 `20260605`；不会生成 `20260606`。
+- 历史说明：`aefd06c8 排行榜问题解决` 已把旧逻辑的“按当天结算”改为“按前一天结算”。旧版本曾可能在 `2026-06-05 00:15` 提前创建 `version=20260605` 的任务；修复后这些老任务仍会因唯一键和 `INSERT IGNORE` 保留并被跳过。
 - `GLORY_ARENA_ROUND_OVER`：
   - 从 version 的 `rsYYYYMMDD` 取 round start，结算日 = `start + 3天`
 - `GLORY_ARENA_SEASON_OVER`：
@@ -225,15 +262,35 @@
   1. `INSERT IGNORE rank_settle_task`
   2. 非 `snapshot_done` 任务：重建快照（先删旧快照）
      - 优先使用内存榜构建快照批量写入 `rank_snapshot_info`
-     - 若内存中不存在该榜，回退 `INSERT...SELECT FROM rank_table`
+     - 若内存中不存在该榜，当前直接返回 `rank snapshot not in memory` 并将任务置为 `failed`
+     - 若内存榜存在但为空，会写入 0 条快照；后续无 pending 快照时任务会置为 `reward_done`
   3. 按快照逐条发奖
   4. `rank_reward_record` 用 `INSERT IGNORE` + `RowsAffected` 做幂等
   5. 发奖成功后更新 `rank_reward_record` 和 `rank_snapshot_info` 状态
   6. 无 pending 快照时任务置 `reward_done`
 
+幂等与老数据行为：
+- `rank_settle_task` 唯一键为 `rank_id + settle_type + version`。
+- 已存在任务时，`INSERT IGNORE` 不会更新 `created_at/updated_at/status`。
+- 如果读取到任务 `status=3 reward_done`，当前扫描只打印 `reason:task_reward_done` 并跳过，不会重建快照或重复发奖。
+- `created_at/updated_at` 是毫秒时间戳 bigint，由 Rank 进程传入的 `currentTime` 写入，不是数据库自动 `DATETIME`。
+
 发奖通道：
 - 个人榜：`SendRankBoardRewardMail`
 - 联盟榜：`SendRankBoardAllianceRewardMail`
+
+### 7.5 结算日志
+
+当前新增 `[rankSettle]` 关键日志，主要用于确认榜单是否进入检测、为什么不结算、以及任务是否执行：
+
+- `check rankId:... pointType:... settleTypes:... currentDate:... allowToday:...`：榜单进入结算检测。
+- `rankId:... settleType:... settleDates:[...]`：本轮计算出的应结算日期。
+- `reason:empty_settle_dates`：该结算类型当前没有到期日期，例如周结算未到周日结束后。
+- `reason:before_daily_settle_window`：当前仍在 `00:15` 前保护窗口。
+- `process rankId:... taskVersion:...`：准备处理某个结算任务。
+- `reason:task_reward_done taskId:...`：任务已经发奖完成，本轮幂等跳过。
+- `rebuild snapshot ... oldStatus:...`：开始重建结算快照。
+- `send rewards ... taskId:...`：开始按快照发奖。
 
 ---
 
@@ -283,6 +340,9 @@
 10. `server/logic/platform/rankBoardPlatform/rankBoardPlatform.go`
 11. `server/logic/gloryArenaService/gatewayGloryArenaService.go`
 12. `server/logic/gloryArenaService/rankBoardGloryArenaPoolService.go`
+13. `rpcProto/rank.proto`
+14. `server/logic/rpcController/gameRpc.go`
+15. `server/logic/platform/logicSessionManager/rankBoardSession.go`
 
 ---
 
@@ -318,6 +378,10 @@
 
 5. 结算只遍历内存榜。  
    - 影响：若某些应结算榜长期未加载进内存，会出现结算延后或遗漏风险（取决于加载策略是否覆盖）。
+
+6. 联盟竞技场榜历史脏数据需要单独清理。  
+   - 背景：旧实现中 `NotifyUpdateRankInfo.id` 同时承载玩家 ID/联盟 ID，联盟榜映射失败时可能把玩家 ID 当作联盟 ID 写入 `ALLIANCE_ARENA` 榜。
+   - 当前修复只阻止后续污染；已存在于 rank 表或内存榜中的玩家 ID 记录，需要按具体 `rankId` 清理或重建。
 
 ### 10.3 优化建议（按优先级）
 

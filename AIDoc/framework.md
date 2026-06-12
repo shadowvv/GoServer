@@ -22,7 +22,7 @@
 |---|---|
 | `main/` | 各节点启动入口（`gameMain.go`、`gatewayMain.go`、`httpMain.go` 等） |
 | `logic/` | 业务核心层（控制器、模型、平台编排、场景调度、RPC处理、配置加载） |
-| `service/` | 基础设施封装（DB、Redis、etcd、gRPC、WebSocket、HTTP、日志） |
+| `service/` | 基础设施封装（DB、Redis、etcd、gRPC、WebSocket、HTTP、日志、敏感词过滤） |
 | `enum/` | 常量、枚举、Redis Key、SQL模板、消息分类 |
 | `tool/` | 通用工具与配置生成工具（含 `xlsx2json`） |
 | `robot/` | 机器人框架（登录、发包、回包、运行模式、统计） |
@@ -76,6 +76,7 @@ graph LR
 - `EventBus`（跨玩法事件）
 - `UnlockService`、`ActivityService`、`PassService`
 - 主要玩法与模型装配（`gameController.InitGameController` + `model.InitModel`）
+- `wordFilter.InitWordFilterService("config/dirtyWord.txt")`（敏感词服务，供聊天、玩家名、联盟名/公告等校验使用）
 
 ## 5. 消息处理模型
 
@@ -171,6 +172,29 @@ graph LR
 - 各配置 loader 在 `init` 注册。
 - 启动 `LoadAllConfig()`，信号 `SIGHUP` 支持热重载 `ReloadAllConfig()`。
 - `xlsx2json` 工具链用于 Excel -> JSON/Go Loader 生成。
+
+### 8.4 敏感词服务（`service/wordFilter`）
+
+`wordFilter` 是 game 节点内的进程级单例服务，用于文本类业务入口的合规校验，当前主要调用点包括：
+
+- 聊天内容：`chatController.SendChatMessageHandle`。
+- 玩家昵称：`playerInfoController`。
+- 联盟名称、公告、宣言：`allianceController`。
+
+实现方式：
+
+- 启动阶段由 `gamePlatform.BootGamePlatform()` 调用 `wordFilter.InitWordFilterService("config/dirtyWord.txt")` 初始化。
+- 内部基于 `github.com/importcjj/sensitive` 构建 trie matcher。
+- 全局服务指针使用 `atomic.Pointer[WordFilter]` 发布，matcher 使用 `atomic.Value` 保存；reload 时先构建新 matcher，成功后再原子替换，失败则保留旧 matcher。
+- 词库逐行读取，加载时会清理 UTF-8 BOM、前后空白并跳过空行，避免脏词条因为词库格式问题失效。
+- `HasSensitive`、`Find`、`Replace` 对输入采用一致的去噪逻辑，其中去噪规则来自 `sensitive.Filter.RemoveNoise`。
+- 未初始化时包级 API 做保护：`HasSensitive` fail-closed 返回 `true`，`Reload` 返回 `ErrWordFilterNotInitialized`，`Find` 返回 `nil`，`Replace` 返回原文。
+- 配置热重载链路中，`gameMain.AfterAllConfigReload()` 会调用 `wordFilter.Reload()` 重建词库。
+
+需要注意：
+
+- 当前词库路径仍是相对路径 `config/dirtyWord.txt`，依赖进程工作目录；后续可以改为从平台配置读取绝对路径。
+- `Replace` 会在去噪后的文本上替换，返回结果不保留原始噪声字符位置，适合审核/调试，不适合直接作为用户原文展示替换。
 
 ## 9. HTTP/后台链路
 

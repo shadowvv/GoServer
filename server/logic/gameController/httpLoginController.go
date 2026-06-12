@@ -95,6 +95,7 @@ func handleGameServerInfoRequest(w http.ResponseWriter, r *http.Request) {
 			v.Level = 1
 		}
 		regList = append(regList, &webProto.UserSimpleInfo{
+			UserId:        v.UserId,
 			Nickname:      v.Nickname,
 			ServerID:      v.ServerId,
 			Frame:         v.HeadFrameId,
@@ -419,7 +420,7 @@ func handleGetChatMessageRequest(w http.ResponseWriter, r *http.Request) {
 	res := make([]*pb.PushReceivedChatMessage, 0)
 	ctx := r.Context()
 
-	if req.ChatType == int32(enum.BROADCAST_TYPE_SERVER_ID) {
+	if req.ChatType == int32(enum.BROADCAST_TYPE_SERVER_ID) || req.ChatType == int32(enum.BROADCAST_TYPE_ALLIANCE) {
 		messages, err := dbService.RDB.LRange(ctx, enum.GetChatKey(req.ChatType, req.ToObjectId), 0, -1).Result()
 		if err == nil {
 

@@ -1,0 +1,20 @@
+modules:
+  equipment:
+    - path: /robot/equipment/list
+      messageId: MESSAGE_ID_EQUIPMENT_LIST_REQ
+
+  mail:
+    - path: /robot/mail/list
+      messageId: MESSAGE_ID_MAIL_LIST_REQ
+    - path: /robot/mail/detail
+      messageId: MESSAGE_ID_MAIL_DETAIL_REQ
+    - path: /robot/mail/read
+      messageId: MESSAGE_ID_MAIL_READ_REQ
+    - path: /robot/mail/claim
+      messageId: MESSAGE_ID_MAIL_CLAIM_REQ
+    - path: /robot/mail/claim/all
+      messageId: MESSAGE_ID_MAIL_CLAIM_ALL_REQ
+    - path: /robot/mail/delete
+      messageId: MESSAGE_ID_MAIL_DELETE_REQ
+    - path: /robot/mail/delete/claimed
+      messageId: MESSAGE_ID_MAIL_DELETE_CLAIMED_REQ

@@ -213,6 +213,7 @@ func (s *EquipmentCfgLoader) loadData() error {
 		v.Star = ParseInt(row["star"])
 		v.Cost = ParseItemArray(row["cost"])
 		v.Equipment = ParseInt(row["equipment"])
+		v.ItemId = ParseInt(row["itemId"])
 		if v.Id <= 0 {
 			continue
 		}
@@ -400,6 +401,8 @@ type EquipBlueprintCfg struct {
 	Cost []*ItemConfig `json:"cost"`
 	// 对应装备
 	Equipment int32 `json:"equipment"`
+	// 对应道具
+	ItemId int32 `json:"itemId"`
 }
 
 type EquipEnhanceCfg struct {

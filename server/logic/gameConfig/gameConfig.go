@@ -225,6 +225,7 @@ func ParseTime(timeString string) (int64, error) {
 	}
 	return t.UnixMilli(), nil
 }
+
 func ParseTimeWithYMD(timeString string) (int64, error) {
 	layout := "2006|01|02"
 	t, err := time.ParseInLocation(layout, timeString, time.Local)

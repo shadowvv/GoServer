@@ -1,0 +1,111 @@
+﻿syntax = "proto3";
+package pb;
+option go_package = "../logic/pb;pb";
+import "commonMessage.proto";
+
+message ExpeditionBattlefieldInfo {
+  int32 battlefieldId = 1; // 战场id
+  int32 battlefieldLevel = 2; // 战场等级
+  repeated ExpeditionPointInfo monsterInfos = 3; // 怪物信息
+}
+
+message ExpeditionPointInfo {
+  int32 pointId = 1; // 点位id
+  int32 monsterId = 2; // 怪物id
+  int64 nextRefreshTime = 3; // 下次刷新时间
+  int32 isReward = 4;// 是否能领奖
+}
+
+message ExpeditionSlotInfo {
+  int32 slotId = 1;// 槽位id
+  int32 status = 2;// 状态（0:未开始 1:进行中）
+  int32 battlefieldId = 3;// 战场id
+  int32 pointId = 4;// 点位id
+  int64 overTime = 5; // 结束时间戳
+}
+
+// 地图信息请求
+message ExpeditionInfoReq {}
+
+message ExpeditionInfoResp {
+  repeated ExpeditionBattlefieldInfo battlefields = 1;// 战场信息
+  repeated ExpeditionSlotInfo slots = 2; // 派遣槽位信息
+  int32 freeClaimCount = 3; // 免费已领取次数
+  int64 freeCDTimeStamp = 4; // 免费领取cd结束时间戳
+  int64 LastPowerRecoveryTimeStamp = 5; // 上一次体力恢复时间戳
+}
+
+// 开始派遣
+message ExpeditionStartReq {
+  int32 slotId = 1;// 槽位id
+  int32 battlefieldId = 2; // 战场id
+  int32 pointId = 3; // 点位id
+}
+
+message ExpeditionStartResp {
+  ExpeditionSlotInfo active = 1; // 激活的槽位信息
+}
+
+// 立刻完成
+message ExpeditionFinishReq {
+  int32 slotId = 1; // 槽位id
+}
+
+message ExpeditionFinishResp {
+  ExpeditionSlotInfo slot = 1; // 槽位信息
+  ExpeditionPointInfo monsterInfos = 3; // 怪物信息
+}
+
+// 领奖协议
+message ExpeditionClaimRewardReq {
+  int32 battleFiledId = 1; // 战场id
+  int32 pointId = 2;// 点id
+}
+
+message ExpeditionClaimRewardResp {
+  repeated ItemBasicInfo reward = 1;// 奖励
+  int32 isWin = 2;// 是否成功
+}
+
+// 加速
+message ExpeditionSpeedUpReq {
+  map<int32, int32> items = 1; // 加速使用的道具id
+  int32 slotId = 2; // 槽位id
+}
+
+message ExpeditionSpeedUpResp {
+  ExpeditionSlotInfo slot = 1; // 槽位信息
+}
+
+// 停止
+message ExpeditionCancelReq {
+  int32 slotId = 1;// 槽位id
+}
+
+message ExpeditionCancelResp {
+  ExpeditionSlotInfo slot = 1;// 槽位信息
+}
+
+// 改变战场等级
+message ExpeditionChangeLevelReq {
+  int32 battlefieldId = 1; // 战场id
+  int32 level = 2; // 等级
+}
+
+message ExpeditionChangeLevelResp {
+
+}
+
+// 领取免费耐力
+message ExpeditionClaimFreeStaminaReq {
+}
+
+message ExpeditionClaimFreeStaminaResp {
+  int64 freeCDTimeStamp = 4; // 免费领取cd结束时间戳
+}
+
+// 推送变化
+message ExpeditionChangePush {
+  repeated ExpeditionSlotInfo slots = 1;// 槽位信息
+  repeated ExpeditionPointInfo points = 2;// 点位信息
+}

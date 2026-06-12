@@ -1,6 +1,8 @@
 package model
 
 import (
+	"errors"
+
 	"github.com/drop/GoServer/server/enum"
 	"github.com/drop/GoServer/server/logic/gameConfig"
 	"github.com/drop/GoServer/server/logic/logicCommon"
@@ -8,6 +10,7 @@ import (
 	"github.com/drop/GoServer/server/logic/platform/easyDB"
 	"github.com/drop/GoServer/server/service/logger"
 	"github.com/drop/GoServer/server/tool"
+	"gorm.io/gorm"
 )
 
 type LotteryEntity struct {
@@ -20,12 +23,26 @@ type LotteryEntity struct {
 	LastChangeTime          int64 `gorm:"column:last_change_time"`           // 上次更新时间
 	LastOnceEffectiveNum    int32 `gorm:"column:last_once_effective_num"`    // 上次单次保底计数
 	OnceEffectiveCount      int32 `gorm:"column:once_effective_count"`       // 单次保底生效档位
-	FirstDropFree           int32 `gorm:"column:first_drop_free"`            //首次免费次数
+	FirstDropFree           int32 `gorm:"column:first_drop_free"`            // 首次免费次数
 	LastFirstDropFreeTime   int64 `gorm:"column:last_once_effective_time"`   // 上次免费次数更新时间
+
+	ActVersion string `gorm:"column:act_version"` // 活动版本号
 }
 
 func (LotteryEntity) TableName() string {
 	return "lottery"
+}
+
+type LotteryLuckyEventEntity struct {
+	UserId           int64 `gorm:"column:user_id;primaryKey"`
+	LuckyNum         int32 `gorm:"column:lucky_num"`
+	CreateTime       int64 `gorm:"column:create_time"`
+	NewLuckyCount    int32 `gorm:"column:new_lucky_count"`
+	IsNewLuckyReward bool  `gorm:"column:is_new_lucky_reward"`
+}
+
+func (LotteryLuckyEventEntity) TableName() string {
+	return "lottery_lucky_event"
 }
 
 var _ logicCommon.PlayerModelInterface = (*LotteryModel)(nil)
@@ -35,6 +52,9 @@ type LotteryModel struct {
 	LotteryEntities      map[int32]*LotteryEntity // key: 卡池ID
 	LotteryHistoryDetail map[int32][]*LotteryLog
 	Changed              map[int32]map[string]interface{}
+
+	LotteryLuckyEventEntity *LotteryLuckyEventEntity
+	LuckyEventChanged       map[string]interface{}
 
 	// 运行时缓存字段（不存数据库，仅在内存中维护）
 	LotterySet        map[int32]map[int32]bool // 已抽到的英雄集合 itemId -> true
@@ -59,20 +79,28 @@ func (l *LotteryModel) SaveModelToDB() {
 		easyDB.UpdatePlayerEntity[LotteryEntity](l.LotteryEntities[id], changes, l.UserId)
 	}
 	l.Changed = make(map[int32]map[string]interface{})
+
+	if l.LotteryLuckyEventEntity != nil && (l.LuckyEventChanged == nil || len(l.LuckyEventChanged) == 0) {
+		return
+	}
+	easyDB.UpdatePlayerEntity[LotteryLuckyEventEntity](l.LotteryLuckyEventEntity, l.LuckyEventChanged, l.UserId)
+	l.LuckyEventChanged = make(map[string]interface{})
 }
 
 func (l *LotteryModel) Heartbeat(lastTickTime int64, currentTime int64, passDay int32, senderMsg bool) {
 
 }
 
-func NewLotteryModel(userId int64, entity map[int32]*LotteryEntity, detail map[int32][]*LotteryLog, set map[int32]map[int32]bool, qualitySet map[int32]map[int32]bool) *LotteryModel {
+func NewLotteryModel(userId int64, entity map[int32]*LotteryEntity, luckyEventEntity *LotteryLuckyEventEntity, detail map[int32][]*LotteryLog, set map[int32]map[int32]bool, qualitySet map[int32]map[int32]bool) *LotteryModel {
 	return &LotteryModel{
-		UserId:               userId,
-		LotteryEntities:      entity,
-		LotteryHistoryDetail: detail,
-		Changed:              make(map[int32]map[string]interface{}),
-		LotterySet:           set,
-		LotteryQualitySet:    qualitySet,
+		UserId:                  userId,
+		LotteryEntities:         entity,
+		LotteryHistoryDetail:    detail,
+		Changed:                 make(map[int32]map[string]interface{}),
+		LotterySet:              set,
+		LotteryQualitySet:       qualitySet,
+		LotteryLuckyEventEntity: luckyEventEntity,
+		LuckyEventChanged:       make(map[string]interface{}),
 	}
 }
 
@@ -199,14 +227,21 @@ func LoadLotteryModel(userId int64) (*LotteryModel, error) {
 	lotteryHistoryDetail := make(map[int32][]*LotteryLog)
 	set := make(map[int32]map[int32]bool)
 	qualitySet := make(map[int32]map[int32]bool)
+	lotteryLuckyEventEntity := &LotteryLuckyEventEntity{}
 
 	row, err := easyDB.GetPlayerEntitiesByWhere[LotteryEntity](map[string]interface{}{"user_id": userId})
 	if err != nil {
-		return NewLotteryModel(userId, LotteryEntities, lotteryHistoryDetail, set, qualitySet), err
+		return NewLotteryModel(userId, LotteryEntities, lotteryLuckyEventEntity, lotteryHistoryDetail, set, qualitySet), err
 	}
 	row1, err1 := easyDB.GetPlayerEntitiesByWhere[LotteryLog](map[string]interface{}{"user_id": userId})
 	if err1 != nil {
-		return NewLotteryModel(userId, LotteryEntities, lotteryHistoryDetail, set, qualitySet), err1
+		return NewLotteryModel(userId, LotteryEntities, lotteryLuckyEventEntity, lotteryHistoryDetail, set, qualitySet), err1
+	}
+	row2, err2 := easyDB.GetPlayerEntityByWhere[LotteryLuckyEventEntity](map[string]interface{}{"user_id": userId})
+	if err2 != nil {
+		if !errors.Is(err2, gorm.ErrRecordNotFound) {
+			return NewLotteryModel(userId, LotteryEntities, lotteryLuckyEventEntity, lotteryHistoryDetail, set, qualitySet), err2
+		}
 	}
 	for _, v := range row {
 		LotteryEntities[v.Id] = v
@@ -225,7 +260,8 @@ func LoadLotteryModel(userId int64) (*LotteryModel, error) {
 			qualitySet[v.Id][itemCfg.Quality] = true
 		}
 	}
-	return NewLotteryModel(userId, LotteryEntities, lotteryHistoryDetail, set, qualitySet), nil
+	lotteryLuckyEventEntity = row2
+	return NewLotteryModel(userId, LotteryEntities, lotteryLuckyEventEntity, lotteryHistoryDetail, set, qualitySet), nil
 }
 
 // 普通抽取
@@ -330,4 +366,81 @@ func (l *LotteryModel) CheckAndUpSpecialGuaranteeNum(cfg *gameConfig.SummonPoolC
 			l.UpdateSpecialGuaranteeCount(LotteryId, lotterDetail.SpecialGuaranteeCount+1)
 		}
 	}
+}
+
+func (l *LotteryModel) UpdateNewLuckyCount(num int32) {
+	l.LotteryLuckyEventEntity.NewLuckyCount = num
+	l.LuckyEventChanged["new_lucky_count"] = num
+}
+
+func (l *LotteryModel) UpdateIsNewLuckyReward() {
+	l.LotteryLuckyEventEntity.IsNewLuckyReward = true
+	l.LuckyEventChanged["is_new_lucky_reward"] = true
+}
+
+func (l *LotteryModel) RewardNewLucky(itemId int32) bool {
+	newLuckyCfg := gameConfig.GetConstantCfg(gameConfig.CONSTANT_beginnerBenefits)
+	if newLuckyCfg == nil || len(newLuckyCfg.Value) < 0 {
+		return false
+	}
+	for _, v := range newLuckyCfg.Value {
+		items := gameConfig.Drop(v)
+		for _, v := range items {
+			if v.ID == itemId {
+				l.UpdateIsNewLuckyReward()
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (l *LotteryModel) GetLotteryLuckyEvent() *LotteryLuckyEventEntity {
+	return l.LotteryLuckyEventEntity
+}
+
+func (l *LotteryModel) CreateLotteryLuckyEvent() error {
+	entity := &LotteryLuckyEventEntity{UserId: l.UserId}
+	cfgWeight := gameConfig.GetConstantCfg(gameConfig.CONSTANT_limitedGachaLuckyEventWeight)
+	if cfgWeight == nil || len(cfgWeight.Value) < 0 {
+		return errors.New("constant cfg error")
+	}
+	cfgValue := gameConfig.GetConstantCfg(gameConfig.CONSTANT_limitedGachaLuckyEventDiscountRate)
+	if cfgValue == nil || len(cfgValue.Value) < 0 {
+		return errors.New("constant cfg error")
+	}
+	if len(cfgWeight.Value) != len(cfgValue.Value) {
+		return errors.New("constant cfg error")
+	}
+	luckyEventNum := gameConfig.WeightedRandomChoice(cfgWeight.Value, cfgWeight.Value)
+	entity.LuckyNum = luckyEventNum
+	entity.CreateTime = tool.UnixNowMilli()
+	if l.LotteryLuckyEventEntity.LuckyNum == 0 && l.LotteryLuckyEventEntity.CreateTime == 0 {
+		l.LotteryLuckyEventEntity = entity
+		return easyDB.CreatePlayerEntity(entity)
+	} else {
+		l.LotteryLuckyEventEntity = entity
+		l.LuckyEventChanged["LuckyNum"] = entity.LuckyNum
+		l.LuckyEventChanged["CreateTime"] = entity.CreateTime
+	}
+	return nil
+}
+
+func (l *LotteryModel) IsLotteryDirty(lotteryId int32, itemId int32) bool {
+	cfg := gameConfig.GetSummonPoolCfg(lotteryId)
+	if cfg == nil {
+		return true
+	}
+	dropIdCfgs := cfg.LuckyGuarantees
+	for _, v := range dropIdCfgs {
+		for _, value := range v.DropGroupIdList {
+			items := gameConfig.Drop(value)
+			for _, item := range items {
+				if item.ID == itemId {
+					return false
+				}
+			}
+		}
+	}
+	return true
 }

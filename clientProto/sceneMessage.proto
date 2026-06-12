@@ -1,0 +1,245 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+import "commonMessage.proto";
+import "messageEnum.proto";
+
+// 获取副本信息
+message GetInstanceInfoReq{
+
+}
+
+// 获取副本信息
+message GetInstanceInfoResp{
+    repeated InstanceInfo infos = 1;
+}
+
+// 副本信息
+message InstanceInfo{
+    int32 instanceId = 1; // 副本id
+    int32 stageId = 2; // 关卡id
+    int32 rewardCommited = 3; // 奖励已领取
+}
+
+// 快速战斗
+message QuickBattleReq {
+    int32 instanceId = 1;// 副本id
+    int32 stageId = 2;// 关卡id
+}
+
+message QuickBattleResp {
+    
+}
+
+// 领取副本奖励
+message CommitInstanceLevelRewardReq {
+    int32 instanceId = 1;// 副本id
+}
+
+// 领取副本奖励
+message CommitInstanceLevelRewardResp {
+
+}
+
+// 进入副本
+message EnterSceneReq {
+    int32 instanceId = 1;// 副本id
+    int32 stageId = 2;// 关卡id
+}
+
+// 进入副本
+message EnterSceneResp {
+    SceneBasicInfo info = 1; // 副本基本信息
+}
+
+// 加载场景完成
+message LoadSceneOverReq {
+
+}
+
+// 加载场景完成
+message LoadSceneOverResp {
+    SceneBasicInfo nextInfo = 1;// 下一个副本信息
+}
+
+// 离开副本
+message LeaveSceneReq {
+
+}
+
+// 离开副本
+message LeaveSceneResp {
+    SceneBasicInfo info = 1;// 离开副本进入的副本信息
+}
+
+// 副本操作
+message BattleOperationReq {
+    int32 frameId = 1; // 帧号
+    int32 x = 2; // 移动x方向
+    int32 y = 3; // 移动y方向
+}
+
+// 副本操作
+message BattleOperationResp {
+    
+}
+
+// 杀死怪物
+message KillMonsterReq {
+    int32 frameId = 1; // 帧号
+    repeated int32 monsterId = 2;// 杀死的怪物id
+    int32 stageId = 3;  //所在关卡
+}
+
+// 杀死怪物
+message KillMonsterResp {
+    repeated ItemBasicInfo dropItems = 1; // 掉落物品
+}
+
+// 检查进入下一关
+message CheckEnterNextSubStageReq {
+    int32 subStageId = 1;
+}
+
+// 检查进入下一关
+message CheckEnterNextSubStageResp {
+}
+
+// 进入下一关房间
+message EnterNextSubStageReq {
+    int32 subStageId = 1;
+}
+
+// 进入下一关房间
+message EnterNextSubStageResp {
+    SubStageInfo subStageInfo = 1;
+}
+
+// 推送主副本下一关信息
+message PushMainInstanceNextStageInfo {
+    SceneBasicInfo info = 1;// 副本基本信息
+}
+
+// 玩家死亡
+message BattlePlayerDeadReq {
+    int32 frameId = 1; // 帧号
+    int32 stageId = 2;  //关卡id
+}
+
+// 玩家死亡回复
+message BattlePlayerDeadResp{
+    SceneBasicInfo lastInstanceInfo = 1;// 返回上一个副本信息
+}
+
+// 推送战斗胜利
+message PushStageBattleWin {
+    int32 isWin = 1;
+    int32 instanceId = 2;// 副本id
+    int32 stageId = 3;// 关卡id
+    int32 arenaChangePoint = 4;// 竞技场积分
+}
+
+// 推送循环场景信息
+message PushCycleStageInfo {
+    SubStageInfo subStageInfo = 1;
+}
+
+// 副本心跳
+message GameToBattleHeartbeatReq {
+    int64 currentTime = 1;
+}
+
+// 副本心跳
+message GameToBattleHeartbeatResp {
+    int64 currentTime = 1;
+}
+
+// 发送战斗开始消息
+message SendToBattleBattleStartReq {
+    int64 battleId = 1; // 战斗Id
+    int64 playerId = 2;// 玩家Id
+    SceneBasicInfo info = 3; // 副本基本信息
+    repeated SubStageInfo enterNextRoomInfo = 4; // 副本基本信息
+    int32 mode = 5;     //1 后校验 2实时 3计算战斗结果
+    repeated BattleClientChangeInfo clientChangeInfo = 6;    //玩家操作数据
+    repeated BattleVerifyInfo verifyInfo = 7;    //校验数据
+}
+
+// 发送战斗开始消息
+message SendToBattleBattleStartResp {
+    int64 battleId = 1; // 战斗Id
+    string errMsg = 2;  //数据检测失败时返回原因，为空则为成功
+}
+
+// 游戏服确认收到战斗服消息
+message NotifyToBattleConfirmMessage {
+    int32 frameId = 1; // 帧号
+    int64 battleId = 2; // 战斗Id
+    int64 playerId = 3; // 玩家Id
+    MESSAGE_ID messageId = 4; // 消息Id
+}
+
+// 战斗服确认收到游戏服消息
+message NotifyToGameConfirmMessage {
+    int32 frameId = 1; // 帧号
+    int64 battleId = 2; // 战斗Id
+    int64 playerId = 3; // 玩家Id
+    MESSAGE_ID messageId = 4; // 消息Id
+}
+
+// 战斗服通知游戏服玩家信息变更
+message NotifyToBattlePlayerChange {
+    int32 frameId = 1;// 帧号
+    int64 battleId = 2;// 战斗Id
+    int64 playerId = 3;// 玩家Id
+    map<int32,HeroBasicInfo> info = 4;// 玩家信息
+    int32 x = 5;// 移动x方向
+    int32 y = 6;// 移动y方向
+}
+
+// 战斗服通知游戏服杀死怪物
+message NotifyToGameKillMonster {
+    int32 frameId = 1; // 帧号
+    int64 battleId = 2; // 战斗Id
+    int32 monsterId = 3; // 杀死的怪物id
+}
+
+// 战斗服通知游戏服英雄死亡
+message NotifyToGameHeroDead {
+    int32 frameId = 1; // 帧号
+    int64 battleId = 2; // 战斗Id
+    int32 herId = 3; // 英雄Id
+}
+
+// 战斗服通知游戏服战斗结果
+message NotifyToGameBattleResult {
+    int32 frameId = 1; // 帧号
+    int64 battleId = 2; // 战斗Id
+    int32 battleResult = 3; // 战斗结果
+}
+
+// 战斗服通知游戏服进入下一关
+message NotifyToGameEnterSubStage {
+    int32 frameId = 1;// 帧号
+    int32 subStageId = 2;// 子场景Id
+}
+
+// 战斗服校验数据
+message BattleVerifyInfo {
+    int32 frameId = 1;
+    repeated int32 list = 2;    //怪物id列表
+}
+
+message BattleMoveDetail {
+    int32 isMove = 1;
+    int32 x = 5;// 移动x方向
+    int32 y = 6;// 移动y方向
+}
+
+//战斗服玩家信息变更数据
+message BattleClientChangeInfo {
+    int32 frameId = 1;
+    int32 op = 2;   //1 切换房间 2修改队伍 3移动
+    map<int32,HeroBasicInfo> heroList = 3;// 玩家信息
+    BattleMoveDetail move = 4;
+}

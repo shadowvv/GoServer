@@ -1,0 +1,104 @@
+{
+  "poster": {
+    "1": {
+      "dropId": "14513",
+      "id": "1",
+      "jumpId": "124",
+      "name": "18127",
+      "pic": "banner_hb_rylt1",
+      "txt": "18128",
+      "type": "1",
+      "typeNum": "1"
+    },
+    "10": {
+      "dropId": "14518",
+      "id": "10",
+      "jumpId": "3",
+      "name": "18157",
+      "pic": "banner_hb_cbg1",
+      "txt": "18159",
+      "type": "3",
+      "typeNum": "114|1"
+    },
+    "2": {
+      "dropId": "14510",
+      "id": "2",
+      "jumpId": "2028",
+      "name": "18129",
+      "pic": "banner_hb_gbwz1",
+      "txt": "18135",
+      "type": "2",
+      "typeNum": "711"
+    },
+    "3": {
+      "dropId": "14511",
+      "id": "3",
+      "jumpId": "2004",
+      "name": "18130",
+      "pic": "banner_hb_cwjb1",
+      "txt": "18136",
+      "type": "2",
+      "typeNum": "703"
+    },
+    "4": {
+      "dropId": "14512",
+      "id": "4",
+      "jumpId": "2016",
+      "name": "18131",
+      "pic": "banner_hb_czdh1",
+      "txt": "18137",
+      "type": "2",
+      "typeNum": "706"
+    },
+    "5": {
+      "dropId": "14514",
+      "id": "5",
+      "jumpId": "111",
+      "name": "18132",
+      "pic": "banner_hb_jjc1",
+      "txt": "18138",
+      "type": "3",
+      "typeNum": "302|1"
+    },
+    "6": {
+      "dropId": "14515",
+      "id": "6",
+      "jumpId": "126",
+      "name": "18133",
+      "pic": "banner_hb_dzwq1",
+      "txt": "18139",
+      "type": "3",
+      "typeNum": "704|1"
+    },
+    "7": {
+      "dropId": "14516",
+      "id": "7",
+      "jumpId": "120",
+      "name": "18134",
+      "pic": "banner_hb_cwlx1",
+      "txt": "18140",
+      "type": "3",
+      "typeNum": "702|1"
+    },
+    "8": {
+      "dropId": "14517",
+      "id": "8",
+      "jumpId": "2030",
+      "name": "18152",
+      "pic": "banner_hb_artms1",
+      "txt": "18153",
+      "type": "2",
+      "typeNum": "712"
+    },
+    "9": {
+      "dropId": "14516",
+      "id": "9",
+      "jumpId": "120",
+      "name": "18156",
+      "pic": "banner_hb_cwlx1",
+      "txt": "18158",
+      "type": "3",
+      "typeNum": "702|1"
+    }
+  }
+}

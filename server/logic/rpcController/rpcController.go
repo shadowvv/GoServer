@@ -115,11 +115,6 @@ func InitRankBoardRpcClients() {
 }
 
 func InitSocialRpcClients() {
-	if !IsSocialRpcEnabled() {
-		logger.InfoWithSprintf("[rpc] social rpc disabled, skip init social node client")
-		return
-	}
-
 	clientFunc := func(shard int32) (grpc.BidiStreamingClient[rpcPb.ForwardSocialMessage, rpcPb.BackwardSocialMessage], error) {
 		client, err := ServerNodeService.GetSocialClient()
 		if err != nil || client == nil {

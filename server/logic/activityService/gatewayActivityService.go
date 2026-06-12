@@ -12,6 +12,7 @@ import (
 	"github.com/drop/GoServer/server/logic/rpcController"
 	"github.com/drop/GoServer/server/logic/rpcPb"
 	"github.com/drop/GoServer/server/service/dbService"
+	"go.uber.org/zap"
 
 	"github.com/drop/GoServer/server/enum"
 	"github.com/drop/GoServer/server/logic/gameConfig"
@@ -55,6 +56,16 @@ func NewGatewayActivityService(env enum.Environment, gameServerInfoService *game
 		env:                       env,
 	}
 	service.activityConfigChanged.Store(false)
+
+	// 保存所有活动配置到redis
+	allConfigConfigString, err := json.Marshal(serverActivityConfigEntities)
+	if err != nil {
+		panic("[platform] activity config json marshal error")
+	}
+	err = dbService.RDB.Set(context.Background(), enum.REDIS_ACTIVITY_ALL_CONFIG, string(allConfigConfigString), 0).Err()
+	if err != nil {
+		panic("[platform] activity config set redis error")
+	}
 	return service
 }
 
@@ -101,7 +112,7 @@ func loadActivityConfig(env enum.Environment) ([]*model.ServerActivityConfigEnti
 				MonthOpenDays:   make([]int32, 0),
 				DurationTimes:   make([]int32, 0),
 				IfBlockServers:  make([]int32, 0),
-				LoopActivity:    false,
+				HasPreActivity:  false,
 			}
 			serverActivityConfigEntities = append(serverActivityConfigEntities, activityConfig)
 			err := easyDB.SaveSeverEntity(activityConfig)
@@ -111,20 +122,33 @@ func loadActivityConfig(env enum.Environment) ([]*model.ServerActivityConfigEnti
 			}
 		}
 	}
-
-	// 保存所有活动配置到redis
-	allConfigConfigString, err := json.Marshal(serverActivityConfigEntities)
-	if err != nil {
-		logger.ErrorBySprintf("[platform] activity config json marshal error: %v", err)
+	if err := checkActivityConfig(serverActivityConfigEntities); err != nil {
 		return nil, err
 	}
-	err = dbService.RDB.Set(context.Background(), enum.REDIS_ACTIVITY_ALL_CONFIG, string(allConfigConfigString), 0).Err()
-	if err != nil {
-		logger.ErrorBySprintf("[platform] activity config set redis error: %v", err)
-		return nil, err
-	}
-
 	return serverActivityConfigEntities, nil
+}
+
+func checkActivityConfig(entities []*model.ServerActivityConfigEntity) error {
+	for _, entity := range entities {
+		err := gameConfig.CheckActivityConfig(&gameConfig.ActivityConfigCheckData{
+			Id:              entity.Id,
+			ServerType:      entity.ServerType,
+			ServerUnit:      entity.ServerUnit,
+			UnlockIds:       gameConfig.ParseIntArray(entity.UnlockId),
+			AttendUnlockIds: gameConfig.ParseIntArray(entity.AttendUnlockId),
+			EventOpen:       entity.EventOpen,
+			EventEnd:        entity.EventEnd,
+			WeekOpenDays:    gameConfig.ParseIntArray(entity.WeekOpen),
+			MonthOpenDays:   gameConfig.ParseIntArray(entity.MonthOpen),
+			Duration:        entity.Duration,
+			NextId:          entity.NextId,
+			OpenLoopMax:     entity.OpenLoopNum,
+		})
+		if err != nil {
+			return fmt.Errorf("[platform] load activity config error: %w", err)
+		}
+	}
+	return nil
 }
 
 func loadOpenActivity() (map[int32][]*model.ServerOpenActivityEntity, error) {
@@ -150,37 +174,62 @@ func (s *GatewayActivityService) Reload() {
 func (s *GatewayActivityService) StartService() {
 	s.initAllActivity()
 	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				logger.ErrorBySprintf("[platform] gateway activity service heartbeat panic: %v", r)
-			}
-		}()
-
 		ticker := time.NewTicker(TICK_INTERVAL)
 		defer ticker.Stop()
 
 		for {
 			select {
 			case <-ticker.C:
-				configChanged := false
-				if s.activityConfigChanged.Load() {
-					serverActivityConfigEntities, err := loadActivityConfig(s.env)
-					if err != nil {
-						logger.ErrorBySprintf("[platform] load all activity config error: %v", err)
-						continue
-					}
-					s.serverActivityConfigModel.ReloadServerActivityConfig(serverActivityConfigEntities)
-					s.activityConfigChanged.Store(false)
-					configChanged = true
-				}
-				changeMap := s.checkActivityChange(configChanged)
-				if len(changeMap) > 0 {
-					s.saveActivityToRedis()
-					rpcController.BroadcastOperationToGameNode(rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_RELOAD_ACTIVITY)
-				}
+				runGatewayActivityHeartbeat(s.heartbeat)
 			}
 		}
 	}()
+}
+
+func runGatewayActivityHeartbeat(heartbeat func()) {
+	defer func() {
+		if r := recover(); r != nil {
+			logger.ErrorBySprintf("[platform] gateway activity service heartbeat panic: %v", r)
+		}
+	}()
+	heartbeat()
+}
+
+func (s *GatewayActivityService) heartbeat() {
+	configChanged := false
+	if s.activityConfigChanged.Load() {
+		serverActivityConfigEntities, err := loadActivityConfig(s.env)
+		if err != nil {
+			logger.ErrorBySprintf("[platform] load all activity config error: %v", err)
+			s.activityConfigChanged.Store(false)
+			return
+		}
+		s.serverActivityConfigModel.ReloadServerActivityConfig(serverActivityConfigEntities)
+		// 保存所有活动配置到redis
+		allConfigConfigString, err := json.Marshal(serverActivityConfigEntities)
+		if err != nil {
+			logger.ErrorBySprintf("[platform] activity config json marshal error: %v", err)
+			return
+		}
+		err = dbService.RDB.Set(context.Background(), enum.REDIS_ACTIVITY_ALL_CONFIG, string(allConfigConfigString), 0).Err()
+		if err != nil {
+			logger.ErrorBySprintf("[platform] activity config set redis error: %v", err)
+			return
+		}
+		s.activityConfigChanged.Store(false)
+		configChanged = true
+	}
+	changeMap := s.checkActivityChange(configChanged)
+	if len(changeMap) > 0 {
+		s.saveActivityToRedis()
+	}
+	if shouldReloadGameActivity(configChanged, len(changeMap)) {
+		rpcController.BroadcastOperationToGameNode(rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_RELOAD_ACTIVITY)
+	}
+}
+
+func shouldReloadGameActivity(configChanged bool, activityChangeCount int) bool {
+	return configChanged || activityChangeCount > 0
 }
 
 func (s *GatewayActivityService) checkActivityChange(configChanged bool) map[int32]map[int32]*model.ServerOpenActivityEntity {
@@ -257,19 +306,41 @@ func (s *GatewayActivityService) refreshAllActivity(configs map[int32]*model.Ser
 			if realConfig.Cd > 0 && currentTime-activity.EndTime < int64(realConfig.Cd)*tool.HOUR_MILLI {
 				continue
 			}
-			openInfo, changed := s.checkActivityOpen(realConfig, servers[serverId], activity.OpenCount, currentTime, false)
+			nextActivityConfig, ok := configs[realConfig.NextId]
+			if !ok {
+				continue
+			}
+			openCount := int32(0)
+			var nextActivity *model.ServerOpenActivityEntity
+			activityMap, ok := activities[serverId]
+			if ok {
+				nextActivity = activityMap[realConfig.NextId]
+				if nextActivity != nil {
+					openCount = nextActivity.OpenCount
+				}
+			}
+			if !shouldOpenNextActivity(activity, nextActivityConfig, nextActivity, currentTime) {
+				continue
+			}
+			if changedMap[serverId] != nil && changedMap[serverId][nextActivityConfig.Id] != nil {
+				continue
+			}
+			openInfo, changed := s.checkActivityOpen(nextActivityConfig, servers[serverId], openCount, currentTime, false)
 			if !changed {
 				continue
 			}
 			if changedMap[serverId] == nil {
 				changedMap[serverId] = make(map[int32]*model.ServerOpenActivityEntity)
 			}
-			changedMap[serverId][activity.ActivityId] = openInfo
+			changedMap[serverId][nextActivityConfig.Id] = openInfo
 		}
 	}
 
 	// 检测所有活动是否开启
 	for _, cfg := range configs {
+		if cfg.HasPreActivity {
+			continue
+		}
 		for serverId, server := range servers {
 			serverActivities, ok := activities[serverId]
 			if ok {
@@ -287,6 +358,9 @@ func (s *GatewayActivityService) refreshAllActivity(configs map[int32]*model.Ser
 				} else {
 					// 检测活动是否结束
 					if currentTime < activity.EndTime {
+						continue
+					}
+					if !shouldCheckFirstActivity(cfg, configs, serverActivities, changedMap[serverId], currentTime) {
 						continue
 					}
 					openInfo, changed := s.checkActivityOpen(cfg, server, activity.OpenCount, currentTime, true)
@@ -313,8 +387,70 @@ func (s *GatewayActivityService) refreshAllActivity(configs map[int32]*model.Ser
 	}
 	return changedMap
 }
+
+func shouldCheckFirstActivity(firstConfig *model.ServerActivityConfigEntity, configs map[int32]*model.ServerActivityConfigEntity, activities map[int32]*model.ServerOpenActivityEntity, changedActivities map[int32]*model.ServerOpenActivityEntity, currentTime int64) bool {
+	if firstConfig.NextId == 0 {
+		return true
+	}
+
+	firstActivity := activities[firstConfig.Id]
+	if firstActivity == nil || firstActivity.OpenCount == 0 {
+		return true
+	}
+
+	visited := map[int32]bool{firstConfig.Id: true}
+	nextId := firstConfig.NextId
+	for nextId != 0 {
+		if nextId == firstConfig.Id {
+			// A circular chain can only reopen its first activity through the tail activity.
+			return false
+		}
+		if visited[nextId] {
+			// Do not independently reopen the first activity for a malformed cycle.
+			return false
+		}
+		visited[nextId] = true
+
+		nextConfig := configs[nextId]
+		if nextConfig == nil {
+			return false
+		}
+		if changedActivities != nil && changedActivities[nextId] != nil {
+			return false
+		}
+
+		nextActivity := activities[nextId]
+		if nextActivity == nil || nextActivity.OpenCount != firstActivity.OpenCount || currentTime < nextActivity.EndTime {
+			return false
+		}
+		nextId = nextConfig.NextId
+	}
+	return true
+}
+
+func shouldOpenNextActivity(activity *model.ServerOpenActivityEntity, nextConfig *model.ServerActivityConfigEntity, nextActivity *model.ServerOpenActivityEntity, currentTime int64) bool {
+	expectedOpenCount := activity.OpenCount
+	if nextConfig.IfFirst == 1 {
+		expectedOpenCount++
+	}
+
+	if nextActivity == nil {
+		return expectedOpenCount == 1
+	}
+	if currentTime < nextActivity.EndTime {
+		return false
+	}
+	return nextActivity.OpenCount+1 == expectedOpenCount
+}
+
 func (s *GatewayActivityService) checkActivityOpen(activityConfig *model.ServerActivityConfigEntity, server *model.GameServerInfoEntity, openCount int32, currentTime int64, checkOpenCondition bool) (*model.ServerOpenActivityEntity, bool) {
+	if server == nil {
+		return nil, false
+	}
 	// 检测屏蔽
+	if server == nil {
+		return nil, false
+	}
 	if activityConfig.IfBlock == 1 {
 		return nil, false
 	}
@@ -360,8 +496,8 @@ func (s *GatewayActivityService) checkActivityOpen(activityConfig *model.ServerA
 		}
 	}
 	version := ""
-	if len(activityConfig.WeekOpenDays) != 0 || len(activityConfig.MonthOpenDays) != 0 || activityConfig.OpenLoopNum != 0 || isLoopActivity(activityConfig) {
-		if openCount >= activityConfig.OpenLoopNum {
+	if len(activityConfig.WeekOpenDays) != 0 || len(activityConfig.MonthOpenDays) != 0 || activityConfig.OpenLoopNum != 0 || HasPreActivity(activityConfig) {
+		if activityConfig.OpenLoopNum != -1 && openCount >= activityConfig.OpenLoopNum {
 			return nil, false
 		}
 		openCount++
@@ -376,41 +512,19 @@ func (s *GatewayActivityService) checkActivityOpen(activityConfig *model.ServerA
 	switch activityConfig.ServerType {
 	case int32(enum.ActivityServerType_Single):
 		if !activityConfig.ServerUnitInfo.AllServer {
-			for _, units := range activityConfig.ServerUnitInfo.ServerUnitVector {
-				find := false
-				if server.ServerId >= units.Left && server.ServerId <= units.Right {
-					find = true
-				} else {
-					for _, id := range units.Units {
-						if server.ServerId == id {
-							find = true
-						}
-					}
-				}
-				if !find {
-					return nil, false
-				}
+			if _, find := findServerUnitIndex(activityConfig.ServerUnitInfo.ServerUnitVector, server.ServerId); !find {
+				return nil, false
 			}
 		}
+		logger.InfoWithZapFields("serverId:%s", zap.Int32("serverId", server.ServerId))
 		version = getActivityVersion(date, server.ServerId, openCount)
 	case int32(enum.ActivityServerType_Multi):
 		if !activityConfig.ServerUnitInfo.AllServer {
-			for i, units := range activityConfig.ServerUnitInfo.ServerUnitVector {
-				find := false
-				if server.ServerId >= units.Left && server.ServerId <= units.Right {
-					find = true
-				} else {
-					for _, id := range units.Units {
-						if server.ServerId == id {
-							find = true
-						}
-					}
-				}
-				if !find {
-					return nil, false
-				}
-				version = getActivityVersion(date, int32(i), openCount)
+			index, find := findServerUnitIndex(activityConfig.ServerUnitInfo.ServerUnitVector, server.ServerId)
+			if !find {
+				return nil, false
 			}
+			version = getActivityVersion(date, index, openCount)
 		}
 	}
 	unlockIds := make([]int32, 0)
@@ -422,32 +536,59 @@ func (s *GatewayActivityService) checkActivityOpen(activityConfig *model.ServerA
 		Version:      version,
 		OpenServerId: server.ServerId,
 		OpenTime:     currentTime,
+		OpenCount:    openCount,
 	}
-	if activityConfig.SettleTime == 0 {
-		openInfo.SettleTime = math.MaxInt64
-	} else {
-		openInfo.SettleTime = currentTime + int64(activityConfig.SettleTime)*tool.HOUR_MILLI
-	}
-	duration := int32(0)
-	if len(activityConfig.DurationTimes) > 1 {
-		duration = activityConfig.DurationTimes[openCount-1]
-	} else if len(activityConfig.DurationTimes) > 0 {
-		duration = activityConfig.DurationTimes[0]
-	}
-	if duration == 0 {
-		openInfo.EndTime = math.MaxInt64
-	} else {
-		openInfo.EndTime = currentTime + int64(duration)*tool.HOUR_MILLI
-	}
+	openInfo.SettleTime, openInfo.EndTime = calculateActivityTimes(activityConfig, openInfo.OpenTime, openInfo.OpenCount)
 	return openInfo, true
+}
+
+func calculateActivityTimes(config *model.ServerActivityConfigEntity, openTime int64, openCount int32) (int64, int64) {
+	settleTime := int64(math.MaxInt64)
+	if config.SettleTime != 0 {
+		settleTime = openTime + int64(config.SettleTime)*tool.HOUR_MILLI
+	}
+
+	endTime := int64(math.MaxInt64)
+	duration := getActivityDuration(config.DurationTimes, openCount)
+	if duration != 0 {
+		endTime = openTime + int64(duration)*tool.HOUR_MILLI
+	}
+	return settleTime, endTime
+}
+
+func getActivityDuration(durationTimes []int32, openCount int32) int32 {
+	if len(durationTimes) == 0 {
+		return 0
+	}
+	if openCount <= 1 {
+		return durationTimes[0]
+	}
+	if openCount > int32(len(durationTimes)) {
+		return durationTimes[len(durationTimes)-1]
+	}
+	return durationTimes[openCount-1]
+}
+
+func findServerUnitIndex(serverUnits []*model.ServerUnitVector, serverId int32) (int32, bool) {
+	for i, units := range serverUnits {
+		if serverId >= units.Left && serverId <= units.Right {
+			return int32(i), true
+		}
+		for _, id := range units.Units {
+			if serverId == id {
+				return int32(i), true
+			}
+		}
+	}
+	return 0, false
 }
 
 func (s *GatewayActivityService) IsActivitySettled(serverId int32, activityId int32, version string) bool {
 	return s.serverOpenActivityModel.IsActivitySettled(serverId, activityId, version)
 }
 
-func (s *GatewayActivityService) GetAllActivityByServerId(serverId int32) []logicCommon.GameActivityInterface {
-	return s.serverOpenActivityModel.GetAllActivityByServerId(serverId)
+func (s *GatewayActivityService) GetAllOpenActivityByServerId(serverId int32) []logicCommon.GameActivityInterface {
+	return s.serverOpenActivityModel.GetAllOpenActivityByServerId(serverId)
 }
 
 func (s *GatewayActivityService) IsActivityOpen(serverId int32, activityId int32) logicCommon.GameActivityInterface {
@@ -488,16 +629,7 @@ func (s *GatewayActivityService) checkConfigChange(config *model.ServerActivityC
 		}
 	}
 
-	duration := int32(0)
-	if len(config.DurationTimes) > 1 {
-		duration = config.DurationTimes[0]
-	} else if len(config.DurationTimes) > 0 {
-		duration = config.DurationTimes[0]
-	}
-	endTime := int64(math.MaxInt64)
-	if duration != 0 {
-		endTime = activity.OpenTime + int64(duration)*tool.HOUR_MILLI
-	}
+	settleTime, endTime := calculateActivityTimes(config, activity.OpenTime, activity.OpenCount)
 
 	// 活动已结束，则不检测活动结束时间
 	if activity.EndTime != endTime {
@@ -505,10 +637,6 @@ func (s *GatewayActivityService) checkConfigChange(config *model.ServerActivityC
 			activity.EndTime = endTime
 			changed = true
 		}
-	}
-	settleTime := int64(math.MaxInt64)
-	if duration != 0 {
-		settleTime = activity.OpenTime + int64(config.SettleTime)*tool.HOUR_MILLI
 	}
 	// 活动已结算，则不检测活动结算时间
 	if activity.SettleTime != settleTime {

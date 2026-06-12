@@ -46,12 +46,12 @@ func (eh *RankBoardEventHandler) handleEvent(event eventService.GameEvent) {
 		return
 	}
 	eventType := event.GetEventType()
-	if _, ok := enum.EventToObjectiveTypes[eventType]; ok {
+	if _, ok := enum.PlayerEventTypes[eventType]; ok {
 		switch eventType {
 		case enum.EventTypePassInstance:
-			eh.dispatcher.DispatchInnerMessageTask(enum.INNER_MSG_TYPE_PLAYER, enum.INNER_MSG_EVENT_UPDATE_RANKBOARD, event.GetObjectID(), event, 0, 0, nil)
+			eh.dispatcher.DispatchInnerMessageTask(enum.INNER_MSG_TYPE_PLAYER, enum.INNER_MSG_EVENT_UPDATE_RANK_BOARD, event.GetObjectID(), event, 0, 0, nil)
 		case enum.EventTypeBuildLevelUp:
-			eh.dispatcher.DispatchInnerMessageTask(enum.INNER_MSG_TYPE_PLAYER, enum.INNER_MSG_EVENT_UPDATE_RANKBOARD, event.GetObjectID(), event, 0, 0, nil)
+			eh.dispatcher.DispatchInnerMessageTask(enum.INNER_MSG_TYPE_PLAYER, enum.INNER_MSG_EVENT_UPDATE_RANK_BOARD, event.GetObjectID(), event, 0, 0, nil)
 		}
 	}
 }

@@ -78,6 +78,7 @@ type NotifyAllianceChangeReq struct {
 	UserId        int64                  `protobuf:"varint,1,opt,name=userId,proto3" json:"userId,omitempty"`         // 玩家id
 	ChangeOper    int32                  `protobuf:"varint,2,opt,name=changeOper,proto3" json:"changeOper,omitempty"` // 联盟操作
 	AllianceId    int64                  `protobuf:"varint,3,opt,name=allianceId,proto3" json:"allianceId,omitempty"` // 联盟id
+	Items         []*ItemInfo            `protobuf:"bytes,4,rep,name=items,proto3" json:"items,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -133,6 +134,13 @@ func (x *NotifyAllianceChangeReq) GetAllianceId() int64 {
 	return 0
 }
 
+func (x *NotifyAllianceChangeReq) GetItems() []*ItemInfo {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
 var File_gateway_proto protoreflect.FileDescriptor
 
 const file_gateway_proto_rawDesc = "" +
@@ -140,7 +148,7 @@ const file_gateway_proto_rawDesc = "" +
 	"\rgateway.proto\x12\x05rpcPb\x1a\fcommon.proto\"E\n" +
 	"\x0fGmKickPlayerReq\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\x03R\x06userId\x12\x1a\n" +
-	"\bserverId\x18\x02 \x01(\x05R\bserverId\"q\n" +
+	"\bserverId\x18\x02 \x01(\x05R\bserverId\"\x98\x01\n" +
 	"\x17NotifyAllianceChangeReq\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\x03R\x06userId\x12\x1e\n" +
 	"\n" +
@@ -148,7 +156,8 @@ const file_gateway_proto_rawDesc = "" +
 	"changeOper\x12\x1e\n" +
 	"\n" +
 	"allianceId\x18\x03 \x01(\x03R\n" +
-	"allianceId2\xd9\x02\n" +
+	"allianceId\x12%\n" +
+	"\x05items\x18\x04 \x03(\v2\x0f.rpcPb.ItemInfoR\x05items2\xd9\x02\n" +
 	"\vGateService\x12-\n" +
 	"\bSayHello\x12\x0f.rpcPb.HelloReq\x1a\x10.rpcPb.HelloResp\x12F\n" +
 	"\x13DeliverRechargeItem\x12\x1d.rpcPb.DeliverRechargeItemReq\x1a\x10.rpcPb.EmptyResp\x12O\n" +
@@ -172,28 +181,30 @@ var file_gateway_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_gateway_proto_goTypes = []any{
 	(*GmKickPlayerReq)(nil),         // 0: rpcPb.GmKickPlayerReq
 	(*NotifyAllianceChangeReq)(nil), // 1: rpcPb.NotifyAllianceChangeReq
-	(*HelloReq)(nil),                // 2: rpcPb.HelloReq
-	(*DeliverRechargeItemReq)(nil),  // 3: rpcPb.DeliverRechargeItemReq
-	(*NotifyOperationMessage)(nil),  // 4: rpcPb.NotifyOperationMessage
-	(*HelloResp)(nil),               // 5: rpcPb.HelloResp
-	(*EmptyResp)(nil),               // 6: rpcPb.EmptyResp
+	(*ItemInfo)(nil),                // 2: rpcPb.ItemInfo
+	(*HelloReq)(nil),                // 3: rpcPb.HelloReq
+	(*DeliverRechargeItemReq)(nil),  // 4: rpcPb.DeliverRechargeItemReq
+	(*NotifyOperationMessage)(nil),  // 5: rpcPb.NotifyOperationMessage
+	(*HelloResp)(nil),               // 6: rpcPb.HelloResp
+	(*EmptyResp)(nil),               // 7: rpcPb.EmptyResp
 }
 var file_gateway_proto_depIdxs = []int32{
-	2, // 0: rpcPb.GateService.SayHello:input_type -> rpcPb.HelloReq
-	3, // 1: rpcPb.GateService.DeliverRechargeItem:input_type -> rpcPb.DeliverRechargeItemReq
-	4, // 2: rpcPb.GateService.NotifyServerOperationHandler:input_type -> rpcPb.NotifyOperationMessage
-	1, // 3: rpcPb.GateService.NotifyAllianceChange:input_type -> rpcPb.NotifyAllianceChangeReq
-	0, // 4: rpcPb.GateService.GmKickPlayer:input_type -> rpcPb.GmKickPlayerReq
-	5, // 5: rpcPb.GateService.SayHello:output_type -> rpcPb.HelloResp
-	6, // 6: rpcPb.GateService.DeliverRechargeItem:output_type -> rpcPb.EmptyResp
-	6, // 7: rpcPb.GateService.NotifyServerOperationHandler:output_type -> rpcPb.EmptyResp
-	6, // 8: rpcPb.GateService.NotifyAllianceChange:output_type -> rpcPb.EmptyResp
-	6, // 9: rpcPb.GateService.GmKickPlayer:output_type -> rpcPb.EmptyResp
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	2, // 0: rpcPb.NotifyAllianceChangeReq.items:type_name -> rpcPb.ItemInfo
+	3, // 1: rpcPb.GateService.SayHello:input_type -> rpcPb.HelloReq
+	4, // 2: rpcPb.GateService.DeliverRechargeItem:input_type -> rpcPb.DeliverRechargeItemReq
+	5, // 3: rpcPb.GateService.NotifyServerOperationHandler:input_type -> rpcPb.NotifyOperationMessage
+	1, // 4: rpcPb.GateService.NotifyAllianceChange:input_type -> rpcPb.NotifyAllianceChangeReq
+	0, // 5: rpcPb.GateService.GmKickPlayer:input_type -> rpcPb.GmKickPlayerReq
+	6, // 6: rpcPb.GateService.SayHello:output_type -> rpcPb.HelloResp
+	7, // 7: rpcPb.GateService.DeliverRechargeItem:output_type -> rpcPb.EmptyResp
+	7, // 8: rpcPb.GateService.NotifyServerOperationHandler:output_type -> rpcPb.EmptyResp
+	7, // 9: rpcPb.GateService.NotifyAllianceChange:output_type -> rpcPb.EmptyResp
+	7, // 10: rpcPb.GateService.GmKickPlayer:output_type -> rpcPb.EmptyResp
+	6, // [6:11] is the sub-list for method output_type
+	1, // [1:6] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_gateway_proto_init() }

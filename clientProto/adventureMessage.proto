@@ -1,0 +1,58 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+import "commonMessage.proto";
+
+// 奇遇入口信息
+message AdventureEntryInfo {
+  // 入口唯一 id
+  // 用来区分同一时间存在的多个奇遇入口
+  string uniqueId = 1;
+
+  // 奇遇副本配置 id
+  // 对应 adventure.xlsx 的 id
+  int32 adventureId = 2;
+
+  // 入口过期时间，毫秒时间戳
+  int64 expireTime = 3;
+}
+
+// 获取奇遇信息请求
+message AdventureInfoReq {
+}
+
+// 获取奇遇信息响应
+message AdventureInfoResp {
+  // 当前奇遇进度
+  int32 progress = 1;
+  // 今日触发次数
+  int32 dailyTriggerCount = 2;
+  // 今日已结算次数
+  int32 dailySettleCount = 3;
+  // 当前已开启但未进入/未过期的奇遇入口列表
+  repeated AdventureEntryInfo entries = 4;
+}
+
+// 开始奇遇副本请求
+message AdventureStartReq {
+  // 要进入的奇遇入口唯一 id
+  string uniqueId = 1;
+}
+
+// 开始奇遇副本响应
+message AdventureStartResp {
+  // 副本开打数据
+  // 结构复用通用副本的 SceneBasicInfo
+  // 和爬塔 EnterSceneResp.info 是同一套战斗数据
+  SceneBasicInfo info = 1;
+}
+
+message PushAdventureInfoChange {
+  // 推送奇遇进度
+  int32 progress = 1;
+  // 今日触发次数
+  int32 dailyTriggerCount = 2;
+  // 奇遇信息
+  repeated AdventureEntryInfo entries = 3;
+}

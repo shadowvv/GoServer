@@ -11,11 +11,12 @@ import (
 )
 
 type RankBoardSession struct {
-	UserId        int64
-	RankBoardId   string
-	BackMessageId int32
-	RespMsgId     rpcPb.RPC_MESSAGE_ID
-	ErrorCode     int32
+	UserId              int64
+	RankBoardId         string
+	GetRankBoardInfoIds []string
+	BackMessageId       int32
+	RespMsgId           rpcPb.RPC_MESSAGE_ID
+	ErrorCode           int32
 
 	sender logicCommon.GrpcSenderInterface[rpcPb.ForwardRankBoardMessage, rpcPb.BackwardRankBoardMessage]
 	codec  serviceInterface.CodecInterface
@@ -27,14 +28,19 @@ func (g *RankBoardSession) SendAndClose(msgId int32, msg proto.Message) {
 
 }
 
-func NewRankBoardSession(codec serviceInterface.CodecInterface, userId int64, rankBoardId string, backMessageId int32, respMsgId rpcPb.RPC_MESSAGE_ID, sender logicCommon.GrpcSenderInterface[rpcPb.ForwardRankBoardMessage, rpcPb.BackwardRankBoardMessage]) *RankBoardSession {
+func NewRankBoardSession(codec serviceInterface.CodecInterface, userId int64, rankBoardIds []string, backMessageId int32, respMsgId rpcPb.RPC_MESSAGE_ID, sender logicCommon.GrpcSenderInterface[rpcPb.ForwardRankBoardMessage, rpcPb.BackwardRankBoardMessage]) *RankBoardSession {
+	rankBoardId := ""
+	if len(rankBoardIds) > 0 {
+		rankBoardId = rankBoardIds[0]
+	}
 	s := &RankBoardSession{
-		UserId:        userId,
-		RankBoardId:   rankBoardId,
-		codec:         codec,
-		BackMessageId: backMessageId,
-		RespMsgId:     respMsgId,
-		sender:        sender,
+		UserId:              userId,
+		RankBoardId:         rankBoardId,
+		GetRankBoardInfoIds: append([]string(nil), rankBoardIds...),
+		codec:               codec,
+		BackMessageId:       backMessageId,
+		RespMsgId:           respMsgId,
+		sender:              sender,
 	}
 	return s
 }

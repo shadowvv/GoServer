@@ -607,6 +607,8 @@ func (h *HeroDetailsCollectionModel) addHeroFormAttrTree(heroOwnId int64) {
 	// 初始化 Second 子 map
 	if h.heroAttrTree.Second[heroClass] == nil {
 		h.heroAttrTree.Second[heroClass] = make(map[int32]bool)
+	}
+	if _, ok := h.heroAttrTree.Second[heroClass][heroModelId]; !ok {
 		h.heroAttrTree.Second[heroClass][heroModelId] = false
 	}
 	// 初始化 Third 子 map
@@ -615,6 +617,8 @@ func (h *HeroDetailsCollectionModel) addHeroFormAttrTree(heroOwnId int64) {
 	}
 	if h.heroAttrTree.Third[heroClass][heroModelId] == nil {
 		h.heroAttrTree.Third[heroClass][heroModelId] = make(map[int32]bool)
+	}
+	if _, ok := h.heroAttrTree.Third[heroClass][heroModelId][int32(heroDetail.HeroOwnID%10)]; !ok {
 		h.heroAttrTree.Third[heroClass][heroModelId][int32(heroDetail.HeroOwnID%10)] = false
 	}
 	// 初始化 Fourth 子 map

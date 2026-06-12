@@ -101,22 +101,40 @@ func (s *GameActivityService) Reload() {
 	serverActivityConfigEntities, err := LoadActivityConfigFromRedis()
 	if err != nil {
 		logger.ErrorBySprintf("[platform] get all activity config from redis error: %v", err)
+	} else {
+		s.serverActivityConfigModel.ReloadServerActivityConfig(serverActivityConfigEntities)
 	}
-	s.serverActivityConfigModel.ReloadServerActivityConfig(serverActivityConfigEntities)
 
 	activityMap, err := LoadServerOpenActivityFromRedis()
 	if err != nil {
 		logger.ErrorBySprintf("[platform] load server open activity from redis error: %v", err)
+	} else {
+		s.serverOpenActivityModel.Reload(activityMap)
 	}
-	s.serverOpenActivityModel.Reload(activityMap)
 }
 
 func (s *GameActivityService) IsActivitySettled(serverId int32, activityId int32, version string) bool {
 	return s.serverOpenActivityModel.IsActivitySettled(serverId, activityId, version)
 }
 
-func (s *GameActivityService) GetAllActivityByServerId(serverId int32) []logicCommon.GameActivityInterface {
-	return s.serverOpenActivityModel.GetAllActivityByServerId(serverId)
+func (s *GameActivityService) GetAllOpenActivityByServerId(serverId int32) []logicCommon.GameActivityInterface {
+	openAll := make([]logicCommon.GameActivityInterface, 0)
+	all := s.serverOpenActivityModel.GetAllOpenActivityByServerId(serverId)
+	for _, activity := range all {
+		cfg := s.serverActivityConfigModel.GetActivityConfig(activity.GetActivityId())
+		if cfg == nil {
+			continue
+		}
+		realConfig, ok := cfg.(*model.ServerActivityConfigEntity)
+		if !ok {
+			continue
+		}
+		if isActivityBlocked(realConfig, serverId) {
+			continue
+		}
+		openAll = append(openAll, activity)
+	}
+	return openAll
 }
 
 func (s *GameActivityService) IsActivityOpen(serverId int32, activityId int32) logicCommon.GameActivityInterface {
@@ -128,15 +146,22 @@ func (s *GameActivityService) IsActivityOpen(serverId int32, activityId int32) l
 	if !ok {
 		return nil
 	}
-	if realConfig.IfBlock == 1 {
+	if isActivityBlocked(realConfig, serverId) {
 		return nil
 	}
-	for _, s := range realConfig.IfBlockServers {
-		if serverId == s {
-			return nil
+	return s.serverOpenActivityModel.IsActivityOpen(serverId, activityId)
+}
+
+func isActivityBlocked(config *model.ServerActivityConfigEntity, serverId int32) bool {
+	if config.IfBlock == 1 {
+		return true
+	}
+	for _, blockedServerId := range config.IfBlockServers {
+		if serverId == blockedServerId {
+			return true
 		}
 	}
-	return s.serverOpenActivityModel.IsActivityOpen(serverId, activityId)
+	return false
 }
 
 func (s *GameActivityService) GetActivityConfig(activityId int32) logicCommon.GameActivityConfigInterface {

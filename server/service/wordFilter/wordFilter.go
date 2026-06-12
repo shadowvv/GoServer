@@ -2,37 +2,61 @@ package wordFilter
 
 import (
 	"bufio"
+	"errors"
 	"os"
+	"strings"
 	"sync/atomic"
 
 	"github.com/importcjj/sensitive"
 )
+
+var ErrWordFilterNotInitialized = errors.New("word filter service is not initialized")
 
 func InitWordFilterService(path string) {
 	service, err := newWordFilter(path)
 	if err != nil {
 		panic(err)
 	}
-	wordFilterService = service
+	wordFilterService.Store(service)
+}
+
+var wordFilterService atomic.Pointer[WordFilter]
+
+func getWordFilterService() *WordFilter {
+	return wordFilterService.Load()
 }
 
 func HasSensitive(text string) bool {
-	return wordFilterService.HasSensitive(text)
+	service := getWordFilterService()
+	if service == nil {
+		return true
+	}
+	return service.HasSensitive(text)
 }
 
 func Reload() error {
-	return wordFilterService.Reload()
+	service := getWordFilterService()
+	if service == nil {
+		return ErrWordFilterNotInitialized
+	}
+	return service.Reload()
 }
 
 func Find(text string) []string {
-	return wordFilterService.Find(text)
+	service := getWordFilterService()
+	if service == nil {
+		return nil
+	}
+	return service.Find(text)
 }
 
 func Replace(text string) string {
-	return wordFilterService.Replace(text)
+	service := getWordFilterService()
+	if service == nil {
+		return text
+	}
+	return service.Replace(text)
 }
-
-var wordFilterService *WordFilter
 
 type WordFilter struct {
 	matcher atomic.Value // 并发安全
@@ -59,8 +83,9 @@ func (wf *WordFilter) load() error {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
+	scanner.Buffer(make([]byte, 1024), 1024*1024)
 	for scanner.Scan() {
-		line := scanner.Text()
+		line := cleanWord(scanner.Text())
 		if line == "" {
 			continue
 		}
@@ -84,12 +109,12 @@ func (wf *WordFilter) HasSensitive(text string) bool {
 
 func (wf *WordFilter) Find(text string) []string {
 	m := wf.matcher.Load().(*sensitive.Filter)
-	return m.FindAll(text)
+	return m.FindAll(m.RemoveNoise(text))
 }
 
 func (wf *WordFilter) Replace(text string) string {
 	m := wf.matcher.Load().(*sensitive.Filter)
-	return m.Replace(text, '*')
+	return m.Replace(m.RemoveNoise(text), '*')
 }
 
 // GM 手动 reload
@@ -107,11 +132,18 @@ func (wf *WordFilter) readAll() ([]string, error) {
 
 	var list []string
 	scanner := bufio.NewScanner(file)
+	scanner.Buffer(make([]byte, 1024), 1024*1024)
 	for scanner.Scan() {
-		line := scanner.Text()
+		line := cleanWord(scanner.Text())
 		if line != "" {
 			list = append(list, line)
 		}
 	}
 	return list, scanner.Err()
+}
+
+func cleanWord(word string) string {
+	word = strings.TrimSpace(word)
+	word = strings.TrimPrefix(word, "\ufeff")
+	return strings.TrimSpace(word)
 }

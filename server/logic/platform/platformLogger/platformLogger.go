@@ -8,7 +8,7 @@ import (
 
 func InfoWithUser(msg string, user logicCommon.UserBaseInterface) {
 	if user == nil {
-		logger.InfoWithSprintf(msg)
+		logger.InfoWithZapFields(msg)
 		return
 	}
 	sessionId := int64(0)

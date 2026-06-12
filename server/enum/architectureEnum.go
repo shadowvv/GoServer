@@ -41,3 +41,20 @@ func GetArchitectureTypeName(t int32) int32 {
 	}
 	return systemUnlockId
 }
+
+func GetArchitectureIdFormFunctionId(key int32) int32 {
+	res := int32(0)
+	switch key {
+	case FUNCTION_ID_STONE:
+		res = int32(ARCHITECTURE_TYPE_STONE)
+	case FUNCTION_ID_PET_SANCTUARY:
+		res = int32(ARCHITECTURE_TYPE_PET)
+	case FUNCTION_ID_COLLECTION:
+		res = int32(ARCHITECTURE_TYPE_COLLECTION)
+	case FUNCTION_ID_EQUIPMENT:
+		res = int32(ARCHITECTURE_TYPE_EQUIPMENT)
+	case FUNCTION_ID_LUMBERYARD:
+		res = int32(ARCHITECTURE_TYPE_LUMBERYARD)
+	}
+	return res
+}

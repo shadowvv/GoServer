@@ -21,6 +21,7 @@ type GameSession struct {
 	sender         logicCommon.GrpcSenderInterface[rpcPb.ForwardGameMessage, rpcPb.BackwardClientMessage]
 	offlineTimeout time.Duration
 	LastActiveTime atomic.Int64
+	isClosed       atomic.Bool
 }
 
 var _ serviceInterface.SessionInterface = (*GameSession)(nil)
@@ -33,6 +34,7 @@ func NewGameSession(codec serviceInterface.CodecInterface, sessionId int64, user
 		codec:          codec,
 		offlineTimeout: offlineTimeout,
 	}
+	s.isClosed.Store(false)
 	return s
 }
 
@@ -90,8 +92,8 @@ func (g *GameSession) SendAndClose(msgId int32, message proto.Message) {
 	}
 }
 
-func (g *GameSession) internalClose() {
-	g.acceptor.OnConnectionTimeout(g)
+func (g *GameSession) internalClose(isForce bool) {
+	g.acceptor.OnSessionClose(g, isForce)
 }
 
 // ------------------ heartbeat ------------------
@@ -108,9 +110,13 @@ func (g *GameSession) heartbeat() {
 	for {
 		select {
 		case <-ticker.C:
+			if g.isClosed.Load() {
+				g.internalClose(true)
+				return
+			}
 			if tool.UnixNowMilli()-g.LastActiveTime.Load() > g.offlineTimeout.Milliseconds() {
-				logger.InfoWithSprintf(fmt.Sprintf("[net] sessionId:%d timeout", g.SessionId))
-				g.internalClose()
+				logger.InfoWithSprintf("[net] sessionId:%d timeout", g.SessionId)
+				g.internalClose(false)
 				return
 			}
 		}
@@ -118,6 +124,7 @@ func (g *GameSession) heartbeat() {
 }
 
 func (g *GameSession) Close() {
+	g.isClosed.Store(true)
 }
 
 func (g *GameSession) GetID() int64 {

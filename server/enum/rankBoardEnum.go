@@ -60,14 +60,14 @@ func IsValidRankBoardSendRewardType(v int32) bool {
 }
 
 const (
-	RankSettleTaskStatusPending      int8 = 0
-	RankSettleTaskStatusRunning      int8 = 1
-	RankSettleTaskStatusSnapshotDone int8 = 2
-	RankSettleTaskStatusRewardDone   int8 = 3
-	RankSettleTaskStatusFailed       int8 = 4
+	RankSettleTaskStatusPending      int8 = 0 // 排行榜发奖等待中
+	RankSettleTaskStatusRunning      int8 = 1 // 排行榜发奖执行中
+	RankSettleTaskStatusSnapshotDone int8 = 2 // 排行榜发奖快照已建立
+	RankSettleTaskStatusRewardDone   int8 = 3 // 排行榜发奖结束
+	RankSettleTaskStatusFailed       int8 = 4 // 排行榜发奖失败
 )
 
 const (
-	RankRewardStatusPending int8 = 0
-	RankRewardStatusDone    int8 = 1
+	RankRewardStatusPending int8 = 0 // 发奖快照：等待中
+	RankRewardStatusDone    int8 = 1 // 发奖快照：已完成
 )

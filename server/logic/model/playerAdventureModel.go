@@ -193,7 +193,7 @@ func (p *PlayerAdventureModel) ResetDaily(now int64) {
 	if p == nil || p.Entity == nil {
 		return
 	}
-	if p.Entity.LastResetTime != 0 && tool.IsSameDay(tool.MilliToTime(p.Entity.LastResetTime), tool.MilliToTime(now)) {
+	if p.Entity.LastResetTime != 0 && tool.IsSameDayByMilli(p.Entity.LastResetTime, now) {
 		return
 	}
 	p.Entity.Progress = 0
@@ -450,7 +450,7 @@ func (p *PlayerAdventureModel) getSettleTypeCount(adventureId int32) int32 {
 	if entity == nil {
 		return 0
 	}
-	if entity.LastResetTime == 0 || tool.IsSameDay(tool.MilliToTime(entity.LastResetTime), tool.MilliToTime(p.Entity.LastResetTime)) {
+	if entity.LastResetTime == 0 || tool.IsSameDayByMilli(entity.LastResetTime, p.Entity.LastResetTime) {
 		return entity.SettleCount
 	}
 	entity.SettleCount = 0

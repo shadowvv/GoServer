@@ -31,6 +31,7 @@ type TaskCfgLoader struct {
 	temp5 map[int32]*DailyAwardsCfg
 	temp6 map[int32]*PassCfg
 	temp7 map[int32]*ActCfg
+	temp8 map[int32]*UnionDailyCfg
 }
 
 var _ configLoaderInterface = (*TaskCfgLoader)(nil)
@@ -170,6 +171,25 @@ func (s *TaskCfgLoader) loadData() error {
 		s.temp7[v.Id] = &v
 	}
 
+	s.temp8 = make(map[int32]*UnionDailyCfg)
+	for _, row := range rawData["unionDaily"] {
+		var v UnionDailyCfg
+		v.Id = ParseInt(row["id"])
+		v.TaskId = ParseInt(row["taskId"])
+		v.TaskReward = ParseItemArray(row["taskReward"])
+		v.Item = ParseItemArray(row["item"])
+		v.ActId = ParseIntArray(row["actId"])
+		v.Unlock = ParseInt(row["unlock"])
+		v.UnlockStop = ParseInt(row["unlockStop"])
+		if v.Id <= 0 {
+			continue
+		}
+		if s.temp8[v.Id] != nil {
+			return errors.New(fmt.Sprintf("[gameConfig] load unionDaily error duplicate ID:%d", v.Id))
+		}
+		s.temp8[v.Id] = &v
+	}
+
 	return nil
 }
 
@@ -186,7 +206,7 @@ func (s *TaskCfgLoader) checkData() error {
 		}
 	}
 	for id, v := range s.temp2 {
-		if v.TaskType < enum.ObjectiveTypeKillAnyMonsterHowMany || v.TaskType > enum.ObjectiveTypeWearHowManyEquipmentLevel {
+		if v.TaskType < enum.ObjectiveTypeKillAnyMonsterHowMany || v.TaskType > enum.ObjectiveTypeCityAgeReachWhatStage {
 			return errors.New(fmt.Sprintf("[gameConfig] load Core error invalid TaskPara limit ID:%d", id))
 		}
 		if v.Id <= 0 {
@@ -260,6 +280,24 @@ func (s *TaskCfgLoader) checkData() error {
 			return errors.New(fmt.Sprintf("[gameConfig] load act task reflect error invalid ID:%d", id))
 		}
 	}
+	for id, v := range s.temp8 {
+		if s.temp2[v.TaskId] == nil {
+			return errors.New(fmt.Sprintf("[gameConfig] load unionDaily error nil ID:%d", id))
+		}
+		for _, value := range v.TaskReward {
+			if GetItemCfg(value.ID) == nil {
+				return errors.New(fmt.Sprintf("[gameConfig] load unionDaily error invalid ID:%d", id))
+			}
+		}
+		for _, value := range v.ActId {
+			if value <= 0 {
+				return errors.New(fmt.Sprintf("[gameConfig] load unionDaily error invalid ActId ID:%d", id))
+			}
+		}
+		if v.Id <= 0 {
+			return errors.New(fmt.Sprintf("[gameConfig] load unionDaily error invalid ID:%d", id))
+		}
+	}
 	err := checkTackTypePara()
 	if err != nil {
 		return err
@@ -275,6 +313,7 @@ func (s *TaskCfgLoader) apply() {
 	DailyAwards.Store(s.temp5)
 	PassCard.Store(s.temp6)
 	Act.Store(s.temp7)
+	UnionDaily.Store(s.temp8)
 	InitSideTask()
 	InitPassTask()
 	InitActTask()
@@ -287,6 +326,7 @@ var Secondary atomic.Value
 var DailyAwards atomic.Value
 var PassCard atomic.Value
 var Act atomic.Value
+var UnionDaily atomic.Value
 
 type CoreCfg struct {
 	// 序号id
@@ -373,6 +413,35 @@ type ActCfg struct {
 	TaskId     int32         `json:"taskId"`
 	TaskReward []*ItemConfig `json:"taskReward"`
 	Reflect    int32         `json:"reflect"`
+}
+
+type UnionDailyCfg struct {
+	// 每日任务id
+	Id int32 `json:"id"`
+	// 任务id
+	TaskId int32 `json:"taskId"`
+	// 任务奖励
+	TaskReward []*ItemConfig `json:"taskReward"`
+	// 特殊掉落
+	Item []*ItemConfig `json:"item"`
+	// 活动id
+	ActId []int32 `json:"actId"`
+	// 解锁条件
+	Unlock int32 `json:"unlock"`
+	// 解锁失效
+	UnlockStop int32 `json:"unlockStop"`
+}
+
+func (u *UnionDailyCfg) GetTaskId() int32 {
+	return u.TaskId
+}
+
+func GetUnionDailyCfg(id int32) *UnionDailyCfg {
+	cfgMap := UnionDaily.Load()
+	if cfgMap == nil {
+		return nil
+	}
+	return cfgMap.(map[int32]*UnionDailyCfg)[id]
 }
 
 func (m *MainCfg) GetTaskId() int32 {
@@ -500,6 +569,12 @@ func GetTaskTypeByAttribution(attribution int32, taskId int32) int32 {
 				return core.TaskType
 			}
 		}
+	case enum.TaskAffiliationDailyAlliance:
+		if cfg := GetUnionDailyCfg(taskId); cfg != nil {
+			if core := GetCoreCfg(cfg.TaskId); core != nil {
+				return core.TaskType
+			}
+		}
 	}
 	return 0
 }
@@ -546,6 +621,19 @@ func GetAllDailyTaskIDs() []int32 {
 	}
 	ids := make([]int32, 0)
 	for id, _ := range cfgMap.(map[int32]*DailyCfg) {
+		idCopy := id
+		ids = append(ids, idCopy)
+	}
+	return ids
+}
+
+func GetAllUnionDailyTaskIDs() []int32 {
+	cfgMap := UnionDaily.Load()
+	if cfgMap == nil {
+		return nil
+	}
+	ids := make([]int32, 0)
+	for id, _ := range cfgMap.(map[int32]*UnionDailyCfg) {
 		idCopy := id
 		ids = append(ids, idCopy)
 	}
@@ -663,6 +751,8 @@ func GetCoreTaskId(attr, id int32) (int32, error) {
 		return id, nil
 	} else if attr == enum.TaskAffiliationAct {
 		cfg = GetActTaskCfg(id)
+	} else if attr == enum.TaskAffiliationDailyAlliance {
+		cfg = GetUnionDailyCfg(id)
 	}
 
 	// 防止配置表变更导致 cfg 为 nil 时 panic
@@ -810,6 +900,14 @@ func checkTackTypePara() error {
 				err = errors.New(fmt.Sprintf("[gameConfig] check Core error invalid TaskPara length ID:%d", coreCfg.Id))
 			}
 		case enum.ObjectiveTypeWearHowManyEquipmentLevel:
+			if len(coreCfg.TaskPara) != 1 {
+				err = errors.New(fmt.Sprintf("[gameConfig] check Core error invalid TaskPara length ID:%d", coreCfg.Id))
+			}
+		case enum.ObjectiveTypeStoneWhatClassWhatAttrLevelUpHowMany:
+			if len(coreCfg.TaskPara) != 2 {
+				err = errors.New(fmt.Sprintf("[gameConfig] check Core error invalid TaskPara length ID:%d", coreCfg.Id))
+			}
+		case enum.ObjectiveTypeCityAgeReachWhatStage:
 			if len(coreCfg.TaskPara) != 1 {
 				err = errors.New(fmt.Sprintf("[gameConfig] check Core error invalid TaskPara length ID:%d", coreCfg.Id))
 			}

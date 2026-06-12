@@ -304,7 +304,7 @@ func PassWhatMainLevel(event *eventService.PassInstanceEvent, player *model.Play
 			return
 		}
 		if event.InstanceTypeId == enum.MAIN_INSTANCE_ID {
-			if event.InstanceId > gameConfig.GetCoreCfg(taskId).TaskPara[0] {
+			if event.InstanceId >= gameConfig.GetCoreCfg(taskId).TaskPara[0] {
 				task.UpdateTaskProgressData(id, taskType, taskAttribution, gameConfig.GetCoreCfg(taskId).TaskNum)
 				task.UpdateUpdateTime(id, taskType, taskAttribution, tool.UnixNowMilli())
 				task.UpdateTaskStatus(id, taskType, taskAttribution, enum.TaskStatusFinishUnReward)
@@ -798,7 +798,12 @@ func DungeonParticipateHowMany(event *eventService.JoinInstanceEvent, player *mo
 		if entity.Status != enum.TaskStatusUnFinish {
 			continue
 		}
-		if cfg := gameConfig.GetCoreCfg(entity.TaskID); cfg != nil {
+		taskId, err := gameConfig.GetCoreTaskId(entity.TaskAttribution, entity.TaskID)
+		if err != nil {
+			logger.ErrorWithZapFields("get core task id error", zap.Int32("attribution", entity.TaskAttribution), zap.Int32("task id", entity.TaskID))
+			return
+		}
+		if cfg := gameConfig.GetCoreCfg(taskId); cfg != nil {
 			if int32(event.InstanceTypeId) == cfg.TaskPara[0] {
 				task.UpdateTaskProgressData(entity.TaskID, taskType, taskAttribution, entity.ProgressData+1)
 				task.UpdateUpdateTime(entity.TaskID, taskType, taskAttribution, tool.UnixNowMilli())
@@ -814,7 +819,12 @@ func DungeonParticipateHowManyCumulative(event *eventService.JoinInstanceEvent, 
 		if entity.Status != enum.TaskStatusUnFinish {
 			continue
 		}
-		if cfg := gameConfig.GetCoreCfg(entity.TaskID); cfg != nil {
+		taskId, err := gameConfig.GetCoreTaskId(entity.TaskAttribution, entity.TaskID)
+		if err != nil {
+			logger.ErrorWithZapFields("get core task id error", zap.Int32("attribution", entity.TaskAttribution), zap.Int32("task id", entity.TaskID))
+			return
+		}
+		if cfg := gameConfig.GetCoreCfg(taskId); cfg != nil {
 			if int32(event.InstanceTypeId) == cfg.TaskPara[0] {
 				task.UpdateTaskProgressData(entity.TaskID, taskType, taskAttribution, entity.ProgressData+1)
 				task.UpdateUpdateTime(entity.TaskID, taskType, taskAttribution, tool.UnixNowMilli())
@@ -829,7 +839,12 @@ func DungeonPassWhatStage(event *eventService.PassInstanceEvent, player *model.P
 		if entity.Status != enum.TaskStatusUnFinish {
 			continue
 		}
-		if cfg := gameConfig.GetCoreCfg(entity.TaskID); cfg != nil {
+		taskId, err := gameConfig.GetCoreTaskId(entity.TaskAttribution, entity.TaskID)
+		if err != nil {
+			logger.ErrorWithZapFields("get core task id error", zap.Int32("attribution", entity.TaskAttribution), zap.Int32("task id", entity.TaskID))
+			return
+		}
+		if cfg := gameConfig.GetCoreCfg(taskId); cfg != nil {
 			if int32(event.InstanceTypeId) == cfg.TaskPara[0] && cfg.TaskPara[1] == event.InstanceId {
 				task.UpdateTaskProgressData(entity.TaskID, taskType, taskAttribution, cfg.TaskNum)
 				task.UpdateUpdateTime(entity.TaskID, taskType, taskAttribution, tool.UnixNowMilli())
@@ -870,6 +885,48 @@ func WearHowManyEquipmentLevel(event *eventService.EquipmentWearEvent, player *m
 	for _, entity := range task.TaskEntity[taskAttribution][taskType] {
 		if entity.Status == enum.TaskStatusUnFinish {
 			task.NeedCheckTaskList = append(task.NeedCheckTaskList, entity)
+		}
+	}
+}
+
+func StoneWhatClassWhatAttrLevelUpHowMany(event *eventService.StoneAttrLevelUpEvent, player *model.PlayerModel, taskAttribution int32, taskType int32) {
+	task := player.TaskModel
+	for _, entity := range task.TaskEntity[taskAttribution][taskType] {
+		if entity.Status != enum.TaskStatusUnFinish {
+			continue
+		}
+		taskId, err := gameConfig.GetCoreTaskId(entity.TaskAttribution, entity.TaskID)
+		if err != nil {
+			logger.ErrorWithZapFields("get core task id error", zap.Int32("attribution", entity.TaskAttribution), zap.Int32("task id", entity.TaskID))
+			return
+		}
+		if cfg := gameConfig.GetCoreCfg(taskId); cfg != nil {
+			if cfg.TaskPara[0] == event.Class && cfg.TaskPara[1] == event.AttrId {
+				task.UpdateTaskProgressData(entity.TaskID, taskType, taskAttribution, entity.ProgressData+event.LevelUpNum)
+				task.UpdateUpdateTime(entity.TaskID, taskType, taskAttribution, tool.UnixNowMilli())
+				TaskFinishCheck(player, taskAttribution, taskType, entity.TaskID)
+			}
+		}
+	}
+}
+
+func CityAgeReachWhatStage(event *eventService.EventTypeCityAgeChange, player *model.PlayerModel, taskAttribution int32, taskType int32) {
+	task := player.TaskModel
+	for _, entity := range task.TaskEntity[taskAttribution][taskType] {
+		if entity.Status != enum.TaskStatusUnFinish {
+			continue
+		}
+		taskId, err := gameConfig.GetCoreTaskId(entity.TaskAttribution, entity.TaskID)
+		if err != nil {
+			logger.ErrorWithZapFields("get core task id error", zap.Int32("attribution", entity.TaskAttribution), zap.Int32("task id", entity.TaskID))
+			return
+		}
+		if cfg := gameConfig.GetCoreCfg(taskId); cfg != nil {
+			if cfg.TaskPara[0] <= event.CityAge {
+				task.UpdateTaskProgressData(entity.TaskID, taskType, taskAttribution, cfg.TaskNum)
+				task.UpdateUpdateTime(entity.TaskID, taskType, taskAttribution, tool.UnixNowMilli())
+				TaskFinishCheck(player, taskAttribution, taskType, entity.TaskID)
+			}
 		}
 	}
 }

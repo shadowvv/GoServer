@@ -1,0 +1,158 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "../logic/pb;pb";
+
+import "messageEnum.proto";
+import "heroMessage.proto";
+import "commonMessage.proto";
+
+// 装备基础信息
+message EquipmentInfo {
+  int64 equipmentOwnId = 1;   // 装备唯一ID，全局唯一标识
+  int32 equipmentId = 2;      // 装备模板ID，对应配置表中的ID
+  int64 heroOwnId = 3;        // 穿戴的英雄唯一ID，0表示在仓库中
+  int32 level = 4;            // 装备等级，固定不可升级
+  int32 slotType = 5;         // 装备部位类型：1-武器，2-防具
+  int32 slotIndex = 6;        // 装备槽位索引：武器(0)，防具(1-5)
+  int32 starLevel = 7;        // 装备星级，预留字段
+  int32 setId = 8;            // 套装ID，0表示不属于任何套装
+  bool isLocked = 9;          // 是否锁定，锁定后无法分解
+  int64 power = 10;           // 战力
+  int32 strongLevel = 11;      // 强化等级
+}
+
+// 获取装备列表请求
+message EquipmentListReq {}
+
+// 获取装备列表响应
+message EquipmentListResp {
+  ERROR_CODE errorCode = 1;              // 错误码
+  repeated EquipmentInfo equipments = 2; // 装备列表
+}
+
+// 获取装备详情请求
+message EquipmentDetailReq {
+  int64 equipmentOwnId = 1;   // 要查询的装备唯一ID
+}
+
+// 获取装备详情响应
+message EquipmentDetailResp {
+  ERROR_CODE errorCode = 1;      // 错误码
+  EquipmentDetailInfo detail = 2; // 装备详情
+}
+
+// 穿戴装备请求
+message EquipmentEquipReq {
+  int64 equipmentOwnId = 1; // 要穿戴的装备ID
+  int64 heroOwnId = 2;      // 英雄ID
+}
+
+// 穿戴装备响应
+message EquipmentEquipResp {
+  ERROR_CODE errorCode = 1; // 错误码
+  bool isSuccess = 2;       // 是否成功（保留字段，兼容旧客户端）
+    HeroBagInfo heroInfo = 3; // 英雄信息
+}
+
+// 卸下装备请求
+message EquipmentUnequipReq {
+  int64 equipmentOwnId = 1;
+}
+
+// 卸下装备响应
+message EquipmentUnequipResp {
+  ERROR_CODE errorCode = 1; // 错误码
+  bool isSuccess = 2;       // 是否成功（保留字段，兼容旧客户端）
+    HeroBagInfo heroInfo = 3; // 英雄信息
+}
+
+// 替换装备请求
+message EquipmentSwapReq {
+  int64 equipmentOwnId = 1;
+  int64 heroOwnId = 2;
+}
+
+// 替换装备响应
+message EquipmentSwapResp {
+  ERROR_CODE errorCode = 1;      // 错误码
+  bool isSuccess = 2;            // 是否成功（保留字段，兼容旧客户端）
+  int64 replacedEquipmentOwnId = 3; // 被替换的装备唯一ID
+    HeroBagInfo heroInfo = 4; // 英雄信息
+}
+
+// 一键穿戴请求
+message EquipmentQuickEquipReq {
+  repeated int64 heroOwnIds = 1;
+}
+
+// 一键穿戴响应
+message EquipmentQuickEquipResp {
+  ERROR_CODE errorCode = 1;            // 错误码
+  bool isSuccess = 2;                 // 是否成功（保留字段，兼容旧客户端）
+  repeated EquipmentInfo equipments = 3; // 穿戴的装备列表
+  repeated HeroBagInfo heroInfos = 4;   // 受影响的英雄信息列表
+}
+
+// 一键卸下请求
+message EquipmentQuickUnequipReq {
+  repeated int64 heroOwnIds = 1;
+}
+
+// 一键卸下响应
+message EquipmentQuickUnequipResp {
+  ERROR_CODE errorCode = 1; // 错误码
+  bool isSuccess = 2;        // 是否成功（保留字段，兼容旧客户端）
+  repeated HeroBagInfo heroInfos = 3; // 受影响的英雄信息列表
+}
+
+// 锁定/解锁装备请求
+message EquipmentLockReq {
+  int64 equipmentOwnId = 1;
+  bool lock = 2;
+}
+
+// 锁定/解锁装备响应
+message EquipmentLockResp {
+  ERROR_CODE errorCode = 1; // 错误码
+  bool isSuccess = 2;        // 是否成功（保留字段，兼容旧客户端）
+}
+
+// 分解装备请求
+message EquipmentDecomposeReq {
+  repeated int64 equipmentOwnIds = 1;
+}
+
+// 分解装备响应
+message EquipmentDecomposeResp {
+  ERROR_CODE errorCode = 1;    // 错误码
+  repeated int32 dropId = 2;   // 掉落物品ID列表
+}
+message PushEquipmentDetail {
+  repeated EquipmentDetailInfo info = 1;
+}
+
+message EquipmentForgeReq{
+  int32 paperId=1;
+  int32 count=2;
+}
+
+message EquipmentForgeResp{}
+
+message EquipmentStrongReq{
+  int64 equipmentOwnId=1;
+  bool isUseStone=2;
+}
+
+message EquipmentStrongResp{
+  EquipmentDetailInfo equipmentDetail=1;
+}
+
+message EquipmentRebirthReq{
+  int64 equipmentOwnId=1;
+}
+
+message EquipmentRebirthResp{
+  EquipmentDetailInfo equipmentDetail=1;
+}

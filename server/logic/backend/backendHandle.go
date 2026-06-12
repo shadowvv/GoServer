@@ -5,6 +5,9 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -595,6 +598,7 @@ func GmGetRank(req *GmGetRankReq, resp *GmResp) {
 			Score:        info.Score,
 			ThumbUpCount: info.ThumbUpCount,
 			EnterTime:    info.EnterTime,
+			UpdateTime:   info.UpdateTime,
 		}
 		// 查询用户昵称
 		userInfo, userErr := easyDB.GetPlayerEntityByWhere[model.UserEntity](map[string]interface{}{"user_id": info.Id})
@@ -930,7 +934,7 @@ func GmEditServer(req *GmEditServerReq, resp *GmResp) {
 		ServerNameId:     req.Info.ServerId,
 		ServerOpenTime:   req.Info.ServerOpenTime,
 		ServerTime:       req.Info.ServerTime,
-		ServerLogicId:    req.Info.ServerLogicId,
+		ServerLogicId:    req.Info.ServerId,
 		AreaId:           req.Info.AreaId,
 		AreaName:         req.Info.AreaName,
 		MaxRegisterCount: req.Info.MaxRegisterCount,
@@ -967,6 +971,20 @@ func GmEditServer(req *GmEditServerReq, resp *GmResp) {
 			resp.Msg = updateErr.Error()
 			return
 		}
+	}
+	row, err := easyDB.GetServerEntityByWhere[model.GameServerInfoEntity](map[string]interface{}{"server_id": req.Info.ServerId})
+	if err != nil {
+		resp.Code = 1
+		resp.Msg = err.Error()
+		return
+	}
+	serverEntity.ServerLogicId = row.ServerId
+	serverEntity.ServerNameId = row.ServerId
+	updateErr := httpPlatform.GetServerInfoService().UpdateServerInfo(serverEntity)
+	if updateErr != nil {
+		resp.Code = 2
+		resp.Msg = updateErr.Error()
+		return
 	}
 }
 
@@ -1012,10 +1030,55 @@ func GmEditGamePublic(req *GmEditGamePublicReq, resp *GmResp) {
 			return
 		}
 	}
-	rpcController.SendOperationToGateway(rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_ANNOUNCE_INFO_UPDATE)
+	rpcController.SendOperationToGateway(rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_ANNOUNCE_INFO_UPDATE, 0)
 }
 
 func GmEditClientVersion(req *GmEditClientVersionReq, resp *GmResp) {
+	// 判断是否有文件上传（通过 UploadFile 字段判断）
+	if req.ClientVersionList.UploadFile != nil {
+		// 保存上传的文件
+		file := req.ClientVersionList.UploadFile
+		saveDir := "../../gameClientHotFixCfg"
+		if err := os.MkdirAll(saveDir, os.ModePerm); err != nil {
+			resp.Code = -1
+			resp.Msg = fmt.Sprintf("create dir error: %s", err.Error())
+			return
+		}
+
+		filePath := filepath.Join(saveDir, file.Filename)
+		out, err := os.Create(filePath)
+		if err != nil {
+			resp.Code = -1
+			resp.Msg = fmt.Sprintf("create file error: %s", err.Error())
+			return
+		}
+		defer out.Close()
+
+		// 打开上传的文件流
+		src, err := file.Open()
+		if err != nil {
+			resp.Code = -1
+			resp.Msg = fmt.Sprintf("open file error: %s", err.Error())
+			return
+		}
+		defer src.Close()
+
+		if _, err := io.Copy(out, src); err != nil {
+			resp.Code = -1
+			resp.Msg = fmt.Sprintf("save file error: %s", err.Error())
+			return
+		}
+
+		// 获取服务器 IP
+		serverIP, err := tool.GetLocalIP()
+		if err != nil || serverIP == "" {
+			serverIP = "127.0.0.1"
+		}
+
+		// 拼接 URL
+		req.ClientVersionList.HotFixConfig = fmt.Sprintf("http://%s/gameClientHotFixCfg/%s", serverIP, file.Filename)
+	}
+
 	clientVersionEntity := &model.GameClientVersionEntity{
 		Version:      req.ClientVersionList.Version,
 		HotfixConfig: req.ClientVersionList.HotFixConfig,
@@ -1023,7 +1086,7 @@ func GmEditClientVersion(req *GmEditClientVersionReq, resp *GmResp) {
 	}
 
 	// 查询是否已存在
-	_, err := easyDB.GetServerEntityByWhere[model.GameClientVersionEntity](map[string]interface{}{"version": req.ClientVersionList.Version})
+	existingEntity, err := easyDB.GetServerEntityByWhere[model.GameClientVersionEntity](map[string]interface{}{"version": req.ClientVersionList.Version})
 	if err != nil {
 		// 不存在则创建
 		createErr := httpPlatform.GetServerInfoService().AddClientVersion(clientVersionEntity)
@@ -1032,8 +1095,10 @@ func GmEditClientVersion(req *GmEditClientVersionReq, resp *GmResp) {
 			resp.Msg = createErr.Error()
 		}
 	} else {
-		// 存在则更新
-		updateErr := httpPlatform.GetServerInfoService().UpdateClientVersion(clientVersionEntity)
+		// 存在则更新（修改查询到的 entity 字段）
+		existingEntity.HotfixConfig = req.ClientVersionList.HotFixConfig
+		existingEntity.Examine = req.ClientVersionList.Examine
+		updateErr := httpPlatform.GetServerInfoService().UpdateClientVersion(existingEntity)
 		if updateErr != nil {
 			resp.Code = 2
 			resp.Msg = updateErr.Error()
@@ -1422,7 +1487,50 @@ func GmGetThroughput(req *GmGetThroughputReq, resp *GmResp) {
 	resp.Data = respData
 }
 
+func GmGetServerActivityOpen(req *GmGetServerActivityOpenReq, resp *GmResp) {
+	respData := resp.Data.(*GmGetServerActivityOpenData)
+
+	if req.ServerId <= 0 {
+		resp.Code = 1
+		resp.Msg = "server_id is required and must be greater than 0"
+		return
+	}
+
+	// 从数据库查询服务器开启的所有活动
+	activities, err := easyDB.GetServerEntitiesByWhere[model.ServerOpenActivityEntity](map[string]interface{}{
+		"open_server_id": req.ServerId,
+	})
+	if err != nil {
+		resp.Code = 2
+		resp.Msg = fmt.Sprintf("query activity error: %s", err.Error())
+		respData.ServerId = req.ServerId
+		respData.Activities = make([]*ServerOpenActivityItem, 0)
+		return
+	}
+
+	// 转换为响应格式
+	respData.ServerId = req.ServerId
+	respData.Activities = make([]*ServerOpenActivityItem, 0, len(activities))
+	for _, activity := range activities {
+		respData.Activities = append(respData.Activities, &ServerOpenActivityItem{
+			ActivityId:   activity.ActivityId,
+			Version:      activity.Version,
+			OpenServerId: activity.OpenServerId,
+			OpenTime:     activity.OpenTime,
+			SettleTime:   activity.SettleTime,
+			EndTime:      activity.EndTime,
+			OpenCount:    activity.OpenCount,
+		})
+	}
+}
+
 // GmKickPlayer 踢人操作
 func GmKickPlayer(req *GmKickPlayerReq, resp *GmResp) {
-	// TODO: 实现踢人逻辑
+	if req.Type == 1 {
+		rpcController.SendOperationToGateway(rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_KICK_PLAYER_OUT, int64(req.Param))
+	} else if req.Type == 2 {
+		rpcController.SendOperationToGateway(rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_KICK_SERVER_PLAYER_OFFLINE, int64(req.Param))
+	} else {
+		rpcController.SendOperationToGateway(rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_KICK_ALL_PLAYER_OFFLINE, 0)
+	}
 }

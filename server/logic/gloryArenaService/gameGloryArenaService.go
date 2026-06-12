@@ -139,10 +139,6 @@ func (s *GameGloryArenaService) LoadChallengePlayerInfos(opponentIDs []int64) ma
 	return logicCommon.GetPlayerRedisInfos(opponentIDs)
 }
 
-func (s *GameGloryArenaService) GetSeasonTypeBySeasonID(seasonID int32) enum.GloryArenaSeasonType {
-	return enum.GetGloryArenaSeasonTypeBySeasonId(seasonID)
-}
-
 func (s *GameGloryArenaService) GetOpsStateByServerID(serverID int32) (*logicCommon.GloryArenaOpsServerState, error) {
 	if serverID <= 0 {
 		return nil, nil

@@ -273,6 +273,30 @@ func (s *UnlockCfgLoader) checkData() error {
 				return errors.New(fmt.Sprintf("[gameConfig] load unlock error invalid winCount:%d,id:%d", count, id))
 			}
 		case enum.UNLOCK_TYPE_PLAYER_GLORY_ARENA_FIRST_ENTER:
+		case enum.UNLOCK_TYPE_PLAYER_PET_LOTTERY_DRAW_COUNT:
+			if v.UnlockParam != 0 && v.UnlockParam != 1 {
+				return errors.New(fmt.Sprintf("[gameConfig] load unlock error invalid unlockParam:%d,id:%d", v.UnlockParam, id))
+			}
+			count := ParseInt(v.UnlockValue)
+			if count < 0 {
+				return errors.New(fmt.Sprintf("[gameConfig] load unlock error invalid count:%d,id:%d", count, id))
+			}
+		case enum.UNLOCK_TYPE_PLAYER_COLLECTION_LOTTERY_DRAW_COUNT:
+			if v.UnlockParam != 0 && v.UnlockParam != 1 {
+				return errors.New(fmt.Sprintf("[gameConfig] load unlock error invalid unlockParam:%d,id:%d", v.UnlockParam, id))
+			}
+			count := ParseInt(v.UnlockValue)
+			if count < 0 {
+				return errors.New(fmt.Sprintf("[gameConfig] load unlock error invalid count:%d,id:%d", count, id))
+			}
+		case enum.UNLOCK_TYPE_PLAYER_EXPEDITION_COUNT:
+			if v.UnlockParam != 0 && v.UnlockParam != 1 {
+				return errors.New(fmt.Sprintf("[gameConfig] load unlock error invalid param:%d,id:%d", v.UnlockParam, id))
+			}
+			count := ParseInt(v.UnlockValue)
+			if count < 0 {
+				return errors.New(fmt.Sprintf("[gameConfig] load unlock error invalid count:%d,id:%d", count, id))
+			}
 		default:
 			return errors.New(fmt.Sprintf("[gameConfig] load unlock error invalid unlockType:%d,id:%d", v.UnlockType, id))
 		}

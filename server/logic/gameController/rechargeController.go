@@ -39,7 +39,6 @@ func handleGmConsumeProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	service := httpPlatform.GetPayService()
 	for _, info := range req.OrderInfo {
 		orderEntity, err := easyDB.GetServerEntityByWhere[model.RechargeOrderEntity](map[string]interface{}{"platform_order_id": info.OrderId})
 		if err != nil {
@@ -47,33 +46,20 @@ func handleGmConsumeProduct(w http.ResponseWriter, r *http.Request) {
 			sendErrorMessage(pb.ERROR_CODE_ORDER_NOT_FOUND, w)
 			return
 		}
-		if orderEntity.Status != int32(enum.RECHARGE_ORDER_STATUS_CREATED) {
+		if orderEntity.Status != int32(enum.RECHARGE_ORDER_STATUS_FAILED) {
 			logger.ErrorBySprintf("[recharge] recharge order status error: %v", req)
 			sendErrorMessage(pb.ERROR_CODE_ORDER_ALREADY_CONSUME, w)
 			return
 		}
 
-		err = service.ConsumeProduct(payService.PayGoogle, info)
-		if err != nil {
-			errorCode := pb.ERROR_CODE_SYSTEM_ERROR
-			switch err {
-			case payService.PAY_CHANNEL_NOT_SUPPORTED:
-			case payService.NOT_PAID_ERROR:
-				errorCode = pb.ERROR_CODE_ORDER_NOT_PAID
-			}
-			sendErrorMessage(errorCode, w)
-			return
-		}
 		logger.InfoWithSprintf("[recharge] check order success: %v", info)
 		orderEntity.Status = int32(enum.RECHARGE_ORDER_STATUS_PAYED)
-		orderEntity.PayTime = tool.UnixNowMilli()
-		err = easyDB.UpdateServerEntity[model.RechargeOrderEntity](orderEntity, map[string]interface{}{"status": orderEntity.Status, "pay_time": orderEntity.PayTime})
+		err = easyDB.UpdateServerEntity[model.RechargeOrderEntity](orderEntity, map[string]interface{}{"status": orderEntity.Status})
 		if err != nil {
 			logger.ErrorWithZapFields(fmt.Sprintf("[recharge] save order db error: %v,order:%v", err, info))
 			sendErrorMessage(pb.ERROR_CODE_SYSTEM_ERROR, w)
 			return
 		}
-		enum.PublishRecharge(dbService.RDB, orderEntity.UserId, orderEntity.Account, int64(orderEntity.Price))
 		Success(orderEntity, w)
 	}
 }
@@ -159,6 +145,7 @@ func handleConsumeProduct(w http.ResponseWriter, r *http.Request) {
 			sendErrorMessage(pb.ERROR_CODE_SYSTEM_ERROR, w)
 			return
 		}
+		enum.PublishRecharge(dbService.RDB, orderEntity.UserId, orderEntity.Account, int64(orderEntity.Price))
 		Success(orderEntity, w)
 	}
 }

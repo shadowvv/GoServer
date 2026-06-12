@@ -7,6 +7,7 @@ import (
 
 	"github.com/drop/GoServer/server/enum"
 	"github.com/drop/GoServer/server/logic/backend"
+	"github.com/drop/GoServer/server/logic/gameConfig"
 	"github.com/drop/GoServer/server/logic/pb"
 	"github.com/drop/GoServer/server/logic/platform/httpPlatform"
 	"github.com/drop/GoServer/server/logic/rpcController"
@@ -43,7 +44,7 @@ func handleGmEditServer(w http.ResponseWriter, r *http.Request) {
 
 	backend.GmEditServer(&req, resp)
 
-	rpcController.SendOperationToGateway(rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_RELOAD_SERVER_INFO)
+	rpcController.SendOperationToGateway(rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_RELOAD_SERVER_INFO, 0)
 
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(resp)
@@ -104,15 +105,80 @@ func handleGmEditClientVersion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	resp := &backend.GmResp{
+		Code: 0,
+		Msg:  "",
+	}
+
+	// 判断是否是上传文件请求（multipart/form-data）
+	if r.Header.Get("Content-Type") != "" && len(r.Header.Get("Content-Type")) > 19 && r.Header.Get("Content-Type")[:19] == "multipart/form-data" {
+		// 解析表单
+		if err := r.ParseMultipartForm(50 << 20); err != nil {
+			resp.Code = -1
+			resp.Msg = fmt.Sprintf("parse form error: %s", err.Error())
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(resp)
+			return
+		}
+
+		token := r.FormValue("token")
+		version := r.FormValue("version")
+		if token == "" || version == "" {
+			resp.Code = -1
+			resp.Msg = "token and version are required"
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(resp)
+			return
+		}
+
+		// 验证 token 和权限
+		tokenData, err2 := tool.ParseToken(token)
+		if err2 != nil {
+			resp.Code = -2001
+			resp.Msg = fmt.Sprintf("token is error! err2=%s", err2.Error())
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(resp)
+			return
+		}
+		if !enum.IsPermiss(tokenData.Permiss, enum.EditClientVersionPermission) {
+			resp.Code = -2002
+			resp.Msg = "permiss is not exist"
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(resp)
+			return
+		}
+
+		// 获取上传的文件
+		file, fileHeader, err := r.FormFile("file")
+		if err != nil {
+			resp.Code = -1
+			resp.Msg = fmt.Sprintf("get file error: %s", err.Error())
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(resp)
+			return
+		}
+		defer file.Close()
+
+		// 构造请求，把文件赋值给 UploadFile
+		req := backend.GmEditClientVersionReq{
+			Token: token,
+			ClientVersionList: &backend.GmClientVersionData{
+				Version:    version,
+				UploadFile: fileHeader,
+			},
+		}
+
+		backend.GmEditClientVersion(&req, resp)
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(resp)
+		return
+	}
+
+	// 原有的 JSON 请求逻辑
 	var req backend.GmEditClientVersionReq
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		sendErrorMessage(pb.ERROR_CODE_INVALID_REQUEST_PARAM, w)
 		return
-	}
-
-	resp := &backend.GmResp{
-		Code: 0,
-		Msg:  "",
 	}
 
 	backend.GmEditClientVersion(&req, resp)
@@ -162,10 +228,39 @@ func handleGmEditServerActivityConfig(w http.ResponseWriter, r *http.Request) {
 		Msg:  "",
 	}
 
+	if req.Data == nil {
+		resp.Code = 1
+		resp.Msg = "invalid request: data is nil"
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(resp)
+		return
+	}
+	if err := gameConfig.CheckActivityConfig(&gameConfig.ActivityConfigCheckData{
+		Id:              req.Data.Id,
+		ServerType:      req.Data.ServerType,
+		ServerUnit:      req.Data.ServerUnit,
+		UnlockIds:       gameConfig.ParseIntArray(req.Data.UnlockId),
+		AttendUnlockIds: gameConfig.ParseIntArray(req.Data.AttendUnlockId),
+		EventOpen:       req.Data.EventOpen,
+		EventEnd:        req.Data.EventEnd,
+		WeekOpenDays:    gameConfig.ParseIntArray(req.Data.WeekOpen),
+		MonthOpenDays:   gameConfig.ParseIntArray(req.Data.MonthOpen),
+		Duration:        req.Data.Duration,
+		NextId:          req.Data.NextId,
+		OpenLoopMax:     req.Data.OpenLoopNum,
+	}); err != nil {
+		resp.Code = 1
+		resp.Msg = fmt.Sprintf("invalid activity config: %v", err)
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(resp)
+		return
+	}
+
 	backend.GmEditServerActivityConfig(&req, resp)
 
-	rpcController.BroadcastOperationToGameNode(rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_RELOAD_ACTIVITY_CONFIG)
-	rpcController.SendOperationToGateway(rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_RELOAD_ACTIVITY_CONFIG)
+	if resp.Code == 0 {
+		rpcController.SendOperationToGateway(rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_RELOAD_ACTIVITY_CONFIG, 0)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(resp)

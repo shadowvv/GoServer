@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "../logic/pb;pb";
+
+import "inventoryCommon.proto";
+import "commonMessage.proto";
+
+// 获取背包列表
+message GetInventoryListReq {
+
+}
+
+message GetInventoryListResp {
+  InventoryResult result = 1;
+  repeated ItemInfo items = 2;
+}
+
+// 丢弃物品
+message DiscardItemReq {
+  int32 item_id = 1;
+  int32 quantity = 2;
+}
+
+message DiscardItemResp {
+  InventoryResult result = 1;
+}
+
+// 获取物品数量
+message GetItemCountReq {
+  int32 item_id = 1;
+}
+
+message GetItemCountResp {
+  InventoryResult result = 1;
+  int64 count = 2;
+}
+
+// 检查物品是否存在
+message HasItemReq {
+  int32 item_id = 1;
+  int32 quantity = 2;
+}
+
+message HasItemResp {
+  InventoryResult result = 1;
+  bool has_item = 2;
+}
+
+// 通知消息
+message AddItemNotify {
+  ItemInfo item = 1;
+}
+
+message RemoveItemNotify {
+  int32 position = 1;
+  int32 inventory_type = 2;
+}
+
+message ItemChangeNotify {
+  ItemInfo item = 1;
+  int32 change_type = 2; // 1:添加, 2:移除, 3:更新
+}
+
+message UseItemsReq{
+  int32 useItemId=1; // 物品id
+  int32 useNum=2; // 使用数量
+  int32 chooseId=3; // 选择的物品id（如果有的话）
+}
+
+message UseItemsResp{
+  repeated ItemBasicInfo itemList=1; // 开启结果 message ItemBasicInfo{int32 itemId = 1;int32 count = 2;}
+}

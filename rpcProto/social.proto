@@ -8,6 +8,11 @@ service SocialService {
   rpc ForwardSocialMessageHandler(stream ForwardSocialMessage) returns (stream BackwardSocialMessage);
 }
 
+message AllianceWarehouseInfo {
+  int32 itemId = 1;
+  int64 count = 2;
+}
+
 message ForwardSocialMessage {
   int64 userId = 1;
   RPC_MESSAGE_ID msgId = 2;
@@ -36,7 +41,6 @@ message AllianceInfo {
   string announce = 9;
   int32 badgeId = 10;
   int32 level = 11;
-  int32 exp = 12;
   int32 applyType = 13;
   int64 powerApplyCondition = 14;
   int32 cityLevel = 15;
@@ -102,6 +106,7 @@ message GetAllianceInfoReq {
 message GetAllianceInfoResp {
   AllianceInfo alliance = 1;
   repeated AllianceMember members = 2;
+  repeated  AllianceWarehouseInfo warehouse = 3;
 }
 
 message ApplyAllianceReq {
@@ -152,4 +157,19 @@ message PushAllianceChanged {
   int64 userId = 1;
   int64 allianceId = 2;
   string allianceName = 3;
+}
+
+message AllianceItemsOperationReq{
+  int64 allianceId = 1;
+  repeated ItemInfo items = 2;
+  int32 operation = 3;
+}
+
+message GetAllianceActivityItemNumReq{
+  int64 allianceId=1;
+}
+
+message GetAllianceActivityItemNumResp{
+  int64 itemNum = 1;
+  int32 errorCode=2;
 }

@@ -170,14 +170,26 @@ func GetRankSettleTaskSettleDates(pointType int32, settleType int32, allSettleTy
 	result := make([]int64, 0)
 	endTime := time.UnixMilli(currentTime)
 	endDate := int64(tool.GetTodayDataIntByTimeStamp(currentTime))
-	startDate := endDate
+	periodEndTime := endTime
+	periodEndDate := endDate
+	if prevDate, ok := addDaysToDateInt(endDate, -1); ok {
+		periodEndDate = prevDate
+		if prevTime, parsed := dateIntToTime(prevDate); parsed {
+			periodEndTime = prevTime.AddDate(0, 0, 1).Add(-time.Millisecond)
+		}
+	}
+	startDate := periodEndDate
 	hasWeekSettle := containsSettleType(allSettleTypes, int32(enum.RANK_BOARD_SETTLE_TYPE_WEEK))
 
 	// Arena-like ranks use version(YYYYMMDD) as start date.
 	if pointType == int32(enum.RANK_BOARD_SCORE_TYPE_ARENA) ||
 		pointType == int32(enum.RANK_BOARD_SCORE_TYPE_ALLIANCE_ARENA) {
-		if serverID, startMilli, _, ok := ParseArenaRankVersionDateInt(version); ok {
+		if serverID, startMilli, weekEndMilli, ok := ParseArenaRankVersionDateInt(version); ok {
 			startDate = int64(tool.GetTodayDataIntByTimeStamp(startMilli))
+			if weekEndMilli < periodEndTime.UnixMilli() {
+				periodEndTime = time.UnixMilli(weekEndMilli)
+				periodEndDate = int64(tool.GetTodayDataIntByTimeStamp(weekEndMilli))
+			}
 			// If server open date is later than rank version date, settle dates start from open date.
 			if openDate, hasOpenDate := getServerOpenDateInt(serverID); hasOpenDate && openDate > startDate {
 				startDate = openDate
@@ -187,7 +199,7 @@ func GetRankSettleTaskSettleDates(pointType int32, settleType int32, allSettleTy
 
 	switch settleType {
 	case int32(enum.RANK_BOARD_SETTLE_TYPE_DAY):
-		for d := startDate; d <= endDate; {
+		for d := startDate; d <= periodEndDate; {
 			// If day+week coexist, Sunday settles week only.
 			appendDay := true
 			if hasWeekSettle {
@@ -215,7 +227,7 @@ func GetRankSettleTaskSettleDates(pointType int32, settleType int32, allSettleTy
 		for startTime.Weekday() != time.Sunday {
 			startTime = startTime.AddDate(0, 0, 1)
 		}
-		for !startTime.After(endTime) {
+		for !startTime.After(periodEndTime) {
 			result = append(result, int64(startTime.Year()*10000+int(startTime.Month())*100+startTime.Day()))
 			startTime = startTime.AddDate(0, 0, 7)
 		}
@@ -294,7 +306,7 @@ func getServerOpenDateInt(serverID int32) (int64, bool) {
 		return 0, false
 	}
 	openDate := int64(tool.GetTodayDataIntByTimeStamp(info.ServerOpenTime))
-	return nextDateInt(openDate)
+	return openDate, true
 }
 
 // startTimeMilli排行榜开始时间，endTimeMilli排行榜理论上的结束时间，cappedCheckTime这个是当前应该的结束时间，比如竞技场排行榜7天结束，当前是第3天，那cappedCheckTime是3天

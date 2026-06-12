@@ -489,7 +489,7 @@ func StoneAttrUpHandle(message proto.Message, player *model.PlayerModel) {
 	messageSender.SendMessage(player, pb.MESSAGE_ID_STONE_ATTR_UP_RESP, &pb.StoneAttrUpResp{
 		Level: targetLevel,
 	})
-	eventBusService.SubmitStoneAttrLevelUpEvent(player.GetUserId())
+	eventBusService.SubmitStoneAttrLevelUpEvent(player.GetUserId(), req.StoneClass, req.Attr, upgradeCount)
 }
 
 func StoneAttrResetHandle(message proto.Message, player *model.PlayerModel) {

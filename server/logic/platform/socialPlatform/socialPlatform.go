@@ -73,7 +73,7 @@ func (s socialMessageSender) SendMessage(player logicCommon.UserBaseInterface, m
 	logger.ErrorBySprintf("[socialPlatform] SendMessage not supported msgId:%d player:%v", msgId, player)
 }
 
-func (s socialMessageSender) Broadcast(msgId pb.MESSAGE_ID, msg proto.Message, broadcastType enum.BroadcastType, typeId int32) {
+func (s socialMessageSender) Broadcast(msgId pb.MESSAGE_ID, msg proto.Message, broadcastType enum.BroadcastType, typeId int64) {
 	logger.ErrorBySprintf("[socialPlatform] Broadcast not supported msgId:%d", msgId)
 }
 

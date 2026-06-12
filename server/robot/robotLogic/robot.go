@@ -415,6 +415,8 @@ func (r *Robot) actionLoop() {
 
 	var opTicker *time.Ticker
 	var opTick <-chan time.Time
+	var durationTimer *time.Timer
+	var durationTick <-chan time.Time
 	ready := false
 
 	for {
@@ -422,6 +424,9 @@ func (r *Robot) actionLoop() {
 		case <-r.ctx.Done():
 			if opTicker != nil {
 				opTicker.Stop()
+			}
+			if durationTimer != nil {
+				durationTimer.Stop()
 			}
 			return
 		case msg := <-r.messageChannel:
@@ -434,15 +439,27 @@ func (r *Robot) actionLoop() {
 			}
 			if !r.AutoOperationsEnabled() {
 				ready = true
+				if r.duration > 0 {
+					durationTimer = time.NewTimer(time.Duration(r.duration) * time.Second)
+					durationTick = durationTimer.C
+				}
 				robotLogger.InfoWithRobot(r, "phase=manual_ready status=success")
 				continue
 			}
 			if !r.hasExecutableMessages() {
-				robotLogger.ErrorWithRobot(r, "no executable messages configured")
-				r.Stop()
-				return
+				ready = true
+				if r.duration > 0 {
+					durationTimer = time.NewTimer(time.Duration(r.duration) * time.Second)
+					durationTick = durationTimer.C
+				}
+				robotLogger.InfoWithRobot(r, fmt.Sprintf("phase=operation_loop status=idle reason=no_executable_messages duration=%ds", r.duration))
+				continue
 			}
 			ready = true
+			if r.duration > 0 {
+				durationTimer = time.NewTimer(time.Duration(r.duration) * time.Second)
+				durationTick = durationTimer.C
+			}
 			moduleGroups, _ := r.runtimeModuleMessages()
 			robotLogger.InfoWithRobot(
 				r,
@@ -453,6 +470,13 @@ func (r *Robot) actionLoop() {
 			)
 			opTicker = time.NewTicker(time.Duration(r.interval) * time.Millisecond)
 			opTick = opTicker.C
+		case <-durationTick:
+			robotLogger.InfoWithRobot(r, fmt.Sprintf("phase=robot_stop status=start reason=duration_reached duration=%ds uptimeMs=%d", r.duration, time.Since(r.startTime).Milliseconds()))
+			if opTicker != nil {
+				opTicker.Stop()
+			}
+			r.Stop()
+			return
 		case <-opTick:
 			if r.isStopped() {
 				if opTicker != nil {

@@ -107,8 +107,13 @@ func ExpeditionChangeLevelHandler(message proto.Message, player *model.PlayerMod
 		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_EXPEDITION_CHANGE_LEVEL_RESP, pb.ERROR_CODE_BATTLEFIELD_IS_LOCKED)
 		return
 	}
-	player.ExpeditionModel.ChangeLevel(req.BattlefieldId, req.Level)
+	pointChange := player.ExpeditionModel.ChangeLevel(req.BattlefieldId, req.Level)
 	messageSender.SendMessage(player, pb.MESSAGE_ID_EXPEDITION_CHANGE_LEVEL_RESP, &pb.ExpeditionChangeLevelResp{})
+	if len(pointChange) > 0 {
+		messageSender.SendMessage(player, pb.MESSAGE_ID_EXPEDITION_CHANGE_PUSH, &pb.ExpeditionChangePush{
+			Points: pointChange,
+		})
+	}
 }
 
 func ExpeditionSpeedUpHandler(message proto.Message, player *model.PlayerModel) {

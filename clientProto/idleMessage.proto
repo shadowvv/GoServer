@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "../logic/pb;pb";
+
+import "messageEnum.proto";
+import "commonMessage.proto";
+
+// 快速领取信息
+message QuickClaimInfo {
+  int32 todayCount = 1;  // 今日快速领取次数
+  int32 maxCount = 2;    // 今日最大领取次数
+  int32 cost = 3;        // 消耗钻石
+  repeated ItemBasicInfo rewards = 4; // 快速领取的奖励
+  int32 adCount = 5; // 今日广告剩余次数
+}
+
+// 挂机信息
+message IdleInfo {
+  int32 idleLevel = 1;           // 挂机等级
+  int32 accumulatedTime = 2;     // 累计挂机时间（秒）
+  int64 LastSettleTime = 3;     // 上次结算时间（秒）
+  repeated ItemBasicInfo rewards = 4; // 可领取的奖励
+  bool canUpgrade = 5;            // 是否可以升级
+  QuickClaimInfo quickClaimInfo = 6; // 快速领取信息
+}
+
+// 获取挂机信息请求
+message IdleInfoReq {}
+
+// 获取挂机信息响应
+message IdleInfoResp {
+  ERROR_CODE errorCode = 1;
+  IdleInfo info = 2;
+}
+
+// 领取挂机奖励请求
+message IdleClaimRewardReq {}
+
+// 领取挂机奖励响应
+message IdleClaimRewardResp {
+  ERROR_CODE errorCode = 1;
+  repeated ItemBasicInfo rewards = 2; // 领取的奖励
+  int32 accumulatedTime = 3;     // 累计挂机时间（秒）
+}
+
+// 快速领取请求
+message IdleQuickClaimReq {
+  int32 idleType = 1; // 领取类型
+}
+
+// 快速领取响应
+message IdleQuickClaimResp {
+  ERROR_CODE errorCode = 1;
+  repeated ItemBasicInfo rewards = 2; // 领取的奖励
+  repeated ItemBasicInfo nextRewards = 3; // 下次可领取的奖励
+}
+
+// 升级挂机等级请求
+message IdleUpgradeLevelReq {}
+
+// 升级挂机等级响应
+message IdleUpgradeLevelResp {
+  ERROR_CODE errorCode = 1;
+  int32 newLevel = 2; // 新的等级
+  bool canUpgrade = 3;            // 是否可以升级
+}
+

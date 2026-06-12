@@ -1,6 +1,7 @@
 package petRecruit
 
 import (
+	"context"
 	"errors"
 
 	"github.com/drop/GoServer/server/enum"
@@ -10,6 +11,8 @@ import (
 	"github.com/drop/GoServer/server/logic/operationLogService"
 	"github.com/drop/GoServer/server/logic/pb"
 	"github.com/drop/GoServer/server/logic/platform/eventService"
+	"github.com/drop/GoServer/server/logic/platform/platformLogger"
+	unlockSvc "github.com/drop/GoServer/server/logic/unlockService"
 	"github.com/drop/GoServer/server/logic/vipCard"
 	"github.com/drop/GoServer/server/tool"
 )
@@ -515,13 +518,21 @@ func RecruitPetFromCandidates(player *model.PlayerModel, recruitType int32, trip
 	if code != pb.ERROR_CODE_SUCCESS {
 		return nil, code, err
 	}
+	recruitCount := int32(0)
 	if player.PetModel != nil {
 		for ownID, ent := range player.PetModel.Entities {
 			if oldPetOwnIDs[ownID] || ent == nil || ent.IsDeleted || ent.PetID != ctx.firstPetID {
 				continue
 			}
 			player.StaticData.UpdatePetRecruitCount(player.StaticData.GetPetRecruitCount() + 1)
+			recruitCount++
 			operationLogService.OnUserPetRecruit(player.GetUserId(), ent.PetID, ent.PetOwnID)
+		}
+	}
+	if recruitCount > 0 {
+		err = unlockSvc.DailyCache.RecordPetRecruit(context.Background(), player.GetUserId(), recruitCount)
+		if err != nil {
+			platformLogger.ErrorWithUser("record pet recruit error", player, err)
 		}
 	}
 	code, err = applyRecruitResultState(m, ctx, player, sanctuaryLevel, nowMilli)

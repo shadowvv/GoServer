@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sort"
 	"strconv"
 	"time"
 
@@ -603,8 +602,8 @@ func buildHonorArenaChallengePlayers(opponentIDs []int64, infos map[int64]*logic
 			Opponent: &pb.PlayerBasicInfo{
 				UserId: opponentID,
 			},
-			Power: 0,
-			Units: make([]int32, 0),
+			Power:  0,
+			Heroes: make([]*pb.HeroShowInfo, 0),
 		}
 
 		if playerInfo != nil && playerInfo.BasicInfo != nil {
@@ -626,11 +625,14 @@ func buildHonorArenaChallengePlayers(opponentIDs []int64, infos map[int64]*logic
 				if hero == nil {
 					continue
 				}
-				item.Units = append(item.Units, hero.Units)
+				info := &pb.HeroShowInfo{
+					Unit: hero.Units,
+				}
+				if hero.PetInfo != nil {
+					info.PetId = hero.PetInfo.PetId
+				}
+				item.Heroes = append(item.Heroes, info)
 			}
-			sort.Slice(item.Units, func(i, j int) bool {
-				return item.Units[i] < item.Units[j]
-			})
 		}
 
 		respPlayers = append(respPlayers, item)

@@ -1,0 +1,8 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+import "commonMessage.proto";
+
+message PushActivityInfo {
+  repeated ActivityInfo activityInfos = 11;
+}

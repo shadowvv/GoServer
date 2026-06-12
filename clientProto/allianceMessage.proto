@@ -1,0 +1,180 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+import "commonMessage.proto";
+
+enum ALLIANCE_POSITION {
+  ALLIANCE_NONE = 0;// 占位符
+  ALLIANCE_LEADER = 1;// 盟主
+  ALLIANCE_COLEADER = 2;// 副盟主
+  ALLIANCE_ELITE = 3;// 精英
+  ALLIANCE_COMMON_MEMBER = 4;// 一般成员
+}
+
+enum ALLIANCE_CHANGE_OPER {
+  ENTER = 0;// 进入联盟
+  KICKOUT = 1; // 踢出联盟
+  NEW_APPLY = 2; // 新申请
+  ITEM_CHANGE=3;// 道具变化
+}
+
+message AllianceWarehouseInfo {
+  int32 itemId=1; // 物品id
+  int64 itemNum=2; // 物品数量
+}
+
+message AllianceBasicInfo {
+  int64 allianceId = 1; // 联盟id
+  string name = 2; // 联盟名字
+  string announce = 3; // 联盟宣言
+  string notice = 4;// 联盟公告
+  int32 badgeId = 5; // 联盟徽章
+  int32 level = 6; // 联盟等级
+  int32 applyType = 8; // 申请类型（0：可申请,1:可加入,2:已申请,3:条件不满足）
+  int64 powerApplyCondition = 9; // 战力要求
+  int32 cityLevel = 10;// 主城等级要求
+  int32 currentPlayerNum = 11; // 联盟当前人数
+  int32 maxPlayerNum = 12;// 联盟最大人数
+  int64 allianceTotalPower = 13;// 联盟总战力
+  string leaderName = 14;// 联盟会长名称
+}
+
+message AllianceMemberInfo {
+  int64 playerId = 1;// 玩家id
+  string nickName = 2;// 昵称
+  int32 head = 3;// 头像
+  int64 power = 4;// 战力
+  int32 cityLevel = 5;// 主城等级
+  int32 contribute = 6;// 贡献
+  ALLIANCE_POSITION position = 7;// 0:成员,1:精英,3:副盟主,4:盟主
+  int64 offlineTime = 8;// 离线时间
+  int32 headFrame = 9;// 头像框
+}
+
+message AllianceApplyPlayerInfo {
+  int64 playerId = 1;// 玩家id
+  string nickName = 2;// 昵称
+  int32 head = 3;// 头像
+  int64 power = 4;// 战力
+  int32 cityLevel = 5;// 主城等级
+  int32 headFrame = 6;//头像框
+}
+
+// 创建联盟
+message CreateAllianceReq {
+  string name = 1; // 联盟名字
+  string announce = 2; // 联盟宣言
+  int32 badgeId = 3; // 联盟徽章
+}
+
+message CreateAllianceResp {
+    AllianceBasicInfo basicInfo = 1; // 联盟信息
+}
+
+// 修改联盟基础信息
+message ChangeAllianceBasicInfoReq {
+  string name = 1; // 联盟名字
+  string announce = 2; // 联盟宣言
+  int32 badgeId = 3; // 联盟徽章
+  int32 applyType = 4; // 申请类型（0：可申请,1:自由加入）
+  int64 powerApplyCondition = 5; // 战力要求
+  int32 cityLevel = 6;// 主城等级要求
+  string notice = 7; // 联盟公告
+}
+
+message ChangeAllianceBasicInfoResp {
+
+}
+
+// 获得相同服务器的联盟信息
+message GetServerAllianceBasicInfoReq {
+  string allianceName = 1; // 联盟名字
+}
+
+message GetServerAllianceBasicInfoResp {
+  repeated AllianceBasicInfo basicInfo = 1; // 联盟信息
+}
+
+// 申请加入联盟
+message ApplyAllianceReq {
+  int64 allianceId = 1; // 联盟id
+}
+
+message ApplyAllianceResp {
+  int64 allianceId = 1; //联盟id
+}
+
+// 获取申请列表
+message GetApplyListReq {
+
+}
+
+message GetApplyListResp {
+  repeated AllianceApplyPlayerInfo infos = 1;
+}
+
+// 审核联盟申请
+message ApproveAllianceApplyReq {
+  int64 playerId = 1; // 玩家id
+  bool approveApply = 2;// 批准:true,拒绝:false
+}
+
+message ApproveAllianceApplyResp {
+
+}
+
+// 获得本人联盟信息
+message GetPlayerAllianceInfoReq {
+
+}
+
+message GetPlayerAllianceInfoResp {
+    AllianceBasicInfo basicInfo = 1;
+    repeated AllianceMemberInfo members = 2;
+      repeated AllianceWarehouseInfo warehouse = 3;
+}
+
+// 修改联盟成员职位
+message ChangeMemberPositionReq {
+  int64 playerId = 1;// 玩家id
+  ALLIANCE_POSITION position = 2;// 职位
+}
+
+message ChangeMemberPositionResp {
+
+}
+
+// 踢出玩家
+message KickMemberOutAllianceReq {
+  int64 playerId = 1;// 玩家id
+}
+
+message KickMemberOutAllianceResp {
+
+}
+
+// 退出联盟
+message LeaveAllianceReq {
+
+}
+
+message LeaveAllianceResp {
+
+}
+
+message PushAllianceChange {
+  ALLIANCE_CHANGE_OPER oper = 1;
+  int64 allianceId = 2;
+  repeated ItemBasicInfo itemList=3; // 联盟道具变化（道具数量变化看count正负）
+}
+
+// 签到
+message AllianceSignInReq {
+  int32 SignType = 1; // 签到类型（1:普通签到,2:广告签到）
+}
+
+message AllianceSignInResp {
+  int32 basicCount = 1; // 基础签到次数
+  int32 advertisementCount = 2; // 广告签到次数
+}

@@ -10,6 +10,41 @@
       "name": "randomMax",
       "value": "10500"
     },
+    "100": {
+      "id": "100",
+      "name": "templeRefreshGuaranteeTimes",
+      "value": "30"
+    },
+    "101": {
+      "id": "101",
+      "name": "templeGuaranteedDrop",
+      "value": "11441"
+    },
+    "102": {
+      "id": "102",
+      "name": "limitedGachaLuckyEventWeight",
+      "value": "3500|5000|1000|500"
+    },
+    "103": {
+      "id": "103",
+      "name": "limitedGachaLuckyEventDiscountRate",
+      "value": "10|9|8|5"
+    },
+    "104": {
+      "id": "104",
+      "name": "limitedGachaLuckyEventTime",
+      "value": "86400"
+    },
+    "105": {
+      "id": "105",
+      "name": "beginnerBenefits",
+      "value": "19057"
+    },
+    "106": {
+      "id": "106",
+      "name": "beginnerBenefitsNumbers",
+      "value": "200"
+    },
     "11": {
       "id": "11",
       "name": "ponerMin",
@@ -183,12 +218,12 @@
     "42": {
       "id": "42",
       "name": "petSummonDiscountCount",
-      "value": "2"
+      "value": "10"
     },
     "43": {
       "id": "43",
       "name": "petSummonDiscount",
-      "value": "6000|8000"
+      "value": "6000|8000|8000|8000|8000|8000|8000|8000|8000|8000"
     },
     "44": {
       "id": "44",
@@ -459,6 +494,31 @@
       "id": "94",
       "name": "gloryArenaRefreshItem",
       "value": "1110088"
+    },
+    "95": {
+      "id": "95",
+      "name": "allianceCheckInRewards",
+      "value": "12124"
+    },
+    "96": {
+      "id": "96",
+      "name": "allianceCheckInDiamondCost",
+      "value": "0|50|100|200|200|200"
+    },
+    "97": {
+      "id": "97",
+      "name": "acceleratesTime",
+      "value": "1200"
+    },
+    "98": {
+      "id": "98",
+      "name": "acceleratesDayNum",
+      "value": "2"
+    },
+    "99": {
+      "id": "99",
+      "name": "acceleratesItem",
+      "value": "5200003"
     }
   }
 }

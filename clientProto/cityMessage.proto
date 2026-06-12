@@ -1,0 +1,241 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+import "commonMessage.proto";
+import "taskMessage.proto";
+
+enum ArchitectureType {
+    ARCHITECTURE_TYPE_NONE=0; // 占位符
+  ARCHITECTURE_TYPE_MAIN = 1; // 城镇中心
+  ARCHITECTURE_TYPE_STONE=2;// 传承石像
+  ARCHITECTURE_TYPE_PET=3; // 宠物
+  ARCHITECTURE_TYPE_COLLECTION=4; // 收藏品
+  ARCHITECTURE_TYPE_EQUIPMENT=5; // 装备
+  ARCHITECTURE_TYPE_LUMBERYARD = 6; // 伐木场
+}
+
+message ArchitectureInfo{
+  int32 type=1;
+  int32 level=2;
+  int32 status=3;// 0 损毁 1 未升级 2 升级中 3 破损to正常
+  int64 upStartTime=4;
+}
+
+message AllArchitectureDetailReq{
+}
+
+message AllArchitectureDetailResp{
+  repeated ArchitectureInfo arInfoList=1;
+}
+
+message ArchitectureLevelUpReq{
+  int32 type=1;
+}
+
+message ArchitectureLevelUpResp{
+    ArchitectureInfo arInfo=1;
+}
+
+message ArchitectureAccelerateReq{
+  int32 type=1;
+  repeated ItemBasicInfo itemInfo=2;
+}
+
+message ArchitectureAccelerateResp{
+  ArchitectureInfo arInfo=1;
+}
+
+message ArchitectureFinishReq{
+  int32 type=1;
+}
+
+message ArchitectureFinishResp{
+  ArchitectureInfo arInfo=1;
+}
+
+message ArchitectureStopReq{
+  int32 type=1;
+}
+
+message ArchitectureStopResp{
+  repeated ItemBasicInfo itemInfo=1;
+  ArchitectureInfo arInfo = 2;
+}
+
+message PushArchitectureInfo{
+  ArchitectureInfo arInfo=1;
+}
+
+message StoneInfo{ // 此乃石像，传承石像
+  int32 stoneClass=1;
+  map<int32,int32> attrLevel=2;
+}
+
+message StoneDetailReq{
+}
+
+message StoneDetailResp{
+  repeated StoneInfo stoneInfoList=1;
+}
+
+message StoneAttrUpReq{
+  int32 stoneClass=1;
+  int32 attr=2;
+  int32 upType=3;// 0 一级 1 十级
+}
+
+message StoneAttrUpResp{
+  int32 level=1;
+}
+
+message StoneAttrResetReq{
+  int32 stoneClass=1;
+}
+
+message StoneAttrResetResp{
+}
+
+message CollectionItemInfo{
+  int32 collectionId=1;
+}
+
+message CollectionEntryInfo{
+  int32 entryId = 1;
+  int32 level = 2;
+}
+
+message CollectionReq{
+}
+
+message CollectionResp{
+  repeated CollectionItemInfo collectionItemInfoList=1;
+  repeated CollectionEntryInfo collectionEntryInfoList=2;
+}
+
+message CollectionItemLevelUpReq{
+  int32 collectionId=1;
+  repeated ItemBasicInfo useItemList=2;
+}
+
+message CollectionItemLevelUpResp{
+  CollectionItemInfo collectionItemInfo=1;
+}
+
+message CollectionEntryLevelUpReq{
+  int32 entryId=1;
+}
+
+message CollectionEntryLevelUpResp{
+  CollectionEntryInfo collectionEntryInfo=1;
+}
+
+// 获取资源详情
+message CityLumberDetailReq {
+}
+
+message CityLumberDetailResp {
+  CityLumberInfo info = 1;
+}
+
+// 采集资源
+message CityLumberCollectReq {
+  int32 itemId = 1;
+}
+
+message CityLumberCollectResp {
+  ItemBasicInfo reward = 1; // 本次领取
+  ItemBasicInfo stored = 2; // 领取后暂存，通常为空
+}
+
+message CityLumberAssignHeroReq {
+  repeated int64 heroOwnId = 1; // 全量派驻列表；传空表示全部解绑
+  bool clearAll = 2;            // 是否全部解绑
+}
+
+message CityLumberAssignHeroResp {
+  bool isSuccess = 1;
+}
+
+message CityFurnitureLevelUpReq {
+  int32 architectureType = 1;
+  int32 furnitureType = 2;
+}
+
+message CityFurnitureLevelUpResp {
+  bool isSuccess = 1;
+}
+
+message PushCityLumberInfo {
+  CityLumberInfo info = 1;
+}
+
+message CityLumberInfo {
+  repeated ItemBasicInfo stored = 1; // 暂存资源
+  repeated int64 heroOwnId = 2; // 派驻英雄列表
+  repeated CityFurnitureInfo furnitureInfo = 3; // 家具信息列表
+}
+
+// 家具信息
+message CityFurnitureInfo {
+  int32 furnitureType = 1;
+  int32 level = 2;
+}
+
+// ==============主城时代==============
+// 获取主城时代详情
+message CityAgeDetailReq {
+}
+
+message CityAgeDetailResp {
+  CityAgeInfo info = 1;
+}
+
+// 领取主城时代组奖励
+message CityAgeGroupRewardReq {
+  int32 groupIndex = 1; // 1-5, 0 一键领取
+}
+
+message CityAgeGroupRewardResp {
+  bool isSuccess = 1;
+}
+
+// 晋升主城时代
+message CityAgeUpReq {
+}
+
+message CityAgeUpResp {
+  bool isSuccess = 1; // dropAge 奖励
+  CityAgeInfo info = 2;
+}
+
+// 领取主城时代每日奖励
+message CityAgeDailyRewardReq {
+}
+
+message CityAgeDailyRewardResp {
+  bool isSuccess = 1; // drop2 每日奖励
+}
+
+message CityAgeInfo {
+  int32 cityAgeId = 1;       // cityAgeUp.id，比如 101
+  repeated CityAgeTaskGroup groupList = 2;
+  repeated CityAgeFirstReachInfo firstReachList = 3;
+  int32 dailyRewardStatus = 4; // 0未领取 1已领取
+}
+
+message CityAgeTaskGroup {
+  int32 groupIndex = 1;       // 1-5
+  int32 rewardStatus = 2;     // 0未领取 1已领取
+  repeated TaskInfo taskList = 3;
+}
+
+message CityAgeFirstReachInfo {
+  int32 cityAgeId = 1;
+  PlayerBasicInfo playerInfo = 2;
+  int64 reachTime = 3;
+}
+
+message PushCityAgeFirstReach {
+  CityAgeFirstReachInfo info = 1;
+}

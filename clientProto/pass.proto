@@ -1,0 +1,95 @@
+syntax = "proto3";
+import "commonMessage.proto";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+// 通行证奖励信息
+message PassRewardInfo {
+  int32 level = 1;        // 等级
+  int32 pointsPer = 2;   // 每级所需积分
+  bool receivedFree = 3; // 是否已领取免费档位
+  bool receivedVip1 = 4; // 是否已领取付费档位1
+  bool receivedVip2 = 5; // 是否已领取付费档位2
+}
+
+// 通行证信息
+message PassInfo {
+  int32 passId = 1;           // 通行证ID
+  int32 progress = 2;        // 当前进度
+  int32 level = 3;           // 当前等级
+  int32 vipLevel = 4;        // VIP等级（位运算）：0=免费, 1=档位1, 2=档位2, 3=档位1+2, 4=档位3, ...
+  repeated PassRewardInfo rewards = 5; // 奖励列表
+  int32 loopProgress = 6;    // 循环积分（满级后多出的积分）
+}
+
+// 通行证奖励选项（当drop有多个道具时）
+message PassRewardOption {
+  int32 itemId = 1; // 道具ID
+  int64 count = 2;  // 数量
+}
+
+// 获取通行证信息请求
+message GetPassInfoReq {
+  int32 passId = 1; // 通行证ID（0表示获取所有）
+}
+
+// 获取通行证信息响应
+message GetPassInfoResp {
+  repeated PassInfo passList = 1; // 通行证列表
+}
+
+// 获取通行证奖励选项请求（当drop有多个道具时）TODO del
+message GetPassRewardOptionsReq {
+  int32 passId = 1;      // 通行证ID
+  int32 level = 2;       // 等级
+  int32 rewardLevel = 3; // 奖励档位：0=免费, 1=档位1, 2=档位2, 3=档位3, ...
+}
+
+// 获取通行证奖励选项响应
+message GetPassRewardOptionsResp {
+  repeated PassRewardOption options = 1; // 奖励选项列表
+}
+
+// 购买通行证积分请求
+message BuyPassProgressReq {
+  int32 passId = 1; // 通行证ID
+  int32 points = 2; // 要购买的积分数量
+}
+
+// 购买通行证积分响应
+message BuyPassProgressResp {
+  int32 progress = 1; // 当前总进度
+  int32 level = 2;    // 当前等级
+}
+
+// 领取循环奖励请求
+message ClaimLoopRewardReq {
+  int32 passId = 1;      // 通行证ID
+}
+
+// 领取循环奖励响应
+message ClaimLoopRewardResp {
+  repeated ItemBasicInfo rewards = 1; // 奖励道具列表
+  int32 loopProgress = 2;             // 剩余循环积分
+}
+
+// 奖励选择信息（用于一次性领取所有奖励）
+message PassRewardChoice {
+  int32 level = 1;         // 等级
+  int32 rewardLevel = 2;   // 奖励档位：0=免费, 1=档位1, 2=档位2, 3=档位3, ...
+  int32 chosenDropId = 3;  // 选择的掉落ID（当dropId2或dropId3是数组时必填）
+  int32 chosenItemId = 4;  // 选择的道具ID（当drop有多个道具时必填）
+}
+
+// 一次性领取所有可领取奖励请求
+message ClaimAllPassRewardReq {
+  int32 passId = 1;                      // 通行证ID
+  repeated PassRewardChoice choices = 2; // 奖励选择信息（仅当奖励需要选择时提供）
+}
+
+// 一次性领取所有可领取奖励响应
+message ClaimAllPassRewardResp {
+  repeated ItemBasicInfo rewards = 1; // 奖励道具列表
+  int32 maxClaimedLevel = 2;          // 最大领取等级
+  PassInfo pass = 3; // 通行证 Info
+}

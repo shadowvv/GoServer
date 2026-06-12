@@ -1,0 +1,93 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+import "commonMessage.proto";
+
+message ChangeNicknameReq {
+  string nickName = 1;
+}
+
+message ChangeNicknameResp {
+}
+
+message GetOtherPlayerBasicInfoReq{
+  int64  playerId = 1;
+}
+
+message GetOtherPlayerBasicInfoResp{
+    PlayerBasicInfo basicInfo = 1;
+    PlayerAllianceInfo allianceInfo = 2;
+    map<int32,OtherPlayerFormationInfo> formationDetails = 3;
+}
+
+message OtherPlayerFormationInfo {
+  int64 battlePower = 2;
+  repeated OtherPlayerHeroBasicInfo heroes = 4;
+}
+
+message OtherPlayerHeroBasicInfo {
+  int64 id = 1;
+  int32 heroId = 2;
+  int32 star = 3;
+  int32 classId = 4;
+  int32 level = 5;
+  int32 units = 6;
+}
+
+message PushPlayerBasicInfo {
+  PlayerBasicInfo basicInfo = 1;
+}
+
+message GetHeroDetailInfoReq {
+  int64 userId = 1;
+  int64 heroId = 2;
+}
+
+message GetHeroDetailInfoResp {
+  CharactorBasicInfo basicInfo = 1;
+  repeated EquipmentBasicInfo equips = 2;
+  AccessoryDetail accessory = 3;
+}
+
+message GetEquipmentDetailInfoReq {
+  int64 userId = 1;
+  int64 equipmentOwnId = 2;   // 装备唯一ID
+}
+
+message GetEquipmentDetailInfoResp {
+    EquipmentDetailInfo info = 1;
+}
+
+message GetAnnounceReq{
+}
+
+message GetAnnounceResp{
+  repeated AnnounceInfo announces = 1;
+}
+
+message AnnounceInfo {
+  int32  id         = 1;
+  int32  type       = 2;
+  int32  showType   = 3;
+  string title      = 4;
+  string content    = 5;
+  string picAddress = 6;
+  int64  startTime  = 7;
+}
+
+message GetSystemUnlockRewardReq{
+  int32  systemId = 1;
+}
+
+message GetSystemUnlockRewardResp{
+  
+}
+
+message GetTempBattleSpeedUpReq{
+
+}
+
+message GetTempBattleSpeedUpResp{
+
+}

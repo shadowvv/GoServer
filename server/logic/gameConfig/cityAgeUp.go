@@ -38,6 +38,12 @@ func (s *CityAgeUpCfgLoader) loadData() error {
 		v.Drop = ParseIntArray(row["drop"])
 		v.Drop2 = ParseInt(row["drop2"])
 		v.DropAge = ParseInt(row["dropAge"])
+		v.AttrAge = make(map[int32]int64)
+		for _, attr := range ParseItemArray(row["attrAge"]) {
+			if attr != nil {
+				v.AttrAge[attr.ID] += attr.Num
+			}
+		}
 		if v.Id <= 0 {
 			continue
 		}
@@ -56,7 +62,7 @@ func (s *CityAgeUpCfgLoader) checkData() error {
 		if cfg.Id <= 0 {
 			return errors.New(fmt.Sprintf("[gameConfig] load cityAgeUp error invalid ID:%d", id))
 		}
-		if cfg.Age <= 0 || cfg.Period <= 0 {
+		if cfg.Age < 0 || cfg.Period < 0 {
 			return errors.New(fmt.Sprintf("[gameConfig] load cityAgeUp error invalid age/period ID:%d", id))
 		}
 		if cfg.Drop2 < 0 || (cfg.Drop2 > 0 && GetDropCfg(cfg.Drop2) == nil) {
@@ -75,6 +81,11 @@ func (s *CityAgeUpCfgLoader) checkData() error {
 		}
 		if cfg.DropAge > 0 && GetDropCfg(cfg.DropAge) == nil {
 			return errors.New(fmt.Sprintf("[gameConfig] load cityAgeUp error invalid dropAge ID:%d dropAge:%d", id, cfg.DropAge))
+		}
+		for attrID := range cfg.AttrAge {
+			if attrID <= 0 {
+				return errors.New(fmt.Sprintf("[gameConfig] load cityAgeUp error invalid attrAge ID:%d", id))
+			}
 		}
 		for groupIndex := int32(1); groupIndex <= 5; groupIndex++ {
 			taskIDs := cfg.GetGroupTasks(groupIndex)
@@ -116,17 +127,18 @@ func (s *CityAgeUpCfgLoader) apply() {
 var cityAgeUp atomic.Value
 
 type CityAgeUpCfg struct {
-	Id         int32   `json:"id"`
-	Age        int32   `json:"age"`
-	Period     int32   `json:"period"`
-	UnlockAge1 []int32 `json:"unlockAge1"`
-	UnlockAge2 []int32 `json:"unlockAge2"`
-	UnlockAge3 []int32 `json:"unlockAge3"`
-	UnlockAge4 []int32 `json:"unlockAge4"`
-	UnlockAge5 []int32 `json:"unlockAge5"`
-	Drop       []int32 `json:"drop"`
-	Drop2      int32   `json:"drop2"`
-	DropAge    int32   `json:"dropAge"`
+	Id         int32           `json:"id"`
+	Age        int32           `json:"age"`
+	Period     int32           `json:"period"`
+	UnlockAge1 []int32         `json:"unlockAge1"`
+	UnlockAge2 []int32         `json:"unlockAge2"`
+	UnlockAge3 []int32         `json:"unlockAge3"`
+	UnlockAge4 []int32         `json:"unlockAge4"`
+	UnlockAge5 []int32         `json:"unlockAge5"`
+	Drop       []int32         `json:"drop"`
+	Drop2      int32           `json:"drop2"`
+	DropAge    int32           `json:"dropAge"`
+	AttrAge    map[int32]int64 `json:"attrAge"`
 }
 
 func sortCityAgeUpCfgList(cfgList []*CityAgeUpCfg) {

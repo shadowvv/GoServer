@@ -20,6 +20,9 @@ type BattleMessageHandler func(message proto.Message)
 // 网关消息处理接口
 type GatewayMessageHandler func(message proto.Message, user *GatewayPlayerInfo)
 
+// 消息处理接口
+type SidewayMessageHandler func(message proto.Message, user *GatewayPlayerInfo)
+
 // 登录消息处理接口
 type LoginMessageHandler func(message proto.Message, user UserBaseInterface)
 

@@ -2,10 +2,11 @@ package logicRouter
 
 import (
 	"fmt"
+	"reflect"
+
 	"github.com/drop/GoServer/server/service/logger"
 	"github.com/drop/GoServer/server/service/serviceInterface"
 	"google.golang.org/protobuf/proto"
-	"reflect"
 )
 
 type GameRouter struct {
@@ -59,8 +60,4 @@ func (r *GameRouter) GetMessage(msgID int32) proto.Message {
 	}
 	logger.ErrorWithZapFields(fmt.Sprintf("[net] unknown msgId:%d", msgID))
 	return nil
-}
-
-func (r *GameRouter) IsEmpty(msgID int32) bool {
-	return r.msgIsEmpty[msgID]
 }

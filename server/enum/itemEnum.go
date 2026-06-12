@@ -1,8 +1,12 @@
 package enum
 
+import "github.com/drop/GoServer/server/tool"
+
 const (
-	DIAMOND_ITEM_ID = 1       // 钻石
-	STAMINA_ITEM_ID = 1110052 // 体力
+	DIAMOND_ITEM_ID                    = 1       // 钻石
+	STAMINA_ITEM_ID                    = 1110052 // 体力
+	ALLIANCE_TASK_ACTIVE_VALUE_ITEM_ID = 1370001 // 联盟任务活跃值
+	ALLIANCE_TASK_EXP_ITEM_ID          = 1370002 // 联盟经验值
 )
 
 // 物品类型枚举
@@ -36,10 +40,11 @@ const (
 	ITEM_TYPE_ACTIVITY_ITEM         ItemType = 34 // 活动道具
 	ITEM_TYPE_ACTIVITY_POINT        ItemType = 35 // 活动积分（兑换商店）
 	ITEM_TYPE_ACTIVITY_PASS_POINT   ItemType = 36 // 活动通行证积分
+	ITEM_TYPE_ALLIANCE_ITEM         ItemType = 37 // 联盟道具
 )
 
 func IsValidItemType(v int32) bool {
-	return v >= int32(ITEM_TYPE_CURRENCY) && v <= int32(ITEM_TYPE_ACTIVITY_PASS_POINT)
+	return v >= int32(ITEM_TYPE_CURRENCY) && v <= int32(ITEM_TYPE_ALLIANCE_ITEM)
 }
 
 // 物品品质枚举
@@ -73,17 +78,15 @@ const (
 type InventoryResult uint32
 
 const (
-	INVENTORY_RESULT_SUCCESS              InventoryResult = 0  // 成功
-	INVENTORY_RESULT_FULL                 InventoryResult = 1  // 背包已满
-	INVENTORY_RESULT_INVALID_ITEM         InventoryResult = 2  // 无效物品
-	INVENTORY_RESULT_NOT_ENOUGH_SPACE     InventoryResult = 3  // 空间不足
-	INVENTORY_RESULT_ITEM_NOT_FOUND       InventoryResult = 4  // 物品不存在
-	INVENTORY_RESULT_INVALID_POSITION     InventoryResult = 5  // 无效位置（已废弃）
-	INVENTORY_RESULT_CANNOT_STACK         InventoryResult = 6  // 无法堆叠（已废弃）
-	INVENTORY_RESULT_NOT_ENOUGH_ITEMS     InventoryResult = 7  // 物品数量不足
-	INVENTORY_RESULT_INSUFFICIENT_ITEMNUM InventoryResult = 8  // 数量不足
-	INVENTORY_RESULT_CANNOT_USE           InventoryResult = 9  // 无法使用
-	INVENTORY_RESULT_INVALID_INVENTORY    InventoryResult = 10 // 无效背包类型
+	INVENTORY_RESULT_SUCCESS               InventoryResult = 0 // 成功
+	INVENTORY_RESULT_FULL                  InventoryResult = 1 // 背包已满
+	INVENTORY_RESULT_INVALID_ITEM          InventoryResult = 2 // 无效物品
+	INVENTORY_RESULT_NOT_ENOUGH_SPACE      InventoryResult = 3 // 空间不足
+	INVENTORY_RESULT_ITEM_NOT_FOUND        InventoryResult = 4 // 物品不存在
+	INVENTORY_RESULT_NOT_ENOUGH_ITEMS      InventoryResult = 5 // 物品数量不足
+	INVENTORY_RESULT_INSUFFICIENT_ITEM_NUM InventoryResult = 6 // 数量不足
+	INVENTORY_RESULT_CANNOT_USE            InventoryResult = 7 // 无法使用
+	INVENTORY_RESULT_INVALID_INVENTORY     InventoryResult = 8 // 无效背包类型
 )
 
 type ItemChangeReason uint32
@@ -164,6 +167,8 @@ const (
 	ITEM_CHANGE_REASON_GLORY_ARENA_LOSE                                     // 荣耀擂台胜利
 	ITEM_CHANGE_REASON_TURN_TABLE_REWARD                                    // 转盘奖励
 	ITEM_CHANGE_REASON_GLORY_ARENA_REFRESH_LIST                             // 荣耀擂台刷新挑战列表
+	ITEM_CHANGE_REASON_ALLIANCE_SIGN_IN                                     // 联盟签到
+	ITEM_CHANGE_REASON_ALLIANCE_DAILY_TASK                                  // 联盟日常任务
 )
 
 type ItemRefreshType int32
@@ -189,8 +194,8 @@ const (
 	// AD_CHEST_DAILY_OPEN_LIMIT 广告宝箱每日开启上限（基础值，特权卡可增加）
 	AD_CHEST_DAILY_OPEN_LIMIT int32 = 20
 
-	// AD_CHEST_OPEN_TOLERANCE_MS 开启时兼容网络波动的容差(毫秒)
-	AD_CHEST_OPEN_TOLERANCE_MS int64 = 5000
+	// AD_CHEST_OPEN_TOLERANCE_MS 开启时兼容网络波动的容差(毫秒) 额外给了看广告时间
+	AD_CHEST_OPEN_TOLERANCE_MS int64 = 10 * tool.MINUTE_MILLI
 )
 
 // 特权功能类型枚举
@@ -212,8 +217,9 @@ const (
 	VIP_PRIVILEGE_RECRUITMENT_3           VipPrivilegeType = 13 // 招募3（data=天）
 	VIP_PRIVILEGE_EXPEDITION_QUEUE_FIRST  VipPrivilegeType = 14 // 派遣队列+1
 	VIP_PRIVILEGE_EXPEDITION_QUEUE_SECOND VipPrivilegeType = 15 // 派遣队列+1
+	VIP_PRIVILEGE_TEMP_BATTLE_SPEED       VipPrivilegeType = 16 // 加速符战斗加速 【数据=加速百分比 格式：万分比】
 )
 
 func IsValidVipPrivilegeType(v int32) bool {
-	return v >= int32(VIP_PRIVILEGE_NO_AD) && v <= int32(VIP_PRIVILEGE_EXPEDITION_QUEUE_SECOND)
+	return v >= int32(VIP_PRIVILEGE_NO_AD) && v <= int32(VIP_PRIVILEGE_TEMP_BATTLE_SPEED)
 }

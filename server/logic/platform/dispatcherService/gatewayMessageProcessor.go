@@ -2,13 +2,15 @@ package dispatcherService
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/drop/GoServer/server/enum"
 	"github.com/drop/GoServer/server/logic/logicCommon"
 	"github.com/drop/GoServer/server/logic/platform/nodeConfig"
 	"github.com/drop/GoServer/server/service/logger"
 	"github.com/drop/GoServer/server/service/serviceInterface"
+	"github.com/drop/GoServer/server/tool"
 	"google.golang.org/protobuf/proto"
-	"time"
 )
 
 //TODO: 后续优化
@@ -155,7 +157,7 @@ func (g *GatewayMessageProcessor) PushMessage(session serviceInterface.SessionIn
 		logger.ErrorBySprintf("[gatewayProcessor] PushMessage nil session")
 		return
 	}
-	index := int(session.GetID() % int64(g.processorNum))
+	index := tool.HashIndexByInt64(session.GetID(), g.processorNum)
 	if index < 0 || index >= g.processorNum {
 		logger.ErrorBySprintf("[gatewayProcessor] index out of range sessionId:%d,msgId:%d", session.GetID(), msgId)
 		return

@@ -207,8 +207,30 @@ func RegisterRpcPlayerMessageHandler(msgType enum.MessageType, msgID rpcPb.RPC_M
 	dispatcher.RegisterPlayerMessageHandler(messageId, messageHandler, enum.FUNCTION_ID_NONE)
 }
 
+func RegisterSidewayMessageHandler(msgType enum.MessageType, msgID pb.MESSAGE_ID, msg proto.Message, h logicCommon.GatewayMessageHandler) {
+	if msgType != enum.MSG_TYPE_SIDEWAY {
+		panic(fmt.Sprintf("[gameController] register sideway process msgType error type:%d msgId:%d", msgType, msgID))
+	}
+
+	messageHandler := func(message proto.Message, user *logicCommon.GatewayPlayerInfo) {
+		if user == nil {
+			logger.ErrorBySprintf("[gameController] sideway msgId:%d user is nil", msgID)
+			return
+		}
+		if h == nil {
+			logger.ErrorBySprintf("[gameController] sideway msgId:%d handler is nil", msgID)
+			return
+		}
+		h(message, user)
+	}
+
+	messageId := int32(msgID)
+	routerService.RegisterMessage(int32(msgType), messageId, msg)
+	dispatcher.RegisterSidewayMessageHandler(messageId, messageHandler)
+}
+
 func RegisterRankBoardMessageHandler(msgType enum.MessageType, msgID rpcPb.RPC_MESSAGE_ID, msg proto.Message, h logicCommon.RankBoardMessageHandler) {
-	if msgType != enum.MSG_TYPE_RANKBOARD {
+	if msgType != enum.MSG_TYPE_RANK_BOARD {
 		panic(fmt.Sprintf("[gameController] register login process msgType error type:%d msgId:%d", msgType, msgID))
 		return
 	}

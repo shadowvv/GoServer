@@ -289,6 +289,15 @@ func (g *GloryArenaInstanceRaid) BuildRaidWithPlayer(raidInfo *logicCommon.Playe
 			AttrInfo:    make(map[int32]int64),
 			SkillId:     make([]int32, 0),
 		}
+		if heroInfo.PetInfo != nil {
+			monsterTemplate.PetInfo = &pb.PetBattleInfo{
+				PetId:     heroInfo.PetInfo.PetId,
+				Level:     heroInfo.PetInfo.Level,
+				Star:      heroInfo.PetInfo.Star,
+				SkillList: make([]int32, 0),
+			}
+			copy(monsterTemplate.PetInfo.SkillList, heroInfo.PetInfo.SkillList)
+		}
 		for id, attr := range heroInfo.Attr {
 			monsterTemplate.AttrInfo[id] = attr
 		}

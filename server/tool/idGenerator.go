@@ -7,10 +7,12 @@ import (
 
 const (
 	EPOCH            = 1767225600000 // 2026-01-01
-	TIME_STAMP_BITS  = 36
-	FUNCTION_ID_BITS = 6
-	WORKER_ID_BITS   = 6
-	SEQUENCE_BITS    = 5
+	TIME_STAMP_BITS  = 36            // 时间位数
+	FUNCTION_ID_BITS = 6             // 功能位数
+	WORKER_ID_BITS   = 6             // 节点id位数
+	SEQUENCE_BITS    = 5             // 最大并发位数
+
+	MAX_ID = 63
 )
 
 type IdGenerator struct {
@@ -25,10 +27,10 @@ func NewIdGenerator(workerId int64, functionId int64) *IdGenerator {
 	if workerId == 0 {
 		panic("[system] workerId must be greater than 0")
 	}
-	if workerId < 0 || workerId > 63 {
+	if workerId < 0 || workerId > MAX_ID {
 		panic(fmt.Sprintf("[system] workerId must be between 0 and 63 currentWorkerId:%d", workerId))
 	}
-	if functionId < 0 || functionId > 63 {
+	if functionId < 0 || functionId > MAX_ID {
 		panic(fmt.Sprintf("[system] functionId must be between 0 and 63 currentFunctionId:%d", functionId))
 	}
 	return &IdGenerator{
@@ -45,7 +47,6 @@ func (g *IdGenerator) NextId() int64 {
 	defer g.lock.Unlock()
 
 	timestamp := UnixNowMilli()
-
 	// 处理时间回拨
 	if timestamp < g.lastTimestamp {
 		// 等待直到时间追上

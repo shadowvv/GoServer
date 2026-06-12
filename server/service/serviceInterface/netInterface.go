@@ -20,7 +20,7 @@ type AcceptorInterface interface {
 	// 获取连接
 	GetSessionById(id int64) SessionInterface
 	// 连接超时处理
-	OnConnectionTimeout(connectionInterface SessionInterface)
+	OnSessionClose(connectionInterface SessionInterface, isForce bool)
 }
 
 // RouterInterface 路由器接口
@@ -31,8 +31,6 @@ type RouterInterface interface {
 	Dispatch(session SessionInterface, msgID int32, msg proto.Message)
 	// 获取消息
 	GetMessage(msgID int32) proto.Message
-	// 判断消息是否没有任何字段
-	IsEmpty(msgID int32) bool
 }
 
 // 内部消息处理接口

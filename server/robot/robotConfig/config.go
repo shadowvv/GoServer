@@ -40,11 +40,13 @@ type LoginConfig struct {
 }
 
 type RunConfig struct {
-	Count      int    `yaml:"count"`
-	Mode       string `yaml:"mode"` // random | custom
-	Interval   int64  `yaml:"interval"`
-	Duration   int    `yaml:"duration"`
-	NamePrefix string `yaml:"namePrefix"`
+	Count             int    `yaml:"count"`
+	Mode              string `yaml:"mode"` // random | custom
+	Interval          int64  `yaml:"interval"`
+	Duration          int    `yaml:"duration"`
+	NamePrefix        string `yaml:"namePrefix"`
+	StartupJitterMs   int    `yaml:"startupJitterMs"`
+	StartupIntervalMs int    `yaml:"startupIntervalMs"`
 }
 
 type OperationConfigItem struct {
@@ -128,6 +130,20 @@ func (c *RobotConfig) RuntimeCount() int {
 	return c.Main.RunConfig.Count
 }
 
+func (c *RobotConfig) RuntimeStartupJitterMs() int {
+	if c.Main.RunConfig.StartupJitterMs <= 0 {
+		return 1000
+	}
+	return c.Main.RunConfig.StartupJitterMs
+}
+
+func (c *RobotConfig) RuntimeStartupIntervalMs() int {
+	if c.Main.RunConfig.StartupIntervalMs <= 0 {
+		return 0
+	}
+	return c.Main.RunConfig.StartupIntervalMs
+}
+
 func LoadConfig(path string) (*RobotConfig, error) {
 	var cfg RobotConfig
 	if err := tool.LoadYaml(path, &cfg); err != nil {
@@ -191,7 +207,8 @@ func buildOperationProto(module string, messageID pb.MESSAGE_ID, params map[stri
 func buildRuntimeModuleMessages(c *RobotConfig) error {
 	moduleList := normalizeModuleList(c.Main.Modules, c.RealOperation)
 	if len(moduleList) == 0 {
-		return fmt.Errorf("no modules selected")
+		c.CurrentRunModule = nil
+		return nil
 	}
 
 	groups := make([]RobotRunModule, 0, len(moduleList))

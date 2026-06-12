@@ -1,0 +1,36 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+message AvatarDetail{
+  int32 id = 1;
+  int64 endTime=2;// 0表示永久，单位毫秒，否则表示到期时间戳
+  bool isWear = 3;
+}
+
+message GetAvatarDetailsReq{
+}
+
+message GetAvatarDetailsResp{
+  repeated AvatarDetail avatarList = 1;
+}
+
+// 穿戴
+message WearAvatarReq{
+  int32 id = 1;
+}
+
+message WearAvatarResp{
+}
+
+// 卸下
+message UnfixAvatarReq{
+  int32 id = 1;
+}
+
+message UnfixAvatarResp{
+}
+
+message PushAvatarDetail{
+  repeated AvatarDetail avatarDetail = 1;
+}

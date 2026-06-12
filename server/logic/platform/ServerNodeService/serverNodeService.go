@@ -324,7 +324,7 @@ func GetGateWayOpenAddress() (string, error) {
 	return gateInfo.NodeParam, nil
 }
 
-func GetGameNodeId(userId int64) (int32, error) {
+func GetGameNodeIdByUserId(userId int64) (int32, error) {
 	nodes := listNodes(enum.NODE_TYPE_GAME)
 	num := len(nodes)
 	if num == 0 {

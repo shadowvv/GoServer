@@ -2,12 +2,11 @@ configs:
   backend: # SERVER_TYPE_HTTP
     local:
       loggerConfig: # 日志配置
-        infoFilename: "logs/info" # 日志文件名
-        errorFilename: "logs/error" # 错误日志文件名
-        maxsize: 500 # 日志文件最大值MB
-        maxBackups: 7 # 保留的文件数
-        maxAge: 1 # 单个文件保留的天数
-        compress: true # 是否压缩
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 30 # 文件数
+        onlyConsole: true
       httpConfig:
         address: ":8082"
         readTimeout: 10000ms
@@ -40,10 +39,10 @@ configs:
         maxOpenConnections: 100 # 最大打开连接数
         maxLifetime: 10s # 连接超时秒数
       rankDBConfig: # 数据库配置
-          dsn: "root:123456@tcp(127.0.0.1:3306)/rankBoard?charset=utf8mb4&parseTime=True&loc=Local" # 数据库连接串
-          maxIdleConnections: 10 # 最大空闲连接数
-          maxOpenConnections: 100 # 最大打开连接数
-          maxLifetime: 10s # 连接超时秒数
+        dsn: "root:123456@tcp(127.0.0.1:3306)/rankBoard?charset=utf8mb4&parseTime=True&loc=Local" # 数据库连接串
+        maxIdleConnections: 10 # 最大空闲连接数
+        maxOpenConnections: 100 # 最大打开连接数
+        maxLifetime: 10s # 连接超时秒数
       redisConfig:
         addr: "127.0.0.1:6379" # redis地址
         db: 0 # 数据库索引
@@ -57,12 +56,11 @@ configs:
         addr: "127.0.0.1"
     test:
       loggerConfig: # 日志配置
-        infoFilename: "logs/info" # 日志文件名
-        errorFilename: "logs/error" # 错误日志文件名
-        maxsize: 500 # 日志文件最大值MB
-        maxBackups: 7 # 保留的文件数
-        maxAge: 1 # 单个文件保留的天数
-        compress: true # 是否压缩
+        infoFilename: "logs/info"
+        errorFilename: "logs/error"
+        maxsize: 1024 # MB
+        maxBackups: 30 # 文件数
+        onlyConsole: true
       httpConfig:
         address: ":8082"
         readTimeout: 10000ms
@@ -95,10 +93,10 @@ configs:
         maxOpenConnections: 100 # 最大打开连接数
         maxLifetime: 10s # 连接超时秒数
       rankDBConfig: # 数据库配置
-          dsn: "root:123qweREQ!@tcp(10.0.8.10:3306)/rankBoard?charset=utf8mb4&parseTime=True&loc=Local" # 数据库连接串
-          maxIdleConnections: 10 # 最大空闲连接数
-          maxOpenConnections: 100 # 最大打开连接数
-          maxLifetime: 10s # 连接超时秒数
+        dsn: "root:123qweREQ!@tcp(10.0.8.10:3306)/rankBoard?charset=utf8mb4&parseTime=True&loc=Local" # 数据库连接串
+        maxIdleConnections: 10 # 最大空闲连接数
+        maxOpenConnections: 100 # 最大打开连接数
+        maxLifetime: 10s # 连接超时秒数
       redisConfig:
         addr: "10.0.8.10:6379" # redis地址
         db: 0 # 数据库索引

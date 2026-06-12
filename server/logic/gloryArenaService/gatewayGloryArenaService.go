@@ -51,7 +51,15 @@ func (s *GatewayGloryArenaService) syncNow(force bool) {
 	_ = force
 
 	now := tool.UnixNowMilli()
-	openServerMap := s.serverInfoService.GetAllServerInfo()
+	openServerMap := s.serverInfoService.GetAllOpenServerInfo()
+	ctx := context.Background()
+	opsKey := enum.GetGloryArenaOpsStateKey()
+	if len(openServerMap) == 0 {
+		// No opened servers: keep ops_state empty.
+		_ = dbService.RDB.Del(ctx, opsKey).Err()
+		return
+	}
+
 	openServers := make([]logicCommon.ServerInfoInterface, 0, len(openServerMap))
 	for _, info := range openServerMap {
 		openServers = append(openServers, info)
@@ -82,9 +90,21 @@ func (s *GatewayGloryArenaService) syncNow(force bool) {
 		return
 	}
 
-	ctx := context.Background()
-	opsKey := enum.GetGloryArenaOpsStateKey()
+	existedFields, existedErr := dbService.RDB.HKeys(ctx, opsKey).Result()
+	if existedErr != nil && existedErr != redis.Nil {
+		logger.ErrorBySprintf("[gatewayGloryArenaStateService] load existed ops_state fields failed err:%v", existedErr)
+	}
+	staleFields := make([]string, 0)
+	for _, field := range existedFields {
+		if _, ok := fields[field]; !ok {
+			staleFields = append(staleFields, field)
+		}
+	}
+
 	pipe := dbService.RDB.Pipeline()
+	if len(staleFields) > 0 {
+		pipe.HDel(ctx, opsKey, staleFields...)
+	}
 	pipe.HSet(ctx, opsKey, fields)
 	pipe.Expire(ctx, opsKey, gloryArenaStateRedisTTL)
 	if _, err = pipe.Exec(ctx); err != nil {

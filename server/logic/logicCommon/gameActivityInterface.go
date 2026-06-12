@@ -17,7 +17,7 @@ type GameActivityServiceInterface interface {
 	// 判断活动是否结算
 	IsActivitySettled(serverId int32, activityId int32, version string) bool
 	// 获取所有开启的活动
-	GetAllActivityByServerId(serverId int32) []GameActivityInterface
+	GetAllOpenActivityByServerId(serverId int32) []GameActivityInterface
 	// 判断活动是否开启
 	IsActivityOpen(serverId int32, activityId int32) GameActivityInterface
 	// 获得获得配置

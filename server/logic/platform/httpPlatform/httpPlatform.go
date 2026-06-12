@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/drop/GoServer/server/enum"
+	"github.com/drop/GoServer/server/logic/gameConfig"
 	"github.com/drop/GoServer/server/logic/gameServerInfoService"
 	"github.com/drop/GoServer/server/logic/logicCommon"
 	"github.com/drop/GoServer/server/logic/pb"
@@ -67,6 +68,9 @@ func BootHttpPlatform() {
 		logger.ErrorWithZapFields("[platform] Init redis error", zap.Error(err))
 		panic("[platform] Init redis error")
 	}
+
+	gameConfig.LoadAllConfig()
+	logger.InfoWithSprintf("[platform] load all config success !!!")
 
 	// 节点RPC服务
 	hooker := &httpRpcHooker{}
@@ -171,7 +175,7 @@ func (h httpMessageSender) SendMessage(player logicCommon.UserBaseInterface, msg
 
 }
 
-func (h httpMessageSender) Broadcast(msgId pb.MESSAGE_ID, msg proto.Message, broadcastType enum.BroadcastType, typeId int32) {
+func (h httpMessageSender) Broadcast(msgId pb.MESSAGE_ID, msg proto.Message, broadcastType enum.BroadcastType, typeId int64) {
 	logger.ErrorBySprintf("[platform] Broadcast error, msgId:%d", msgId)
 }
 

@@ -75,7 +75,7 @@ func (im *InventoryManager) RemoveItem(uid int32, itemNum int64) enum.InventoryR
 	}
 
 	if item.ItemNum < itemNum {
-		return enum.INVENTORY_RESULT_INSUFFICIENT_ITEMNUM
+		return enum.INVENTORY_RESULT_INSUFFICIENT_ITEM_NUM
 	}
 
 	item.ItemNum -= itemNum

@@ -161,7 +161,7 @@ func preseasonRoundState(serverOpenTime int64, currentTime int64) *gloryArenaRou
 }
 
 func nextTuesdayAfter(base time.Time) time.Time {
-	tuesday := tool.WeekStart(base).AddDate(0, 0, 1).Add(gloryArenaRoundOpenOffset)
+	tuesday := tool.WeekStartByMilli(base.UnixMilli()).AddDate(0, 0, 1).Add(gloryArenaRoundOpenOffset)
 	if !base.Before(tuesday) {
 		tuesday = tuesday.AddDate(0, 0, 7)
 	}
@@ -759,7 +759,7 @@ func getGloryArenaSeasonEndDate(seasonStartDate int64, version string) (endTime 
 	seasonType, hasSeasonType := parseSeasonTypeFromVersion(version)
 	if hasSeasonType && seasonType == int32(enum.GLORY_ARENA_SEASON_TYPE_PRE) {
 		round1End := seasonStartTime.AddDate(0, 0, 3)
-		weekSaturday := tool.WeekStart(round1End).AddDate(0, 0, 5)
+		weekSaturday := tool.WeekStartByMilli(round1End.UnixMilli()).AddDate(0, 0, 5)
 		seasonEnd := round1End
 		// Keep same rule as preseasonRoundState: only open round2 when round1End < weekSaturday.
 		if round1End.Before(weekSaturday) {

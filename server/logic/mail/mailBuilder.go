@@ -54,6 +54,6 @@ func buildServerMailEntityFromServerMail(s *ServerMail) *ServerMailEntity {
 	_ = entity.SetItems(s.Items)
 	_ = entity.SetUnlockList(s.UnlockList)
 	_ = entity.SetTitleParams(nil)
-	_ = entity.SetContentParams(nil)
+	_ = entity.SetContentParams(s.ContentParams)
 	return entity
 }

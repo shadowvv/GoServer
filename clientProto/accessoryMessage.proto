@@ -1,0 +1,60 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+import "commonMessage.proto";
+import "heroMessage.proto";
+message AccessoryLevelUpReq{
+  int32 levelUpType=1; // 0单个升级 1一键升级
+  int32 accessoryId=2; // 饰品id
+}
+
+message AccessoryLevelUpResp{
+  repeated AccessoryDetail infoList=1; // 饰品信息列表
+}
+
+message GetUserAccessoryDetailReq{
+  int32 accessoryId=1;// 饰品id
+  int32 getType=2;// 获取类型 1：当前玩家 2：1级预览
+}
+
+message GetUserAccessoryDetailResp{
+  repeated AccessoryDetail infoList=1; // 饰品信息列表
+}
+
+message AccessoryOperationReq{
+  int32 operationType=1; // 操作类型 0 穿 1 脱
+  int64 heroOwnId=2;// 英雄唯一id
+  int32 accessoryId=3;// 饰品id
+}
+
+message AccessoryOperationResp{
+    repeated AccessoryDetail info =1;// 饰品信息
+    HeroBagInfo heroInfo=2;// 英雄信息
+}
+
+message AccessoryLuckyDetail{
+  int32 LuckyId=1;// 抽奖组id
+  int32 LuckyLevel=2; // 等级
+  int32 LuckyNum=3; // 抽奖次数
+  int32 FreeNum=4; // 看过广告次数
+  int32 FreeLuckyNum=5;// 本次免费抽取次数
+  int64 FreeUpdateTime=6;// 上次免费抽时间戳（毫秒）
+}
+
+message GetAccessoryLuckyDetailReq{
+}
+
+message GetAccessoryLuckyDetailResp{
+  repeated AccessoryLuckyDetail infoList=1;
+}
+
+message AccessoryLuckyReq{
+  int32 LuckyId=1;
+  int32 LuckyType=2;// 抽奖类型 0：消耗道具11次 1：消耗道具35次 2：广告35次
+}
+
+message AccessoryLuckyResp{
+  AccessoryLuckyDetail info=1;
+  repeated ItemBasicInfo itemList=2; // 开启结果 message ItemBasicInfo{int32 itemId = 1;int32 count = 2;}
+}

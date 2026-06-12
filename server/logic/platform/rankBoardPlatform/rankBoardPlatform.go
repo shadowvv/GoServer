@@ -78,7 +78,7 @@ func (r rankBoardMessageSender) SendMessage(player logicCommon.UserBaseInterface
 	logger.ErrorBySprintf("[platform] SendMessage error, msgId:%d, player:%v", msgId, player)
 }
 
-func (r rankBoardMessageSender) Broadcast(msgId pb.MESSAGE_ID, msg proto.Message, broadcastType enum.BroadcastType, typeId int32) {
+func (r rankBoardMessageSender) Broadcast(msgId pb.MESSAGE_ID, msg proto.Message, broadcastType enum.BroadcastType, typeId int64) {
 	logger.ErrorBySprintf("[platform] Broadcast error, msgId:%d, broadcastType:%d, typeId:%d", msgId, broadcastType, typeId)
 }
 
@@ -246,7 +246,7 @@ func SendRankBoardRewardMail(mailTemplateId int32, playerId int64, items []*game
 	}
 }
 
-func SendRankBoardAllianceRewardMail(mailTemplateId int32, serverId int32, allianceId int64, items []*gameConfig.ItemConfig) error {
+func SendRankBoardAllianceRewardMail(mailTemplateId int32, serverId int32, allianceId int64, items []*gameConfig.ItemConfig, rank int32) error {
 	if allianceId <= 0 {
 		return nil
 	}
@@ -258,6 +258,8 @@ func SendRankBoardAllianceRewardMail(mailTemplateId int32, serverId int32, allia
 	expireTime := int64(0)
 	if cfg.MailExpTime > 0 {
 		expireTime = tool.UnixNow() + int64(cfg.MailExpTime)*3600
+	} else {
+		expireTime = tool.UnixNow() + 7*24*3600
 	}
 	serverMailID := mailIdGenerator.NextId()
 
@@ -270,20 +272,21 @@ func SendRankBoardAllianceRewardMail(mailTemplateId int32, serverId int32, allia
 		})
 	}
 	allianceMail := &mail.ServerMail{
-		ServerMailID: serverMailID,
-		MailType:     cfg.MailType,
-		Title:        strconv.FormatInt(int64(cfg.MailTitle), 10),
-		Content:      strconv.FormatInt(int64(cfg.MailWords), 10),
-		TemplateID:   cfg.ID,
-		ServerID:     serverId,
-		AllianceID:   allianceId,
-		UnlockList:   []int32{},
-		IsConvenient: cfg.IsConvenient,
-		Items:        mailItems,
-		SendTime:     tool.UnixNow(),
-		ExpireTime:   expireTime,
-		Status:       mail.ServerMailStatusSent,
-		CreatedBy:    "rank_board_settle",
+		ServerMailID:  serverMailID,
+		MailType:      cfg.MailType,
+		Title:         strconv.FormatInt(int64(cfg.MailTitle), 10),
+		Content:       strconv.FormatInt(int64(cfg.MailWords), 10),
+		ContentParams: []string{strconv.Itoa(int(rank))},
+		TemplateID:    cfg.ID,
+		ServerID:      serverId,
+		AllianceID:    allianceId,
+		UnlockList:    []int32{},
+		IsConvenient:  cfg.IsConvenient,
+		Items:         mailItems,
+		SendTime:      tool.UnixNow(),
+		ExpireTime:    expireTime,
+		Status:        mail.ServerMailStatusSent,
+		CreatedBy:     "rank_board_settle",
 	}
 
 	entity := mail.ServerMailToEntity(allianceMail)

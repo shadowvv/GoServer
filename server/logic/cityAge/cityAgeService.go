@@ -2,7 +2,6 @@ package cityAge
 
 import (
 	"errors"
-	"time"
 
 	"github.com/drop/GoServer/server/enum"
 	"github.com/drop/GoServer/server/logic/gameConfig"
@@ -216,7 +215,7 @@ func (s *CityAgeService) Upgrade(player *model.PlayerModel) (*pb.CityAgeInfo, []
 	} else if ok && messageSender != nil {
 		messageSender.Broadcast(pb.MESSAGE_ID_PUSH_CITY_AGE_FIRST_REACH, &pb.PushCityAgeFirstReach{
 			Info: s.buildFirstReachInfo(reachEntity, player.User.Entity),
-		}, enum.BROADCAST_TYPE_SERVER_ID, player.GetUserServerId())
+		}, enum.BROADCAST_TYPE_SERVER_ID, int64(player.GetUserServerId()))
 	}
 
 	firstReachList, err := s.loadFirstReachInfoList(player.GetUserServerId())
@@ -252,7 +251,7 @@ func (s *CityAgeService) ClaimDailyReward(player *model.PlayerModel) error {
 		return errors.New("daily reward not found")
 	}
 	if cityAgeModel.Entity.DailyRewardTime > 0 &&
-		tool.IsSameDay(time.UnixMilli(cityAgeModel.Entity.DailyRewardTime), time.UnixMilli(tool.UnixNowMilli())) {
+		tool.IsSameDayByMilli(cityAgeModel.Entity.DailyRewardTime, tool.UnixNowMilli()) {
 		return errors.New("daily reward already claimed")
 	}
 
@@ -347,7 +346,7 @@ func (s *CityAgeService) buildInfoWithCfg(player *model.PlayerModel, cityAgeMode
 	if cfg.Drop2 <= 0 {
 		dailyRewardStatus = cityAgeDailyRewardStatusClaimed
 	} else if cityAgeModel.Entity.DailyRewardTime > 0 &&
-		tool.IsSameDay(time.UnixMilli(cityAgeModel.Entity.DailyRewardTime), time.UnixMilli(tool.UnixNowMilli())) {
+		tool.IsSameDayByMilli(cityAgeModel.Entity.DailyRewardTime, tool.UnixNowMilli()) {
 		dailyRewardStatus = cityAgeDailyRewardStatusClaimed
 	}
 

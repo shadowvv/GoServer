@@ -1,0 +1,247 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+import "messageEnum.proto";
+import "heroMessage.proto";
+
+// 玩家错误推送
+message MessageError {
+  MESSAGE_ID msgId = 1;
+  ERROR_CODE errorCode = 2;
+}
+
+message ExchangeItemReq {
+  int32 exchangeId = 1;
+  int32 exchangeNum = 2;
+}
+
+message ExchangeItemResp {
+  
+}
+
+message PushFunctionChange{
+  repeated FunctionOpenInfo infos = 1;
+}
+
+// 推送物品变更
+message PushItemChange {
+  ITEM_CHANGE_TYPE type = 1;
+  repeated ItemBasicInfo addItemList = 2;
+  repeated ItemBasicInfo removeItemList = 3;
+  int32 source = 4; //来源
+  int32 isPay = 5;  //是否是支付获得，0不是 1是
+}
+
+message PlayerGMMessage {
+  int32 funcId = 1;
+  string content = 2;
+}
+
+// 功能开启数据
+message FunctionOpenInfo {
+  int32 funcId = 1; // 功能id
+  int32 status = 2; // 功能状态。0关闭，1可见，2可用
+  int32 rewardCommited = 3; // 领取的奖励是否已经提交
+  int64 unlockTime = 4; //系统解锁时间
+}
+
+message ItemBasicInfo{
+  int32 itemId = 1;
+  int64 count = 2;
+}
+
+// 物品信息
+message ItemInfo {
+  int32 item_id = 1; // 配置ID
+  int64 item_num = 2; // 数据
+  int32 item_uid = 3; // 唯一
+}
+
+message InventoryData {
+  repeated ItemInfo items = 1;
+}
+
+message PlayerBasicInfo {
+  int64 userId = 1;
+  string nickName = 2;
+  int32 serverId = 3;
+  int32 headId = 6;
+  int32 headFrameId = 7;
+  int32 titleId = 8;
+  int32 level = 9;
+  int32 bubbleId = 10; // 对话框id
+  int32 imageId = 11; // 小人id
+  int32 chargeCount=12; // 充值数据
+}
+
+message PlayerAllianceInfo {
+  int64 allianceId = 1;
+  string allianceName = 2;
+}
+
+message PlayerFormationDetail {
+  int32 formationId = 1;
+  int32 formationType = 2;
+  repeated HeroBagInfo infos = 3;
+}
+
+message SceneBasicInfo {
+  int32 instanceId = 1;
+  int32 stageId = 2;
+  int32 currentSubStageId = 3;
+  repeated SubStageInfo subStageInfos = 4;
+  repeated MonsterTemplateInfo allMonsterTemplate = 5;
+  int64 randomSeed = 6;
+}
+
+message SubStageInfo {
+  int32 subStageId = 1;
+  int32 roomId = 2;
+  repeated monsterInfo monsterInfos = 3;
+  int32 isCyCle = 4;
+  repeated HeroBasicInfo heroInfos = 5;
+  int32 playerLevel = 6;
+  repeated int32 selfComboSkillIds = 7;
+  repeated int32 enemyComboSkillIds = 8;
+}
+
+message monsterInfo {
+  int32 index = 1;
+  string spawnId = 2;
+  int32 waveSequence = 3;
+  int32 monsterId = 4;
+  repeated ItemBasicInfo drops = 7;
+}
+
+message HeroBasicInfo{
+  int32 heroId = 1;
+  CharactorBasicInfo basicInfo = 2;
+}
+message MonsterTemplateInfo{
+  int32 monsterId = 1;
+  int32 unitId = 2;
+  int32 atkSpeed = 3;
+  int32 moveSpeed = 4;
+  int32 patrolRange = 5;
+  int32 aggroRange = 6;
+  int32 attackRange = 7;
+  map<int32,int64> attrs = 8;
+  int32 basicSkill= 9;
+  repeated int32 skillIds = 10;
+  PetBattleInfo petBattleInfo = 11;
+}
+
+message CharactorBasicInfo{
+  map<int32,int64> attrs = 1;
+  SkillsInfo skillIds = 2;
+  int32 unitsId=3;
+  int32 attackRange=4;
+  PetBattleInfo petBattleInfo = 5;
+}
+
+// 宠物战斗信息
+message PetBattleInfo {
+  int64 petOwnId = 1;
+  int32 petId = 2;
+  int32 level = 3;
+  int32 star = 4;
+  repeated int32 skillList = 5;
+}
+
+message SkillsInfo{
+  int32 basicSkill = 1; // 基础技能
+  repeated int32 skillList=2;// 其余技能List
+}
+
+// 活动信息
+message ActivityInfo {
+  int32 activityId = 1; // 活动ID
+  int64 settleTime = 2; // 结算时间
+  int64 endTime = 3; // 结束时间
+  bool locked = 4; // 是否锁定
+  int64 startTime = 5; // 开启时间
+}
+
+// 剧情完成请求
+message StoryFinishReq {
+  int32 storyId = 1;
+}
+
+message StoryFinishResp {
+}
+
+message HeroShowInfo {
+  int32 unit = 1;
+  int32 petId = 2;
+}
+
+message AccessoryDetail{
+  int32 accessoryId=1;// 饰品id
+  int32 accessoryLevel=2;// 饰品等级
+  int32 accessoryNum=3;// 饰品数量
+  int64 heroOwnId=4;// 英雄唯一id
+  int64 power=5;// 战力
+}
+
+// 装备详情信息
+message EquipmentDetailInfo {
+  int64 equipmentOwnId = 1;   // 装备唯一ID
+  int32 equipmentId = 2;      // 装备模板ID
+  int64 heroOwnId = 3;        // 穿戴的英雄唯一ID
+  int32 level = 4;            // 装备等级
+  int32 slotType = 5;         // 装备部位类型
+  int32 slotIndex = 6;        // 装备槽位索引
+  int32 starLevel = 7;        // 装备星级
+  int32 setId = 8;            // 套装ID
+  bool isLocked = 9;          // 是否锁定
+  int32 forgeLevel = 10;      // 锻造等级，预留字段
+  map<int32, int32> baseStats = 11; // 基础属性
+  repeated EquipmentAffixInfo attributeAffix = 12; // 属性词条
+  repeated EquipmentSkillAffixInfo skillAffix = 13; // 技能词条
+  EquipmentSetInfo setInfo = 14; // 套装信息
+  int64 power = 15;           // 战力
+  int32  strongLevel = 16; // 强化等级
+}
+
+// 装备词条信息
+message EquipmentAffixInfo {
+  int32 affixId = 1;          // 词条ID
+  int32 statType = 2;         // 属性类型
+  int32 statValue = 3;        // 属性数值
+}
+
+// 装备技能词条信息
+message EquipmentSkillAffixInfo {
+  int32 skillAffixId = 1;     // 技能词条ID
+  int32 skillId = 2;          // 技能ID
+  int32 skillLevel = 3;       // 技能等级
+}
+
+// 套装信息
+message EquipmentSetInfo {
+  int32 setId = 1;            // 套装ID
+  int32 activePieceCount = 2; // 当前激活件数
+  int32 pieceCount = 3;       // 总件数
+  map<int32, int32> activeStats = 4; // 激活属性
+}
+
+// 宠物详情信息
+message PetDetailInfo {
+  int64 petOwnId = 1;     // 宠物唯一ID
+  int32 petId = 2;        // 配表ID
+  int32 level = 3;        // 等级
+  int32 star = 4;         // 星级（从0开始）
+  int64 heroOwnId = 5;    // 绑定英雄，0=在背包
+  map<int32, int64> Attributes = 6; // 宠物属性列表
+  repeated int32 passiveSkills = 7; // 被动技能列表（没有则空）
+}
+
+message EquipmentBasicInfo {
+  int64 equipmentOwnId = 1;   // 装备唯一ID
+  int32 equipmentId = 2;      // 装备模板ID
+  int32 level = 3;            // 装备等级
+  int32 slotType = 4;         // 装备部位类型
+  int32 slotIndex = 5;        // 装备槽位索引
+  int32 starLevel = 6;        // 装备星级
+  int32 strongLevel = 7; // 强化等级
+}

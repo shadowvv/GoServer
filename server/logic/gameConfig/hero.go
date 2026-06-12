@@ -63,6 +63,7 @@ func (s *HeroCfgLoader) loadData() error {
 		v.LimitedHero = ParseIntArray(row["limitedHero"])
 		v.StarLimit = ParseIntArray(row["starLimit"])
 		v.LeaderId = ParseInt(row["leaderId"])
+		v.Group = ParseInt(row["group"])
 		if v.Id <= 0 {
 			continue
 		}
@@ -338,7 +339,7 @@ func (s *HeroCfgLoader) checkData() error {
 				if v.BreakMaterials == nil || v.BreakCost == nil || len(v.BreakMaterials) != len(v.BreakCost) {
 					return errors.New(fmt.Sprintf("[gameConfig] load heroBreak error invalid ID:%d", id))
 				}
-				if v.HeroPotential < 1 || v.HeroPotential > 4 {
+				if v.HeroPotential < 1 || v.HeroPotential > 5 {
 					return errors.New(fmt.Sprintf("[gameConfig] load heroBreak error invalid ID:%d", id))
 				}
 				if GetHeroClassCfg(v.HeroClass) == nil {
@@ -497,6 +498,8 @@ type ComboSkillCfg struct {
 	Id int32 `json:"id"`
 	// 合体技等级
 	Level int32 `json:"level"`
+	// 合体技分组
+	Group int32 `json:"group"`
 	// 限定英雄
 	LimitedHero []int32 `json:"limitedHero"`
 	// 星级限制

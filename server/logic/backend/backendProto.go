@@ -1,6 +1,8 @@
 package backend
 
 import (
+	"mime/multipart"
+
 	"github.com/drop/GoServer/server/logic/mail"
 )
 
@@ -191,9 +193,10 @@ type GmEditClientVersionData struct {
 }
 
 type GmClientVersionData struct {
-	Version      string `json:"v"`             // 客户端版本
-	HotFixConfig string `json:"hotfix_config"` // 热更配置
-	Examine      int32  `json:"examine"`       // 是否审核
+	Version      string                `json:"v"`             // 客户端版本
+	HotFixConfig string                `json:"hotfix_config"` // 热更配置
+	Examine      int32                 `json:"examine"`       // 是否审核
+	UploadFile   *multipart.FileHeader `json:"-"`             // 上传的文件（不从 JSON 解析）
 }
 
 type GmGetClientVersionReq struct {
@@ -309,6 +312,7 @@ type GmGetRankData struct {
 	Score        int64  `json:"score"`          // 分数
 	ThumbUpCount int32  `json:"thumb_up_count"` // 点赞数
 	EnterTime    int64  `json:"enter_time"`     // 进入时间
+	UpdateTime   int64  `json:"update_time"`    // 更新时间
 }
 
 // GmGamePublicReq 请求游戏内加载界面公告
@@ -460,7 +464,30 @@ type GmImportPlayerData struct {
 type GmKickPlayerReq struct {
 	Token string `json:"token"`
 	Type  int32  `json:"type"`  // 踢人类型 1=按userid踢人 2=区服踢人 3=全服踢人
-	Param int32  `json:"param"` // 参数（type=1时为userid，type=2时为serverId，type=3时无意义）
+	Param int64  `json:"param"` // 参数（type=1时为userid，type=2时为serverId，type=3时无意义）
+}
+
+// GmGetServerActivityOpenReq 获取服务器开启活动请求
+type GmGetServerActivityOpenReq struct {
+	Token    string `json:"token"`
+	ServerId int32  `json:"server_id"`
+}
+
+// GmGetServerActivityOpenData 服务器开启活动数据
+type GmGetServerActivityOpenData struct {
+	ServerId   int32                     `json:"server_id"`
+	Activities []*ServerOpenActivityItem `json:"activities"` // 活动列表
+}
+
+// ServerOpenActivityItem 单个开启的活动信息
+type ServerOpenActivityItem struct {
+	ActivityId   int32  `json:"activity_id"`
+	Version      string `json:"version"`
+	OpenServerId int32  `json:"open_server_id"`
+	OpenTime     int64  `json:"open_time"`
+	SettleTime   int64  `json:"settle_time"`
+	EndTime      int64  `json:"end_time"`
+	OpenCount    int32  `json:"open_count"`
 }
 
 // GmGetThroughputReq 获取吞吐量监控数据请求
@@ -473,4 +500,11 @@ type GmThroughputItem struct {
 	Key      string `json:"key"`      // Redis key
 	Handled  int64  `json:"handled"`  // 已处理数量
 	Received int64  `json:"received"` // 已接收数量
+}
+
+type EditGmBuFaReq struct {
+	Token     string `json:"token"`
+	UserId    int64  `json:"user_id"`
+	ProductId string `json:"product_id"`
+	OrderId   string `json:"order_id"`
 }

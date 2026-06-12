@@ -14,6 +14,7 @@ type PlayerFunctionEntity struct {
 	UserId         int64 `gorm:"column:user_id;primaryKey"`
 	FunctionId     int32 `gorm:"column:function_id;primaryKey"`
 	RewardCommited int32 `gorm:"column:reward_commited"`
+	UnlockTime     int64 `gorm:"column:unlock_time"`
 }
 
 func (m *PlayerFunctionEntity) TableName() string {
@@ -87,23 +88,41 @@ func (m *PlayerFunctionModel) Heartbeat(lastTickTime int64, currentTime int64, p
 			}
 		}
 		if isShow {
-			status = 1
+			status = int32(enum.FUNCTION_STATUS_SHOW)
 		}
 		if isOpen {
-			status = 2
+			status = int32(enum.FUNCTION_STATUS_UNLOCK)
 		}
 
 		// 这里用 currentTime(毫秒) 初始化 idle 的 LastSettleTime(秒)
-		if status == 2 && funcId == int32(enum.FUNCTION_ID_IDLE) &&
+		if status == int32(enum.FUNCTION_STATUS_UNLOCK) && funcId == int32(enum.FUNCTION_ID_IDLE) &&
 			m.Player != nil && m.Player.IdleModel != nil && m.Player.IdleModel.Entity != nil &&
 			m.Player.IdleModel.Entity.LastSettleTime == 0 {
 			m.Player.IdleModel.UpdateLastSettleTime(currentTime / 1000)
 		}
 
 		rewardCommited := int32(0)
-		if entity := m.Get(funcId); entity != nil {
+		unlockTime := int64(0)
+		var entity *PlayerFunctionEntity
+		if entity = m.Get(funcId); entity != nil {
 			rewardCommited = entity.RewardCommited
+		} else {
+			if status == int32(enum.FUNCTION_STATUS_UNLOCK) {
+				entity = &PlayerFunctionEntity{
+					UserId:         m.UserId,
+					FunctionId:     funcId,
+					RewardCommited: rewardCommited,
+					UnlockTime:     currentTime,
+				}
+				err := easyDB.CreatePlayerEntity[PlayerFunctionEntity](entity)
+				if err != nil {
+					continue
+				}
+				unlockTime = entity.UnlockTime
+				m.Entities[funcId] = entity
+			}
 		}
+
 		if current, ok := m.FunctionStatus[enum.FunctionIdEnum(funcId)]; ok {
 			if status == current {
 				continue
@@ -113,6 +132,7 @@ func (m *PlayerFunctionModel) Heartbeat(lastTickTime int64, currentTime int64, p
 				FuncId:         funcId,
 				Status:         status,
 				RewardCommited: rewardCommited,
+				UnlockTime:     unlockTime,
 			})
 		} else {
 			if status == 0 {
@@ -123,6 +143,7 @@ func (m *PlayerFunctionModel) Heartbeat(lastTickTime int64, currentTime int64, p
 				FuncId:         funcId,
 				Status:         status,
 				RewardCommited: rewardCommited,
+				UnlockTime:     unlockTime,
 			})
 		}
 	}
@@ -147,18 +168,7 @@ func (m *PlayerFunctionModel) CommitReward(functionId int32) {
 			if m.Changed[functionId] == nil {
 				m.Changed[functionId] = make(map[string]interface{})
 			}
-			m.Changed[functionId]["reward_committed"] = 1
-		}
-	} else {
-		entity := &PlayerFunctionEntity{
-			UserId:         m.UserId,
-			FunctionId:     functionId,
-			RewardCommited: 1,
-		}
-		m.Entities[functionId] = entity
-		err := easyDB.CreatePlayerEntity[PlayerFunctionEntity](entity)
-		if err != nil {
-			return
+			m.Changed[functionId]["reward_commited"] = 1
 		}
 	}
 }

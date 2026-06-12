@@ -68,14 +68,15 @@ func (sm *GameSessionManager) ReplaceSession(session serviceInterface.SessionInt
 	sm.mu.Unlock()
 }
 
-func (sm *GameSessionManager) OnConnectionTimeout(session serviceInterface.SessionInterface) {
+func (sm *GameSessionManager) OnSessionClose(session serviceInterface.SessionInterface, isForce bool) {
 	sm.mu.Lock()
 	if _, ok := sm.sessionMap[session.GetID()]; ok {
 		delete(sm.sessionMap, session.GetID())
 	}
+	player := sm.sessionPlayerMap[session.GetID()]
 	sm.mu.Unlock()
-	if player, ok := sm.sessionPlayerMap[session.GetID()]; ok {
-		sm.hooker.OnSessionClose(player)
+	if player != nil {
+		sm.hooker.OnSessionClose(player, isForce)
 	}
 	logger.InfoWithZapFields("[net] session timeout", zap.Int64("sessionId", session.GetID()))
 }
@@ -93,6 +94,30 @@ func (sm *GameSessionManager) RangeOnlinePlayers(f func(*model.PlayerModel)) {
 			f(p)
 		}
 	}
+}
+
+func (sm *GameSessionManager) KickOutServerPlayers(serverId int32) int {
+	count := 0
+	sm.RangeOnlinePlayers(func(p *model.PlayerModel) {
+		if p.GetUserServerId() != serverId || p.GetSession() == nil {
+			return
+		}
+		p.GetSession().Close()
+		count++
+	})
+	return count
+}
+
+func (sm *GameSessionManager) KickOutAllPlayers() int {
+	count := 0
+	sm.RangeOnlinePlayers(func(p *model.PlayerModel) {
+		if p.GetSession() == nil {
+			return
+		}
+		p.GetSession().Close()
+		count++
+	})
+	return count
 }
 
 func (sm *GameSessionManager) GetSessionById(id int64) serviceInterface.SessionInterface {

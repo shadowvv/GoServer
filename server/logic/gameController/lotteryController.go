@@ -30,6 +30,7 @@ func (l *LotteryController) RegisterLogicMessage() {
 	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_GET_LOTTERY_HISTORY_DETAIL_REQ, &pb.GetLotteryHistoryDetailReq{}, GetLotteryHistoryDetailHandle, enum.FUNCTION_ID_NONE)
 	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_GET_LOTTERY_INFO_REQ, &pb.GetLotteryInfoReq{}, GetLotteryInfoHandle, enum.FUNCTION_ID_NONE)
 	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_LOTTERY_REQ, &pb.LotteryReq{}, LotteryHandle, enum.FUNCTION_ID_NONE)
+	RegisterPlayerMessageHandler(enum.MSG_TYPE_PLAYER, pb.MESSAGE_ID_NEW_LUCKY_REWARD_REQ, &pb.NewLuckyRewardReq{}, NewLuckyRewardHandle, enum.FUNCTION_ID_NONE)
 }
 
 func GetLotteryHistoryDetailHandle(message proto.Message, player *model.PlayerModel) {
@@ -116,17 +117,23 @@ func GetLotteryInfoHandle(message proto.Message, player *model.PlayerModel) {
 		return
 	}
 	if lotteryEntity.FirstDropFree > 0 {
-		if !tool.IsSameDay(tool.MilliToTime(lotteryEntity.LastFirstDropFreeTime), tool.MilliToTime(tool.UnixNowMilli())) {
+		if !tool.IsSameDayByMilli(lotteryEntity.LastFirstDropFreeTime, tool.UnixNowMilli()) {
 			lotteryEntity.FirstDropFree--
 			player.LotteryModel.UpdateFirstDropFree(lotteryId, lotteryEntity.FirstDropFree)
 		}
 	}
+	lotteryLuckyEvent := player.LotteryModel.GetLotteryLuckyEvent()
 	resp := &pb.GetLotteryInfoResp{
 		LotteryInfo: &pb.LotteryInfo{
 			LotteryCount:         lotteryEntity.AllCount,
 			LastBasicGuaranteNum: lotteryEntity.LastBasicGuaranteeNum,
 		},
 		FirstDropFree: player.LotteryModel.LotteryEntities[req.LotteryId].FirstDropFree,
+		LotteryLuckyEvent: &pb.LotteryLuckyEvent{
+			LuckyNum:   lotteryLuckyEvent.LuckyNum,
+			CreateTime: lotteryLuckyEvent.CreateTime,
+		},
+		//NewLuckyCount:
 	}
 	messageSender.SendMessage(player, pb.MESSAGE_ID_GET_LOTTERY_INFO_RESP, resp)
 }
@@ -136,7 +143,6 @@ func LotteryHandle(message proto.Message, player *model.PlayerModel) {
 
 	req, ok := message.(*pb.LotteryReq)
 	if !ok {
-
 		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_LOTTERY_RESP, pb.ERROR_CODE_PB_CONV_ERROR)
 		return
 	}
@@ -175,6 +181,16 @@ func LotteryHandle(message proto.Message, player *model.PlayerModel) {
 			OnceEffectiveCount:      0,
 			LastChangeTime:          tool.UnixNowMilli(),
 			FirstDropFree:           0,
+		}
+		if cfg.ActModID != 0 {
+			ok, actVersion := player.PlayerActivityModel.CheckActivityOpen(cfg.ActModID)
+			if ok {
+				newEntity.ActVersion = actVersion
+			} else {
+				platformLogger.InfoWithUser("lottery req activity not open", player)
+				messageSender.SendErrorMessage(player, pb.MESSAGE_ID_LOTTERY_RESP, pb.ERROR_CODE_ACTIVITY_NOT_OPEN)
+				return
+			}
 		}
 		if err := player.LotteryModel.AddLotteryEntity(newEntity); err != nil {
 			platformLogger.ErrorWithUser("add lottery entity error", player, err)
@@ -217,6 +233,17 @@ func LotteryHandle(message proto.Message, player *model.PlayerModel) {
 	}
 
 	// todo 判断卡池时间
+	if cfg.ActModID != 0 {
+		ok, actVersion := player.PlayerActivityModel.CheckActivityOpen(cfg.ActModID)
+		if !ok {
+			platformLogger.InfoWithUser("lottery req activity not open", player)
+			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_LOTTERY_RESP, pb.ERROR_CODE_ACTIVITY_NOT_OPEN)
+			return
+		}
+		if lotteryDetail.ActVersion != "" && lotteryDetail.ActVersion != actVersion {
+			// todo 重置卡池数据
+		}
+	}
 
 	if cfg.UnlockID != 0 && !unlockService.CheckUnlock(cfg.UnlockID, player) {
 		platformLogger.InfoWithUser("lottery req unlock not open", player)
@@ -322,7 +349,26 @@ func LotteryHandle(message proto.Message, player *model.PlayerModel) {
 		player.LotteryModel.UpdateFirstDropFree(lotteryId, lotteryDetail.FirstDropFree+1)
 		player.LotteryModel.UpdateLastFirstDropFreeTime(lotteryId, tool.UnixNowMilli())
 	} else {
-		err := itemService.RemoveItem(player, &gameConfig.ItemConfig{ID: gameConfig.GetSummonPoolCfg(req.LotteryId).DropToken, Num: int64(lotteryNum)}, enum.ITEM_CHANGE_REASON_DRAW_LOTTERY)
+		removeItems := &gameConfig.ItemConfig{ID: gameConfig.GetSummonPoolCfg(req.LotteryId).DropToken, Num: int64(lotteryNum)}
+		lotteryLuckyEvent := player.LotteryModel.GetLotteryLuckyEvent()
+		// 抽奖类型：英雄卡池          数量：十抽          卡池类型：限定卡池
+		if cfg.Gashatype == 1 && lotteryNum == 10 && cfg.ActModID != 0 {
+			luckyEventCfgTime := gameConfig.GetConstantCfg(gameConfig.CONSTANT_limitedGachaLuckyEventTime)
+			// 事件存在，折数存在，且未过期
+			if lotteryLuckyEvent != nil && lotteryLuckyEvent.LuckyNum > 0 && (tool.UnixNowMilli()-lotteryLuckyEvent.CreateTime) < int64(luckyEventCfgTime.Value[0]*1000) {
+				removeItems.Num = removeItems.Num * int64(lotteryLuckyEvent.LuckyNum) / 10
+			}
+			err := player.LotteryModel.CreateLotteryLuckyEvent()
+			if err != nil {
+				platformLogger.ErrorWithUser("create lottery lucky event error", player, err)
+				messageSender.SendErrorMessage(player, pb.MESSAGE_ID_LOTTERY_RESP, pb.ERROR_CODE_CREATE_LOTTERY_LUCKY_EVENT_ERROR)
+				return
+			}
+		}
+		if cfg.Gashatype == 1 && !lotteryLuckyEvent.IsNewLuckyReward {
+			player.LotteryModel.UpdateNewLuckyCount(lotteryLuckyEvent.NewLuckyCount + lotteryNum)
+		}
+		err := itemService.RemoveItem(player, removeItems, enum.ITEM_CHANGE_REASON_DRAW_LOTTERY)
 		if err != nil {
 			platformLogger.InfoWithUser("扣除材料失败", player)
 			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_LOTTERY_RESP, pb.ERROR_CODE_REMOVE_ITEM_ERROR)
@@ -341,6 +387,7 @@ func LotteryHandle(message proto.Message, player *model.PlayerModel) {
 		platformLogger.ErrorWithUser("add item error", player, err)
 		return
 	}
+	lotteryLuckyEvent := player.LotteryModel.GetLotteryLuckyEvent()
 	resp := &pb.LotteryResp{
 		Result:   pb.LotteryResult_LOTTERY_RESULT_SUCCESS,
 		InfoList: res,
@@ -349,6 +396,11 @@ func LotteryHandle(message proto.Message, player *model.PlayerModel) {
 			LastBasicGuaranteNum: lotteryDetail.LastBasicGuaranteeNum,
 		},
 		FirstDropFree: player.LotteryModel.LotteryEntities[req.LotteryId].FirstDropFree,
+		LotteryLuckyEvent: &pb.LotteryLuckyEvent{
+			CreateTime: lotteryLuckyEvent.CreateTime,
+			LuckyNum:   lotteryLuckyEvent.LuckyNum,
+		},
+		NewLuckyCount: lotteryLuckyEvent.NewLuckyCount,
 	}
 	messageSender.SendMessage(player, pb.MESSAGE_ID_LOTTERY_RESP, resp)
 
@@ -359,10 +411,36 @@ func LotteryHandle(message proto.Message, player *model.PlayerModel) {
 
 	// 记录今日抽卡数据到 Redis
 	ctx := context.Background()
+	if cfg.Gashatype == 2 {
+		player.StaticData.UpdateCollectionLotteryDrawCount(player.StaticData.GetCollectionLotteryDrawCount() + lotteryNum)
+		err := unlockSvc.DailyCache.RecordCollectionLottery(ctx, player.GetUserId(), lotteryNum)
+		if err != nil {
+			platformLogger.ErrorWithUser("record collection lottery to redis error", player, err)
+		}
+	}
 	for _, item := range items {
 		err := unlockSvc.DailyCache.RecordLottery(ctx, player.GetUserId(), lotteryId, item.ID, int32(item.Num))
 		if err != nil {
 			platformLogger.ErrorWithUser("record lottery to redis error", player, err)
 		}
 	}
+}
+
+func NewLuckyRewardHandle(message proto.Message, player *model.PlayerModel) {
+	req, ok := message.(*pb.NewLuckyRewardReq)
+	if !ok {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_NEW_LUCKY_REWARD_RESP, pb.ERROR_CODE_PB_CONV_ERROR)
+		return
+	}
+	newLuckyNumCfg := gameConfig.GetConstantCfg(gameConfig.CONSTANT_beginnerBenefitsNumbers)
+	if newLuckyNumCfg == nil || len(newLuckyNumCfg.Value) < 0 {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_NEW_LUCKY_REWARD_RESP, pb.ERROR_CODE_CFG_NOT_FOUND)
+		return
+	}
+	flag := player.LotteryModel.RewardNewLucky(req.ItemId)
+	if !flag {
+		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_NEW_LUCKY_REWARD_RESP, pb.ERROR_CODE_NEW_LUCKY_REWARD_ERROR)
+		return
+	}
+	messageSender.SendMessage(player, pb.MESSAGE_ID_NEW_LUCKY_REWARD_RESP, &pb.NewLuckyRewardResp{})
 }

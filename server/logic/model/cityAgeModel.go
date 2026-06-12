@@ -14,6 +14,7 @@ import (
 const CityAgeGroupCount = 5
 
 var _ logicCommon.PlayerModelInterface = (*CityAgeModel)(nil)
+var _ logicCommon.HeroAttrInterface = (*CityAgeModel)(nil)
 
 type CityAgeEntity struct {
 	UserId            int64               `gorm:"column:user_id;primaryKey"`
@@ -103,6 +104,25 @@ func normalizeCityAgeGroupRewardStatus(status tool.JSONInt32Slice) tool.JSONInt3
 }
 
 func (m *CityAgeModel) Heartbeat(lastTickTime int64, currentTime int64, passDay int32, senderMsg bool) {
+}
+
+func (m *CityAgeModel) GetHeroAttr(heroId int64, attrId int32) int64 {
+	cfg := m.GetCurrentCfg()
+	if cfg == nil {
+		return 0
+	}
+	return cfg.AttrAge[attrId]
+}
+
+func (m *CityAgeModel) GetBuffAttr(heroId int64, attrId int32) int64 {
+	return 0
+}
+
+func (m *CityAgeModel) GetChangedHeroOwnIDs() ([]int64, bool) {
+	if _, ok := m.Changed["age_id"]; !ok {
+		return []int64{}, false
+	}
+	return []int64{}, true
 }
 
 func (m *CityAgeModel) SaveModelToDB() {

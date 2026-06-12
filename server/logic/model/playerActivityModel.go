@@ -51,15 +51,12 @@ func (p *PlayerActivityModel) CheckNewActivity() {
 					p.Changed[activity.ActivityId] = make(map[string]interface{})
 				}
 				p.Changed[activity.ActivityId] = map[string]interface{}{"is_settled": 1}
-				//if activityService.IsRankBoardActivity(activity.ActivityId) {
-				//	// TODO: 排行榜结算
-				//}
 			}
 		}
 	}
 	resp := &pb.PushActivityInfo{}
 	resp.ActivityInfos = make([]*pb.ActivityInfo, 0)
-	allActivity := activityService.GetAllActivityByServerId(p.Player.GetUserServerId())
+	allActivity := activityService.GetAllOpenActivityByServerId(p.Player.GetUserServerId())
 	for _, activity := range allActivity {
 		attend := p.checkAttendActivity(activity)
 		if _, ok := p.OpenActivity[activity.GetActivityId()]; ok {
@@ -127,7 +124,7 @@ func (p *PlayerActivityModel) Heartbeat(lastTickTime int64, currentTime int64, p
 
 func (p *PlayerActivityModel) GetAllOpenActivity() []*pb.ActivityInfo {
 	allActivity := make([]*pb.ActivityInfo, 0)
-	allServerOpenActivity := activityService.GetAllActivityByServerId(p.Player.GetUserServerId())
+	allServerOpenActivity := activityService.GetAllOpenActivityByServerId(p.Player.GetUserServerId())
 	for _, activity := range allServerOpenActivity {
 		pActivity := p.ActivityEntities[activity.GetActivityId()]
 		if pActivity == nil {
@@ -152,7 +149,6 @@ func (p *PlayerActivityModel) CheckActivitySettled(activityId int32) (bool, stri
 	if activity == nil {
 		playerActivity := p.ActivityEntities[activityId]
 		if playerActivity == nil {
-			logger.InfoWithSprintf("[PlayerActivityModel] CheckActivitySettled return settled activity not open and player activity nil userId:%d serverId:%d activityId:%d", p.Player.GetUserId(), p.Player.GetUserServerId(), activityId)
 			return true, ""
 		}
 		playerActivity.IsSettled = 1
@@ -160,7 +156,6 @@ func (p *PlayerActivityModel) CheckActivitySettled(activityId int32) (bool, stri
 			p.Changed[activityId] = make(map[string]interface{})
 		}
 		p.Changed[activityId] = map[string]interface{}{"is_settled": 1}
-		logger.InfoWithSprintf("[PlayerActivityModel] CheckActivitySettled return settled activity not open userId:%d serverId:%d activityId:%d version:%s", p.Player.GetUserId(), p.Player.GetUserServerId(), activityId, playerActivity.Version)
 		return true, ""
 	} else {
 		playerActivity := p.ActivityEntities[activityId]
@@ -169,10 +164,8 @@ func (p *PlayerActivityModel) CheckActivitySettled(activityId int32) (bool, stri
 		}
 		playerActivity = p.ActivityEntities[activityId]
 		if playerActivity == nil {
-			logger.InfoWithSprintf("[PlayerActivityModel] CheckActivitySettled return settled create player activity failed userId:%d serverId:%d activityId:%d version:%s", p.Player.GetUserId(), p.Player.GetUserServerId(), activityId, activity.GetVersion())
 			return true, ""
 		}
-		logger.InfoWithSprintf("[PlayerActivityModel] CheckActivitySettled return activity open userId:%d serverId:%d activityId:%d version:%s isSettled:%d", p.Player.GetUserId(), p.Player.GetUserServerId(), activityId, playerActivity.Version, playerActivity.IsSettled)
 		return playerActivity.IsSettled == 1, playerActivity.Version
 	}
 }
@@ -189,7 +182,7 @@ func (p *PlayerActivityModel) CheckActivityOpen(activityId int32) (bool, string)
 			p.Changed[activityId] = make(map[string]interface{})
 		}
 		p.Changed[activityId] = map[string]interface{}{"is_settled": 1}
-		return true, ""
+		return false, ""
 	} else {
 		playerActivity := p.ActivityEntities[activityId]
 		if playerActivity == nil {

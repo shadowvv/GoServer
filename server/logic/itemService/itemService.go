@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/drop/GoServer/server/logic/platform/platformLogger"
+	"github.com/drop/GoServer/server/logic/rpcController"
+	"github.com/drop/GoServer/server/logic/rpcPb"
 	"github.com/drop/GoServer/server/tool"
 
 	"github.com/drop/GoServer/server/logic/platform/eventService"
@@ -27,6 +29,7 @@ var mainInventoryService inventory.InventoryServiceInterface
 var equipInventoryService logicCommon.EquipmentInterface
 var eventBus *eventService.EventBus
 var passService logicCommon.PassServiceInterface
+var allianceService logicCommon.AllianceItemServiceInterface
 
 type ItemService struct {
 }
@@ -40,6 +43,7 @@ func (i *ItemService) AddItem(player logicCommon.PlayerInterface, item *gameConf
 	itemPb := make([]*pb.ItemBasicInfo, 0)
 
 	itemCfg := gameConfig.GetItemCfg(item.ID)
+	allianceItems := make([]*gameConfig.ItemConfig, 0)
 	if itemCfg == nil {
 		platformLogger.ErrorWithUser("AddItems failed config = nil", player, nil)
 		return errors.New("item config is nil")
@@ -100,6 +104,8 @@ func (i *ItemService) AddItem(player logicCommon.PlayerInterface, item *gameConf
 				messageSender.SendMessage(player, pb.MESSAGE_ID_PUSH_AD_CHEST_NEW, pushMsg)
 			}
 		}
+	} else if itemCfg.ShowGroup == int32(enum.ITEM_TYPE_ALLIANCE_ITEM) {
+		allianceItems = append(allianceItems, item)
 	} else if itemCfg.ShowGroup == int32(enum.ITEM_TYPE_COLLECTION) {
 		spidNum := int64(gameConfig.GetConstantCfg(gameConfig.CONSTANT_collectionExchangeSpid).Value[0])
 		spidId := itemCfg.TargetId
@@ -139,6 +145,12 @@ func (i *ItemService) AddItem(player logicCommon.PlayerInterface, item *gameConf
 			return err
 		}
 	}
+	if len(allianceItems) > 0 {
+		flag := allianceItemsOperationRpcToSocialNode(player, allianceItems, enum.AddProp)
+		if !flag {
+			return errors.New("alliance items operation failed")
+		}
+	}
 
 	eventBus.SubmitItemCollectEvent(player.GetUserId(), []*gameConfig.ItemConfig{item})
 	messageSender.SendMessage(player, pb.MESSAGE_ID_PUSH_ITEM_CHANGE, &pb.PushItemChange{
@@ -160,6 +172,7 @@ func (i *ItemService) AddItemsWithPayType(player logicCommon.PlayerInterface, it
 	itemInventoryMap := make(map[enum.InventoryType]map[int32]int64)
 	itemPb := make([]*pb.ItemBasicInfo, 0)
 
+	allianceItems := make([]*gameConfig.ItemConfig, 0)
 	for _, item := range items {
 		itemCfg := gameConfig.GetItemCfg(item.ID)
 		if itemCfg == nil {
@@ -185,6 +198,11 @@ func (i *ItemService) AddItemsWithPayType(player logicCommon.PlayerInterface, it
 				platformLogger.ErrorWithUser("AddVipCard failed", player, err)
 				return err
 			}
+			continue
+		}
+		if itemCfg.ShowGroup == int32(enum.ITEM_TYPE_ALLIANCE_ITEM) {
+			ReportItemChange(player, item, reason, 0, 0, true)
+			allianceItems = append(allianceItems, item)
 			continue
 		}
 		// 通行证进度道具（ShowGroup 21）
@@ -314,6 +332,12 @@ func (i *ItemService) AddItemsWithPayType(player logicCommon.PlayerInterface, it
 			}
 		}
 	}
+	if len(allianceItems) > 0 {
+		flag := allianceItemsOperationRpcToSocialNode(player, allianceItems, enum.AddProp)
+		if !flag {
+			return errors.New("alliance items operation failed")
+		}
+	}
 	eventBus.SubmitItemCollectEvent(player.GetUserId(), items)
 	isPay := 0
 	if payType == enum.RECHARGE_TYPE_NORMAL {
@@ -398,6 +422,7 @@ func (i *ItemService) RemoveItem(player logicCommon.PlayerInterface, item *gameC
 	itemPb := make([]*pb.ItemBasicInfo, 0)
 
 	itemCfg := gameConfig.GetItemCfg(item.ID)
+	allianceItems := make([]*gameConfig.ItemConfig, 0)
 	if itemCfg == nil {
 		platformLogger.ErrorWithUser("AddItems failed config = nil", player, nil)
 		return errors.New("item config is nil")
@@ -409,12 +434,21 @@ func (i *ItemService) RemoveItem(player logicCommon.PlayerInterface, item *gameC
 	if itemCfg.ShowGroup == int32(enum.ITEM_TYPE_EQUIP) || itemCfg.ShowGroup == int32(enum.ITEM_TYPE_HERO) || itemCfg.ShowGroup == int32(enum.ITEM_TYPE_LOOP_BOX) {
 		ReportItemChange(player, item, reason, 0, 0, false)
 		platformLogger.ErrorWithUser("RemoveItems failed", player, nil)
+	} else if itemCfg.ShowGroup == int32(enum.ITEM_TYPE_ALLIANCE_ITEM) {
+		ReportItemChange(player, item, reason, 0, 0, false)
+		allianceItems = append(allianceItems, item)
 	} else {
 		ReportItemChange(player, item, reason, 0, 0, false)
 		_, err := mainInventoryService.RemoveItem(player.GetUserId(), item.ID, item.Num)
 		if err != nil {
 			platformLogger.ErrorWithUser("AddItems failed", player, err)
 			return err
+		}
+	}
+	if len(allianceItems) > 0 {
+		flag := allianceItemsOperationRpcToSocialNode(player, allianceItems, enum.RemoveProp)
+		if !flag {
+			return errors.New("alliance items operation failed")
 		}
 	}
 	messageSender.SendMessage(player, pb.MESSAGE_ID_PUSH_ITEM_CHANGE, &pb.PushItemChange{
@@ -432,6 +466,7 @@ func (i *ItemService) RemoveItems(player logicCommon.PlayerInterface, items []*g
 	itemInventoryMap := make(map[enum.InventoryType]map[int32]int64)
 	itemPb := make([]*pb.ItemBasicInfo, 0)
 
+	allianceItems := make([]*gameConfig.ItemConfig, 0)
 	for _, item := range items {
 		itemCfg := gameConfig.GetItemCfg(item.ID)
 		if itemCfg == nil {
@@ -445,6 +480,9 @@ func (i *ItemService) RemoveItems(player logicCommon.PlayerInterface, items []*g
 		if itemCfg.ShowGroup == int32(enum.ITEM_TYPE_EQUIP) || itemCfg.ShowGroup == int32(enum.ITEM_TYPE_HERO) || itemCfg.ShowGroup == int32(enum.ITEM_TYPE_LOOP_BOX) {
 			ReportItemChange(player, item, reason, 0, 0, false)
 			platformLogger.ErrorWithUser("RemoveItems failed", player, nil)
+		} else if itemCfg.ShowGroup == int32(enum.ITEM_TYPE_ALLIANCE_ITEM) {
+			ReportItemChange(player, item, reason, 0, 0, false)
+			allianceItems = append(allianceItems, item)
 		} else {
 			ReportItemChange(player, item, reason, 0, 0, false)
 			if itemInventoryMap[enum.INVENTORY_TYPE_MAIN] == nil {
@@ -455,6 +493,12 @@ func (i *ItemService) RemoveItems(player logicCommon.PlayerInterface, items []*g
 			} else {
 				itemInventoryMap[enum.INVENTORY_TYPE_MAIN][item.ID] = item.Num
 			}
+		}
+	}
+	if len(allianceItems) > 0 {
+		flag := allianceItemsOperationRpcToSocialNode(player, allianceItems, enum.RemoveProp)
+		if !flag {
+			return errors.New("alliance items operation failed")
 		}
 	}
 	if itemInventoryMap[enum.INVENTORY_TYPE_MAIN] != nil {
@@ -927,4 +971,32 @@ func GetItemCount(player logicCommon.PlayerInterface, itemId int32) int64 {
 
 func GetItemService() *ItemService {
 	return service
+}
+
+func allianceItemsOperationRpcToSocialNode(player logicCommon.PlayerInterface, items []*gameConfig.ItemConfig, operation enum.AllianceItemOperation) bool {
+	allianceInfo := logicCommon.GetPlayerAllianceInfoFromRedis(player.GetUserId())
+	if allianceInfo == nil || allianceInfo.AllianceId <= 0 {
+		return false
+	}
+
+	rpcItems := make([]*rpcPb.ItemInfo, 0, len(items))
+	for _, item := range items {
+		rpcItems = append(rpcItems, &rpcPb.ItemInfo{
+			ItemId: item.ID,
+			Count:  item.Num,
+		})
+	}
+
+	err := rpcController.SendMessageToSocial(
+		player.GetUserId(),
+		allianceInfo.AllianceId,
+		0,
+		rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_ALLIANCE_ITEMS_OPERATION_REQ,
+		&rpcPb.AllianceItemsOperationReq{
+			AllianceId: allianceInfo.AllianceId,
+			Items:      rpcItems,
+			Operation:  int32(operation),
+		},
+	)
+	return err == nil
 }

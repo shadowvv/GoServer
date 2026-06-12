@@ -3,10 +3,11 @@ package gameConfig
 import (
 	"errors"
 	"fmt"
-	"github.com/drop/GoServer/server/enum"
-	"github.com/drop/GoServer/server/tool"
 	"strings"
 	"sync/atomic"
+
+	"github.com/drop/GoServer/server/enum"
+	"github.com/drop/GoServer/server/tool"
 )
 
 func init() {
@@ -81,62 +82,34 @@ func (s *ActivityCfgLoader) loadData() error {
 
 func (s *ActivityCfgLoader) checkData() error {
 	for id, v := range s.temp1 {
-		if v.Id <= 0 {
-			return errors.New(fmt.Sprintf("[gameConfig] load activity error invalid ID:%d", id))
-		}
-		if !enum.IsValidActivityServerType(v.ServerType) {
-			return errors.New(fmt.Sprintf("[gameConfig] load activity error invalid ServerType:%d,configId:%d", v.ServerType, id))
-		}
-		for _, unlockId := range v.UnlockId {
-			unlockConfig := GetUnlockCfg(unlockId)
-			if unlockConfig == nil {
-				return errors.New(fmt.Sprintf("[gameConfig] load activity error invalid unlockId:%d,configId:%d", unlockId, id))
-			}
-			if !enum.IsServerUnlock(unlockConfig.GetUnlockType()) {
-				return errors.New(fmt.Sprintf("[gameConfig] load activity error invalid unlockId:%d is not server unlock,configId:%d", unlockConfig.GetUnlockType(), id))
-			}
-		}
-		for _, unlockId := range v.UnlockAttendId {
-			if GetUnlockCfg(unlockId) == nil {
-				return errors.New(fmt.Sprintf("[gameConfig] load activity error invalid unlockAttendId:%d,configId:%d", unlockId, id))
-			}
-		}
-		if v.EventOpen != "" {
-			err := errors.New("")
-			count := strings.Count(v.EventOpen, "|")
-			if count == 2 {
-				_, err = ParseTimeWithYMD(v.EventOpen)
-			} else {
-				_, err = ParseTime(v.EventOpen)
-			}
-			if err != nil {
-				return errors.New(fmt.Sprintf("[gameConfig] load activity error invalid EventOpen:%s,configId:%d", v.EventOpen, id))
-			}
-		}
-		if v.EventEnd != "" {
-			err := errors.New("")
-			count := strings.Count(v.EventEnd, "|")
-			if count == 2 {
-				_, err = ParseTimeWithYMD(v.EventEnd)
-			} else {
-				_, err = ParseTime(v.EventEnd)
-			}
-			if err != nil {
-				return errors.New(fmt.Sprintf("[gameConfig] load activity error invalid EventEnd:%s,configId:%d", v.EventEnd, id))
-			}
-		}
-		for _, weekOpen := range v.WeekOpen {
-			if weekOpen < 1 || weekOpen > 7 {
-				return errors.New(fmt.Sprintf("[gameConfig] load activity error invalid WeekOpen:%d,configId:%d", weekOpen, id))
-			}
-		}
-		for _, monthOpen := range v.MonthOpen {
-			if monthOpen < 1 || monthOpen > 28 {
-				return errors.New(fmt.Sprintf("[gameConfig] load activity error invalid MonthOpen:%d,configId:%d", monthOpen, id))
-			}
+		original := s.temp2[id]
+		err := CheckActivityConfig(&ActivityConfigCheckData{
+			Id:              v.Id,
+			ServerType:      v.ServerType,
+			ServerUnit:      original.ServerUnit,
+			UnlockIds:       v.UnlockId,
+			AttendUnlockIds: v.UnlockAttendId,
+			EventOpen:       v.EventOpen,
+			EventEnd:        v.EventEnd,
+			WeekOpenDays:    v.WeekOpen,
+			MonthOpenDays:   v.MonthOpen,
+			Duration:        original.Duration,
+			NextId:          v.NextId,
+			OpenLoopMax:     v.OpenLoopMax,
+		})
+		if err != nil {
+			return fmt.Errorf("[gameConfig] load activity error %w", err)
 		}
 	}
 	return nil
+}
+
+func checkActivityUnlock(unlockId int32) (bool, bool) {
+	unlockConfig := GetUnlockCfg(unlockId)
+	if unlockConfig == nil {
+		return false, false
+	}
+	return true, enum.IsServerUnlock(unlockConfig.GetUnlockType())
 }
 
 func (s *ActivityCfgLoader) apply() {
@@ -227,4 +200,85 @@ func GetAllOriginalActivityCfg() map[int32]*ActivityOriginalCfg {
 		return nil
 	}
 	return cfgMap.(map[int32]*ActivityOriginalCfg)
+}
+
+type ActivityConfigCheckData struct {
+	Id              int32
+	ServerType      int32
+	ServerUnit      string
+	UnlockIds       []int32
+	AttendUnlockIds []int32
+	EventOpen       string
+	EventEnd        string
+	WeekOpenDays    []int32
+	MonthOpenDays   []int32
+	Duration        string
+	NextId          int32
+	OpenLoopMax     int32
+}
+
+func checkActivityTime(value string) error {
+	if value == "" {
+		return nil
+	}
+	if strings.Count(value, "|") == 2 {
+		_, err := ParseTimeWithYMD(value)
+		return err
+	}
+	_, err := ParseTime(value)
+	return err
+}
+
+func CheckActivityConfig(data *ActivityConfigCheckData) error {
+	if data.Id <= 0 {
+		return fmt.Errorf("invalid ID:%d", data.Id)
+	}
+	if !enum.IsValidActivityServerType(data.ServerType) {
+		return fmt.Errorf("invalid ServerType:%d,configId:%d", data.ServerType, data.Id)
+	}
+	if data.ServerType == int32(enum.ActivityServerType_Multi) && data.ServerUnit == "" {
+		return fmt.Errorf("empty ServerUnit for multi-server activity,configId:%d", data.Id)
+	}
+	for _, unlockId := range data.UnlockIds {
+		unlockCfg := GetUnlockCfg(unlockId)
+		if unlockCfg == nil {
+			return fmt.Errorf("invalid unlockId:%d,configId:%d", unlockId, data.Id)
+		}
+		if !enum.IsServerUnlock(unlockCfg.GetUnlockType()) {
+			return fmt.Errorf("invalid unlockId:%d is not server unlock,configId:%d", unlockId, data.Id)
+		}
+	}
+	for _, unlockId := range data.AttendUnlockIds {
+		if GetUnlockCfg(unlockId) == nil {
+			return fmt.Errorf("invalid unlockAttendId:%d,configId:%d", unlockId, data.Id)
+		}
+	}
+	if err := checkActivityTime(data.EventOpen); err != nil {
+		return fmt.Errorf("invalid EventOpen:%s,configId:%d", data.EventOpen, data.Id)
+	}
+	if err := checkActivityTime(data.EventEnd); err != nil {
+		return fmt.Errorf("invalid EventEnd:%s,configId:%d", data.EventEnd, data.Id)
+	}
+	for _, weekOpen := range data.WeekOpenDays {
+		if weekOpen < 1 || weekOpen > 7 {
+			return fmt.Errorf("invalid WeekOpen:%d,configId:%d", weekOpen, data.Id)
+		}
+	}
+	for _, monthOpen := range data.MonthOpenDays {
+		if monthOpen < 1 || monthOpen > 28 {
+			return fmt.Errorf("invalid MonthOpen:%d,configId:%d", monthOpen, data.Id)
+		}
+	}
+	if data.OpenLoopMax < -1 {
+		return fmt.Errorf("invalid OpenLoopMax:%d,configId:%d", data.OpenLoopMax, data.Id)
+	}
+	if data.NextId != 0 {
+		if strings.TrimSpace(data.Duration) == "" {
+			return fmt.Errorf("empty Duration for activity with NextId:%d,configId:%d", data.NextId, data.Id)
+		}
+		if data.OpenLoopMax == 0 {
+			return fmt.Errorf("invalid OpenLoopMax:0 for activity with NextId:%d,configId:%d", data.NextId, data.Id)
+		}
+	}
+	return nil
 }

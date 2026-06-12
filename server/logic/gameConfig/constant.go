@@ -239,6 +239,45 @@ func (s *ConstantCfgLoader) checkData() error {
 	if s.temp1[CONSTANT_gloryArenaRefreshItem] == nil || GetItemCfg(s.temp1[CONSTANT_gloryArenaRefreshItem].Value[0]) == nil {
 		return fmt.Errorf("[gameConfig] load constant error invalid gloryArenaRefreshItem")
 	}
+	if s.temp1[CONSTANT_allianceCheckInRewards] == nil || GetDropCfg(s.temp1[CONSTANT_allianceCheckInRewards].Value[0]) == nil {
+		return fmt.Errorf("[gameConfig] load constant error invalid allianceCheckInRewards")
+	}
+	if s.temp1[CONSTANT_allianceCheckInDiamondCost] == nil || s.temp1[CONSTANT_allianceCheckInDiamondCost].Value[0] < 0 {
+		return fmt.Errorf("[gameConfig] load constant error invalid allianceCheckInDiamondCost")
+	}
+	if s.temp1[CONSTANT_acceleratesTime] == nil || s.temp1[CONSTANT_acceleratesTime].Value[0] < 0 {
+		return fmt.Errorf("[gameConfig] load constant error invalid acceleratesTime")
+	}
+	if s.temp1[CONSTANT_acceleratesDayNum] == nil || s.temp1[CONSTANT_acceleratesDayNum].Value[0] < 0 {
+		return fmt.Errorf("[gameConfig] load constant error invalid acceleratesDayNum")
+	}
+	if s.temp1[CONSTANT_acceleratesItem] == nil || GetItemCfg(s.temp1[CONSTANT_acceleratesItem].Value[0]) == nil {
+		return fmt.Errorf("[gameConfig] load constant error invalid acceleratesItemId")
+	}
+	if s.temp1[CONSTANT_templeRefreshGuaranteeTimes] == nil || s.temp1[CONSTANT_templeRefreshGuaranteeTimes].Value[0] < 0 {
+		return fmt.Errorf("[gameConfig] load constant error invalid templeRefreshGuaranteeTimes")
+	}
+	if s.temp1[CONSTANT_templeGuaranteedDrop] == nil || GetDropCfg(s.temp1[CONSTANT_templeGuaranteedDrop].Value[0]) == nil {
+		return fmt.Errorf("[gameConfig] load constant error invalid templeGuaranteedDrop")
+	}
+	if s.temp1[CONSTANT_limitedGachaLuckyEventWeight] == nil || s.temp1[CONSTANT_limitedGachaLuckyEventWeight].Value[0] < 0 {
+		return fmt.Errorf("[gameConfig] load constant error invalid limitedGachaLuckyEventWeight")
+	}
+	if s.temp1[CONSTANT_limitedGachaLuckyEventDiscountRate] == nil || s.temp1[CONSTANT_limitedGachaLuckyEventDiscountRate].Value[0] < 0 {
+		return fmt.Errorf("[gameConfig] load constant error invalid limitedGachaLuckyEventDiscountRate")
+	}
+	if len(s.temp1[CONSTANT_limitedGachaLuckyEventWeight].Value) != len(s.temp1[CONSTANT_limitedGachaLuckyEventDiscountRate].Value) {
+		return fmt.Errorf("[gameConfig] load constant error invalid limitedGachaLuckyEventWeight and limitedGachaLuckyEventDiscountRate length not equal")
+	}
+	if s.temp1[CONSTANT_limitedGachaLuckyEventTime] == nil || s.temp1[CONSTANT_limitedGachaLuckyEventTime].Value[0] <= 0 {
+		return fmt.Errorf("[gameConfig] load constant error invalid limitedGachaLuckyEventTime")
+	}
+	if s.temp1[CONSTANT_beginnerBenefits] == nil || s.temp1[CONSTANT_beginnerBenefits].Value[0] < 0 {
+		return fmt.Errorf("[gameConfig] load constant error invalid beginnerBenefits")
+	}
+	if s.temp1[CONSTANT_beginnerBenefitsNumbers] == nil || s.temp1[CONSTANT_beginnerBenefitsNumbers].Value[0] <= 0 {
+		return fmt.Errorf("[gameConfig] load constant error invalid beginnerBenefitsNumbers")
+	}
 	return nil
 }
 
@@ -330,6 +369,18 @@ const (
 	CONSTANT_monsterAdventureProgressValue         = "monsterAdventureProgressValue"
 	CONSTANT_realmStorageCap                       = "realmStorageCap"
 	CONSTANT_gloryArenaRefreshItem                 = "gloryArenaRefreshItem"
+	CONSTANT_allianceCheckInRewards                = "allianceCheckInRewards"
+	CONSTANT_allianceCheckInDiamondCost            = "allianceCheckInDiamondCost"
+	CONSTANT_acceleratesTime                       = "acceleratesTime"
+	CONSTANT_acceleratesDayNum                     = "acceleratesDayNum"
+	CONSTANT_acceleratesItem                       = "acceleratesItem"
+	CONSTANT_templeRefreshGuaranteeTimes           = "templeRefreshGuaranteeTimes"
+	CONSTANT_templeGuaranteedDrop                  = "templeGuaranteedDrop"
+	CONSTANT_limitedGachaLuckyEventWeight          = "limitedGachaLuckyEventWeight"
+	CONSTANT_limitedGachaLuckyEventDiscountRate    = "limitedGachaLuckyEventDiscountRate"
+	CONSTANT_limitedGachaLuckyEventTime            = "limitedGachaLuckyEventTime"
+	CONSTANT_beginnerBenefits                      = "beginnerBenefits"
+	CONSTANT_beginnerBenefitsNumbers               = "beginnerBenefitsNumbers"
 )
 
 func GetMaxNicknameLength() int32 {
@@ -707,4 +758,24 @@ func GetRealmStorageCap() int32 {
 
 func GetGloryArenaRefreshItem() int32 {
 	return GetConstantCfg(CONSTANT_gloryArenaRefreshItem).Value[0]
+}
+
+func GetAllianceCheckInRewards() int32 {
+	return GetConstantCfg(CONSTANT_allianceCheckInRewards).Value[0]
+}
+
+func GetAllianceCheckInDiamondCost() []int32 {
+	return GetConstantCfg(CONSTANT_allianceCheckInDiamondCost).Value
+}
+
+func GetBattleSpeedUpTime() int32 {
+	return GetConstantCfg(CONSTANT_acceleratesTime).Value[0]
+}
+
+func GetDailyBattleSpeedUpTimes() int32 {
+	return GetConstantCfg(CONSTANT_acceleratesDayNum).Value[0]
+}
+
+func GetBattleSpeedUpItemId() int32 {
+	return GetConstantCfg(CONSTANT_acceleratesItem).Value[0]
 }

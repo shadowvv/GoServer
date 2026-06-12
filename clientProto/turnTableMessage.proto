@@ -1,0 +1,68 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+import "taskMessage.proto";
+
+// ==============活动转盘==============
+
+// 获取转盘详情
+message TurnTableDetailReq {
+  int32 modId = 1; // act_turntablemain.id
+}
+  
+message TurnTableDetailResp {
+  TurnTableInfo info = 1;
+}
+  
+// 转盘抽奖
+message TurnTableDrawReq {
+  int32 modId = 1; // act_turntablemain.id
+  int32 count = 2; // 1/10/50
+}
+  
+message TurnTableDrawResp {
+  bool isSuccess = 1;
+  map<int32, int32> drawCountMap = 2; 
+}
+  
+// 领取累计奖励
+message TurnTableUsuallyRewardReq {
+  int32 modId = 1;    // act_turntablemain.id
+  int32 type = 2;     // 1抽数 2消耗道具数
+  int32 rewardId = 3; // UsuallyUse.id；一键领取传0，逐个领取传具体id
+}
+  
+message TurnTableUsuallyRewardResp {
+  bool isSuccess = 1;
+}
+  
+// 领取活动任务奖励
+message TurnTableTaskRewardReq {
+  int32 actTaskId = 1; // task.json Act.id
+}
+
+message TurnTableTaskRewardResp {
+  bool isSuccess = 1;
+}
+
+message TurnTableInfo {
+  int32 modId = 1;
+  int32 actId = 2;
+  int32 drawCount = 3; // 当前modId在当前活动期的累计抽数
+  repeated TurnTableUsuallyProgress usuallyProgressList = 4;
+  repeated TaskInfo taskList = 5; // TaskInfo.taskId 返回 task.json Act.id
+  repeated TurnTableRewardLimitInfo rewardLimitList = 6; // 只返回配置了limit的奖励
+  map<int32, int32> guaranteeCountMap = 7; // 保底次数列表
+}
+
+message TurnTableUsuallyProgress {
+  int32 type = 1;           // 1抽数 2消耗道具数
+  int64 progress = 2;       // 当前modId下该type的累计进度
+  int32 claimedMaxId = 3;   // 当前type已领取到的最大 UsuallyUse.id
+  int32 loopClaimCount = 4; // 循环奖励已领取次数，没有循环填0
+}
+
+message TurnTableRewardLimitInfo {
+  int32 rewardId = 1; // act_turntable.id，只返回limit>0的奖励
+  int32 hitCount = 2; // 当前活动期当前modId下已命中次数
+}

@@ -1,0 +1,109 @@
+syntax = "proto3";
+package pb;
+option go_package = "../logic/pb;pb";
+
+import "mailMessage.proto";
+
+// GM命令类型枚举
+enum GMCommandType {
+  GM_CMD_UNKNOWN = 0;
+  // 道具相关
+  GM_CMD_ADD_ITEM = 1;        // 添加道具
+  GM_CMD_REMOVE_ITEM = 2;     // 移除道具
+  // 经验相关
+  GM_CMD_ADD_EXP = 3;         // 增加经验
+  GM_CMD_SET_LEVEL = 4;       // 设置等级
+  // 英雄相关
+  GM_CMD_HERO_LEVEL_UP = 5;   // 英雄升级
+  GM_CMD_HERO_STAR_UP = 6;    // 英雄升星
+  // 货币相关
+  GM_CMD_ADD_CURRENCY = 7;    // 增加货币
+  GM_CMD_REMOVE_CURRENCY = 8; // 移除货币
+  // 装备相关
+  GM_CMD_ADD_EQUIPMENT = 9;    // 添加装备
+  GM_CMD_REMOVE_EQUIPMENT = 10; // 移除装备
+  GM_CMD_ADD_HERO = 11;        // 添加英雄
+  // 邮件相关
+  GM_CMD_SEND_MAIL = 12;       // 发送个人邮件
+  GM_CMD_SEND_SERVER_MAIL = 13; // 发送全服邮件
+  // 副本相关
+  GM_CMD_CHANGE_MAIN_STAGE = 14;// 切换主线副本
+  // 任务相关
+  GM_CMD_JUMP_THIS_MAIN_TASK = 15;// 跳过当前主线任务完成过程
+  // 宠物相关
+  GM_CMD_ADD_PET = 16;        // 添加宠物
+}
+
+// GM调用方类型
+enum GMInvokerType {
+  GM_INVOKER_UNKNOWN = 0;
+  GM_INVOKER_CLIENT = 1;      // 客户端调用
+  GM_INVOKER_INTERNAL = 2;    // 程序内部调用
+  GM_INVOKER_RPC = 3;         // RPC调用（运营后台）
+}
+
+// GM命令请求
+message MessageGmReq {
+  GMCommandType cmdType = 1;              // 命令类型
+  int64 userId = 2;                       // 用户ID（客户端调用时可省略，使用登录用户ID）
+
+  // 额外参数（JSON格式，用于扩展）
+  string extraParams = 3;
+
+  // 调用方类型（由系统自动填充）
+  GMInvokerType invokerType = 4;
+  string invokerId = 5;                  // 调用方标识（如IP、服务名等）
+
+  // 道具相关参数
+  int64 itemId = 6;                       // 道具ID
+  int32 itemQuantity = 7;                 // 道具数量
+  int32 inventoryType = 8;                // 背包类型
+  
+  // 经验相关参数
+  int64 exp = 9;                           // 经验值
+  
+  // 等级相关参数
+  int32 level = 10;                         // 等级
+  
+  // 英雄相关参数
+  int64 heroId = 11;                     // 英雄配置ID
+  int64 heroOwnId = 12;                   // 英雄唯一ID
+  int32 heroLevel = 13;                    // 英雄等级
+  int32 heroStar = 14;                    // 英雄星级
+  
+  // 货币相关参数
+  int32 currencyType = 15;                // 货币类型
+  int64 currencyAmount = 16;              // 货币数量
+
+  int32 mainStageId = 17;               // 主线副本ID
+  int32 mainSubStageId = 18;            // 主线副本房间ID
+
+  // 邮件相关参数
+  string title = 19;                 // 邮件标题
+  string content = 20;               // 邮件内容
+  int32 mailType=21;                 // 邮件类型（1=个人邮件，2=全服邮件）
+  string senderAvatar=22; // 发送者头像（可选）
+  repeated MailAttachmentItem items=23;                 // 附件物品条目（业务约定：只有一个附件，直接传 items
+  bool IsConvenient=24;                 // 是否可一键领取（true=可一键领取；false=只能单独领取）
+  int32  expireDays=25;                 // 邮件过期天数（0表示永不过期）
+  int32 cfgId=26; // 邮件模板ID（0表示未使用模板）
+}
+
+// GM命令响应
+message MessageGmResp {
+  GMResult result = 1;                     // 结果码
+  string message = 2;                      // 消息
+  map<string, string> extraData = 3;     // 额外返回数据
+}
+
+// GM结果枚举
+enum GMResult {
+  GM_RESULT_SUCCESS = 0;                   // 成功
+  GM_RESULT_FAILED = 1;                    // 失败
+  GM_RESULT_INVALID_CMD = 2;               // 无效命令
+  GM_RESULT_INVALID_USER = 3;              // 无效用户
+  GM_RESULT_INVALID_PARAM = 4;             // 无效参数
+  GM_RESULT_INVOKER_DISABLED = 5;          // 调用方已禁用
+  GM_RESULT_PERMISSION_DENIED = 6;         // 权限不足
+}
+

@@ -51,7 +51,7 @@ func (g *gatewayRpcHooker) OnNodeDisconnect(nodeId int32, nodeType enum.NodeType
 	if nodeType == enum.NODE_TYPE_GAME {
 		gatewaySessionManager.KickOutNodePlayer(nodeId, func(player logicCommon.UserBaseInterface) {
 			logger.ErrorBySprintf("[platform] kick out node player Id:%d", player.GetUserId())
-			messageSender.CloseSessionWithError(player, pb.MESSAGE_ID_LOGIN_RESP, pb.ERROR_CODE_SYSTEM_ERROR)
+			messageSender.CloseSessionWithError(player, pb.MESSAGE_ID_LOGIN_RESP, pb.ERROR_CODE_PLAYER_IS_KICK_OUT)
 		})
 		rpcController.RemoveGatewayRpcGameClient(nodeId)
 	}
@@ -89,12 +89,24 @@ func (g *gatewayMessageSender) SendMessage(player logicCommon.UserBaseInterface,
 	player.GetSession().Send(int32(msgId), message)
 }
 
-func (g *gatewayMessageSender) Broadcast(msgId pb.MESSAGE_ID, msg proto.Message, broadcastType enum.BroadcastType, typeId int32) {
-	if broadcastType == enum.BROADCAST_TYPE_SERVER_ID {
-		playerMap := gatewaySessionManager.GetPlayerSessionsByServerId(typeId)
-		for _, v := range playerMap {
-			v.Session.Send(int32(msgId), msg)
+func (g *gatewayMessageSender) Broadcast(msgId pb.MESSAGE_ID, msg proto.Message, broadcastType enum.BroadcastType, typeId int64) {
+	var playerMap map[int64]*logicCommon.GatewayPlayerInfo
+	switch broadcastType {
+	case enum.BROADCAST_TYPE_SERVER_ID:
+		playerMap = gatewaySessionManager.GetPlayerSessionsByServerId(int32(typeId))
+	case enum.BROADCAST_TYPE_ALLIANCE:
+		ids := logicCommon.GetAllianceMemberId(typeId)
+		if len(ids) == 0 {
+			return
 		}
+		playerMap = gatewaySessionManager.GetPlayerSessionsByUserIds(ids)
+	default:
+	}
+	if len(playerMap) == 0 {
+		return
+	}
+	for _, v := range playerMap {
+		v.Session.Send(int32(msgId), msg)
 	}
 }
 
@@ -201,10 +213,15 @@ func BootGatewayPlatform() {
 	// 游戏服务器信息服务
 	serverInfoService = gameServerInfoService.NewGameServerInfoService()
 	serverInfoService.ResetOnlinePlayerNum()
-	rpcController.InitGateRpc(serverInfoService)
-	logger.InfoWithSprintf("[platform] init server info service")
 
 	unlock = unlockService.NewUnlockService(serverInfoService)
+	activityInfoService = activityService.NewGatewayActivityService(nodeConfig.Env, serverInfoService, unlock)
+	activityInfoService.StartService()
+	logger.InfoWithSprintf("[platform] init activity info service")
+
+	rpcController.InitGateRpc(serverInfoService, activityInfoService)
+	logger.InfoWithSprintf("[platform] init server info service")
+
 	messageSender = &gatewayMessageSender{}
 
 	// 节点RPC服务
@@ -214,9 +231,6 @@ func BootGatewayPlatform() {
 	logger.InfoWithSprintf("[platform] init node proxy service")
 	logger.InfoWithSprintf("[platform] Boot platform success !!!")
 
-	activityInfoService = activityService.NewGatewayActivityService(nodeConfig.Env, serverInfoService, unlock)
-	activityInfoService.StartService()
-	logger.InfoWithSprintf("[platform] init activity info service")
 	gloryArenaService.NewGatewayGloryArenaStateService(serverInfoService).StartService()
 	logger.InfoWithSprintf("[platform] init gateway glory arena state service")
 

@@ -23,7 +23,7 @@ func (j *JSONInt64Slice) Scan(value interface{}) error {
 	case string:
 		bytes = []byte(v)
 	default:
-		return fmt.Errorf("JSONInt64Slice: 无法扫描类型 %T", value)
+		return fmt.Errorf("[system] JSONInt64Slice: 无法扫描类型 %T", value)
 	}
 
 	return json.Unmarshal(bytes, j)
@@ -51,7 +51,7 @@ func (j *JSONInt32Slice) Scan(value interface{}) error {
 	case string:
 		bytes = []byte(v)
 	default:
-		return fmt.Errorf("JSONInt32Slice.Scan: 无法处理类型 %T", v)
+		return fmt.Errorf("[system] JSONInt32Slice.Scan: 无法处理类型 %T", v)
 	}
 
 	return json.Unmarshal(bytes, j)

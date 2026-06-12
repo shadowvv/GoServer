@@ -16,8 +16,7 @@ type ServerOpenActivityEntity struct {
 	OpenTime     int64  `gorm:"column:open_time"`
 	SettleTime   int64  `gorm:"column:settle_time"`
 	EndTime      int64  `gorm:"column:end_time"`
-
-	OpenCount int32 `gorm:"-"`
+	OpenCount    int32  `gorm:"column:open_count"`
 }
 
 var _ logicCommon.GameActivityInterface = (*ServerOpenActivityEntity)(nil)
@@ -63,19 +62,14 @@ func (m *ServerOpenActivityModel) GetAllFinalActivity() map[int32]map[int32]*Ser
 	defer m.mu.RUnlock()
 
 	finalActivity := make(map[int32]map[int32]*ServerOpenActivityEntity)
-	for k, allEntities := range m.entities {
-		if finalActivity[k] == nil {
-			finalActivity[k] = make(map[int32]*ServerOpenActivityEntity)
+	for serverId, allEntities := range m.entities {
+		if finalActivity[serverId] == nil {
+			finalActivity[serverId] = make(map[int32]*ServerOpenActivityEntity)
 		}
-		for _, v := range allEntities {
-			if finalActivity[k][v.ActivityId] == nil {
-				finalActivity[k][v.ActivityId] = v
-				v.OpenCount = 1
-			} else {
-				v.OpenCount = finalActivity[k][v.ActivityId].OpenCount + 1
-				if finalActivity[k][v.ActivityId].EndTime < v.EndTime {
-					finalActivity[k][v.ActivityId] = v
-				}
+		for _, activity := range allEntities {
+			final := finalActivity[serverId][activity.ActivityId]
+			if final == nil || final.OpenCount < activity.OpenCount || (final.OpenCount == activity.OpenCount && final.OpenTime < activity.OpenTime) {
+				finalActivity[serverId][activity.ActivityId] = activity
 			}
 		}
 	}
@@ -111,6 +105,7 @@ func (m *ServerOpenActivityModel) OpenActivity(activities map[int32]map[int32]*S
 					OpenTime:     activityEntity.OpenTime,
 					SettleTime:   activityEntity.SettleTime,
 					EndTime:      activityEntity.EndTime,
+					OpenCount:    activityEntity.OpenCount,
 				}
 				m.entities[serverId] = append(m.entities[serverId], newActivity)
 
@@ -152,12 +147,18 @@ func (m *ServerOpenActivityModel) IsActivitySettled(serverId int32, activityId i
 	return true
 }
 
-func (m *ServerOpenActivityModel) GetAllActivityByServerId(serverId int32) []logicCommon.GameActivityInterface {
+func (m *ServerOpenActivityModel) GetAllOpenActivityByServerId(serverId int32) []logicCommon.GameActivityInterface {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
 	all := make([]logicCommon.GameActivityInterface, 0)
 	for _, v := range m.entities[serverId] {
+		if tool.UnixNowMilli() >= v.EndTime {
+			continue
+		}
+		if tool.UnixNowMilli() < v.OpenTime {
+			continue
+		}
 		all = append(all, v)
 	}
 	return all

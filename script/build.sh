@@ -105,6 +105,12 @@ case "$BUILD_ENV" in
         TRIMPATH="-trimpath"
         LDFLAGS="-s -w"
         ;;
+    audit)
+        echo "==> 构建环境: audit（审核环境）"
+        CGO_ENABLED=0
+        TRIMPATH="-trimpath"
+        LDFLAGS="-s -w"
+        ;;
     stage)
         echo "==> 构建环境: stage（预发布环境）"
         CGO_ENABLED=0

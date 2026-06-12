@@ -40,3 +40,10 @@ const (
 	AllianceHeartbeatCheckInterval = 30 * time.Minute // 联盟心跳时间
 	AllianceUpdateFlushInterval    = 2 * time.Second  // 联盟入库时间间隔
 )
+
+type AllianceItemOperation int32
+
+const (
+	AddProp    AllianceItemOperation = iota + 1 // 添加道具
+	RemoveProp                                  // 移除道具
+)

@@ -22,6 +22,7 @@ const (
 	ImportPlayerPermission      int32 = 26 // 导入玩家数据（操作）
 	ExportPlayerPermission      int32 = 27 // 导出玩家数据（操作）
 	KickPlayerPermission        int32 = 28 // 踢人（操作）
+	BuFaPermission              int32 = 29 // 补发（操作）
 )
 
 // IsPermiss 检查权限列表中是否包含指定权限

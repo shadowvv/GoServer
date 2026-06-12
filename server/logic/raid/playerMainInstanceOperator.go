@@ -73,7 +73,10 @@ func (i *MainInstanceOperation) OnRaidEnd(player *model.PlayerModel, info *logic
 			monster.IsDead = 0
 		}
 	}
-
+	if playerInstanceModel.CurrentMainInstanceInfo.CurrentStageId >= playerInstanceModel.NextMainInstanceInfo.CurrentStageId {
+		logger.ErrorBySprintf("[debug] next stage is less current stage,playerId:%d,currentStageId:%d,nextStageId:%d", player.GetUserId(),
+			playerInstanceModel.CurrentMainInstanceInfo.CurrentStageId, playerInstanceModel.NextMainInstanceInfo.CurrentStageId)
+	}
 	playerInstanceModel.CurrentMainInstanceInfo = playerInstanceModel.NextMainInstanceInfo
 	playerInstanceModel.CurrentRaidInfo = playerInstanceModel.CurrentMainInstanceInfo
 	mainInstance := playerInstanceModel.InstanceEntities[int32(enum.MAIN_INSTANCE_ID)]

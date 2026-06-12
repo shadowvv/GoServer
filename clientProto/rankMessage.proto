@@ -1,0 +1,88 @@
+syntax = "proto3";
+package pb;
+option go_package = "../logic/pb;pb";
+
+// 获取排行榜列表请求
+message RankListReq {
+  int32 commonRankId = 1;                //排行榜id
+  int32 actId = 2;                      //活动Id
+  repeated int32 actTargetId = 3;       //活动排行榜Id
+}
+
+// 获取排行榜列表响应
+message RankListResp {
+  repeated RankInfo rankInfo = 1;
+}
+
+//点赞请求
+message RankLikeReq{
+  int32 commonRankId = 1;                //排行榜id
+  int32 actId = 2;                      //活动Id
+  int32 actTargetId = 3;                //活动排行榜Id
+  int64 account = 4;//玩家id
+}
+//点赞响应
+message RankLikeResp{
+  int64 account = 1;//玩家id
+}
+
+//领取宝箱请求
+message RankReceiveBoxRewardReq{
+  int32 commonRankId = 1;                //排行榜id
+  int32 actId = 2;                      //活动Id
+  int32 actTargetId = 3;                //活动排行榜Id
+}
+//领取宝箱响应
+message RankReceiveBoxRewardResp{
+
+}
+
+//排行榜信息
+message RankInfo {
+  int32 commonRankId = 1;                //排行榜id
+  int32 actId = 2;                      //活动Id
+  int32 actTargetId = 3;                //活动排行榜Id
+  bool chestClaimed = 4;                //宝箱是否领取领取
+  int32 myRank = 5;                     //自己的排名
+  bool isLiked = 6;         // 今日是否已点赞
+  repeated RankDetailInfo details = 7;  //详情
+  repeated RankAllianceDetailInfo allianceDetails = 8;  //详情
+}
+
+//排行榜基础信息
+message  RankDetailInfo{
+  int64 playerId = 1; // 玩家id
+  int32 rank = 2; // 排名
+  int32 likeNum = 3;        // 点赞数
+  int64 rankScore = 4;      // 排行依据
+  int32 heroId = 5; // 英雄id
+  int32 classId =6; // 职业id
+  string nickName = 7;      // 名字
+  int32 head = 8;          //头像
+  int32 frameId = 9;       //头像框
+  int64 rankedOn = 10;//玩家上榜时间
+  map<int32,int64> battlePower = 11; // key=阵容id,value=战力
+  int32 Title = 12;           // 称号id
+  int32 BubbleId = 13;        // 对话框id
+  int32 ImageId = 14;         // 小人id
+}
+
+//排行榜基础信息
+message  RankAllianceDetailInfo{
+  int64 allianceId = 1;
+  int32 rank = 2;
+  int32 likeNum = 3;
+  int64 rankScore = 4;
+  string allianceName = 5;
+  int32 icon = 6;
+  int64 rankedOn = 7;
+  int64 battlePower = 8;
+}
+
+
+
+
+
+
+
+

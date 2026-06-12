@@ -95,7 +95,7 @@ func shouldLoadCommonTable(rankTable string, cfg *gameConfig.CommonRankCfg, curr
 
 func shouldLoadCommonArenaRankTable(rankTable string, cfg *gameConfig.CommonRankCfg, currentTime int64) bool {
 	_, _, _, version := logicCommon.GetRankRealIdFromUniqueId(rankTable)
-	startMilli, weekEndMilli, ok := logicCommon.ParseGloryArenaRankVersionDateInt(version)
+	_, startMilli, weekEndMilli, ok := logicCommon.ParseArenaRankVersionDateInt(version)
 	if !ok {
 		return true
 	}
@@ -121,7 +121,7 @@ func shouldLoadCommonArenaRankTable(rankTable string, cfg *gameConfig.CommonRank
 
 func shouldLoadCommonGloryArenaRankTable(rankTable string, cfg *gameConfig.CommonRankCfg, currentTime int64) bool {
 	_, _, _, version := logicCommon.GetRankRealIdFromUniqueId(rankTable)
-	_, startMilli, weekEndMilli, ok := logicCommon.ParseArenaRankVersionDateInt(version)
+	startMilli, weekEndMilli, ok := logicCommon.ParseGloryArenaRankVersionDateInt(version)
 	if !ok {
 		return true
 	}
@@ -378,18 +378,22 @@ func (s *RankBoardService) ensureAndProcessSettleTask(rankTable string, settleTy
 	}
 	task := tasks[0]
 	if task == nil {
+		logger.InfoWithSprintf("[rankSettle] skip rankId:%s settleType:%d taskVersion:%s reason:task_nil", rankTable, settleType, taskVersion)
 		return nil
 	}
 	if task.Status == enum.RankSettleTaskStatusRewardDone {
+		logger.InfoWithSprintf("[rankSettle] skip rankId:%s settleType:%d taskVersion:%s reason:task_reward_done taskId:%d", rankTable, settleType, taskVersion, task.Id)
 		return nil
 	}
 
 	if task.Status != enum.RankSettleTaskStatusSnapshotDone {
+		logger.InfoWithSprintf("[rankSettle] rebuild snapshot rankId:%s settleType:%d taskVersion:%s taskId:%d oldStatus:%d", rankTable, settleType, taskVersion, task.Id, task.Status)
 		if err = s.rebuildSettleTaskSnapshot(task, now); err != nil {
 			_ = easyDB.RunRankRawSql("UPDATE rank_settle_task SET status=?, updated_at=? WHERE id=?", enum.RankSettleTaskStatusFailed, now, task.Id)
 			return err
 		}
 	}
+	logger.InfoWithSprintf("[rankSettle] send rewards rankId:%s settleType:%d taskVersion:%s taskId:%d", rankTable, settleType, taskVersion, task.Id)
 	if err = s.processSettleTaskRewards(task, cfg, serverID, now); err != nil {
 		_ = easyDB.RunRankRawSql("UPDATE rank_settle_task SET status=?, updated_at=? WHERE id=?", enum.RankSettleTaskStatusFailed, now, task.Id)
 		return err
@@ -557,7 +561,7 @@ func (s *RankBoardService) sendSettleRewardByPointType(pointType int32, mailID i
 		if serverID <= 0 {
 			serverID = 0
 		}
-		return rankBoardPlatform.SendRankBoardAllianceRewardMail(mailID, serverID, sourceID, items)
+		return rankBoardPlatform.SendRankBoardAllianceRewardMail(mailID, serverID, sourceID, items, rank)
 	default:
 		rankBoardPlatform.SendRankBoardRewardMail(mailID, sourceID, items, rank)
 		return nil

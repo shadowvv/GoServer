@@ -27,7 +27,7 @@ func UnixNowMilli() int64 {
 	return time.Now().UnixNano() / int64(time.Millisecond)
 }
 
-// ParseTime2TimeStamp 将字符串解析为时间戳
+// ParseTime2TimeStamp 将字符串解析为时间戳 eg:2006-01-02 15:04:05
 func ParseTime2TimeStamp(timeStr string) (int64, error) {
 	t, err := time.Parse("2006-01-02 15:04:05", timeStr)
 	if err != nil {
@@ -36,13 +36,7 @@ func ParseTime2TimeStamp(timeStr string) (int64, error) {
 	return t.Unix(), nil
 }
 
-// TodayZero 返回今天零点时间
-func TodayZero() time.Time {
-	now := time.Now()
-	year, month, day := now.Date()
-	return time.Date(year, month, day, 0, 0, 0, 0, now.Location())
-}
-
+// 返回特定时间点的00:00:00的毫秒值
 func GetTodayZeroByTimeStamp(timeStamp int64) int64 {
 	// 毫秒 → time.Time
 	t := time.UnixMilli(timeStamp)
@@ -57,10 +51,11 @@ func GetTodayZeroByTimeStamp(timeStamp int64) int64 {
 	return zero.UnixMilli()
 }
 
-// IsSameDay 判断两个时间是否是同一天
-func IsSameDay(t1, t2 time.Time) bool {
-	y1, m1, d1 := t1.Date()
-	y2, m2, d2 := t2.Date()
+func IsSameDayByMilli(t1, t2 int64) bool {
+	tTime1 := time.UnixMilli(t1)
+	tTime2 := time.UnixMilli(t2)
+	y1, m1, d1 := tTime1.Date()
+	y2, m2, d2 := tTime2.Date()
 	return y1 == y2 && m1 == m2 && d1 == d2
 }
 
@@ -82,17 +77,6 @@ func GetNatureDayDistance(now, target int64) int32 {
 	return int32(days)
 }
 
-// WeekStart 获取指定时间所在周的周一
-func WeekStart(t time.Time) time.Time {
-	y, m, d := t.Date()
-	wd := int(t.Weekday())
-	if wd == 0 { // Sunday -> 7
-		wd = 7
-	}
-	// 回退到周一
-	return time.Date(y, m, d-wd+1, 0, 0, 0, 0, t.Location())
-}
-
 // weekStart 获取指定时间所在周的周一
 func WeekStartByMilli(ts int64) time.Time {
 	t := time.UnixMilli(ts)
@@ -106,8 +90,8 @@ func WeekStartByMilli(ts int64) time.Time {
 
 // GetNatureWeekDistance 获取两个自然周之间的距离
 func GetNatureWeekDistance(now, target int64) int32 {
-	nowStart := WeekStart(time.UnixMilli(now))
-	targetStart := WeekStart(time.UnixMilli(target))
+	nowStart := WeekStartByMilli(now)
+	targetStart := WeekStartByMilli(target)
 
 	weeks := int(targetStart.Sub(nowStart) / (7 * 24 * time.Hour))
 	if weeks < 0 {
@@ -141,41 +125,10 @@ func MonthDayWithTimeStamp(timestamp int64) int {
 	return t.Day()
 }
 
-// MilliToTime 毫秒时间戳转换为时间
-func MilliToTime(milli int64) time.Time {
-	sec := milli / 1000
-	nsec := (milli % 1000) * int64(time.Millisecond)
-	return time.Unix(sec, nsec)
-}
-
 // ValidateCron 验证 cron 表达式
 func ValidateCron(expr string) bool {
 	_, err := cron.ParseStandard(expr)
 	return err == nil
-}
-
-// CheckCronMatch 判断时间戳是否匹配 5 字段 cron 表达式（精度：分钟）
-func CheckCronMatchWithExpression(cronExpr string, ts int64) (bool, error) {
-	t := time.Unix(ts, 0).Truncate(time.Minute)
-
-	// 使用标准 5 字段解析器（无秒）
-	parser := cron.NewParser(
-		cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow,
-	)
-
-	schedule, err := parser.Parse(cronExpr)
-	if err != nil {
-		return false, err
-	}
-
-	// 获取 t 的前一分钟作为参考时间
-	prevTime := t.Add(-time.Minute)
-
-	// 找到 prevTime 后下一个应该触发的时间
-	next := schedule.Next(prevTime)
-
-	// 如果 next 正好等于当前时间 t，则表示匹配成功
-	return next.Equal(t), nil
 }
 
 // CheckCronMatch 验证 cron 表达式是否匹配给定的时间戳
@@ -230,8 +183,4 @@ func GetMondayDataStringByTimeStamp(currentTime int64) string {
 	}
 	monday := t.AddDate(0, 0, -(weekday - 1))
 	return monday.Format("20060102")
-}
-
-func CheckIsMondayByTimeStamp(currentTime int64) bool {
-	return time.UnixMilli(currentTime).Weekday() == time.Monday
 }

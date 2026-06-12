@@ -39,19 +39,20 @@ type Mail struct {
 
 // ServerMail 全服邮件业务模型
 type ServerMail struct {
-	ServerMailID int64
-	MailType     int32
-	Title        string
-	Content      string
-	TemplateID   int32
-	ServerID     int32
-	AllianceID   int64                 // 联盟ID（0=非联盟邮件；>0 表示联盟邮件）
-	SenderAvatar string                // 发送者头像（全服邮件展示用；可存URL/资源名）
-	UnlockList   []int32               // 解锁条件列表（unlockID数组）
-	IsConvenient bool                  // 是否可一键领取（true=可一键领取；false=只能单独领取）
-	Items        []*MailAttachmentItem // 全服邮件附件物品条目列表（业务约定：只有一个附件，直接存 items）
-	SendTime     int64
-	ExpireTime   int64
-	Status       int32
-	CreatedBy    string
+	ServerMailID  int64
+	MailType      int32
+	Title         string
+	Content       string
+	ContentParams []string
+	TemplateID    int32
+	ServerID      int32
+	AllianceID    int64                 // 联盟ID（0=非联盟邮件；>0 表示联盟邮件）
+	SenderAvatar  string                // 发送者头像（全服邮件展示用；可存URL/资源名）
+	UnlockList    []int32               // 解锁条件列表（unlockID数组）
+	IsConvenient  bool                  // 是否可一键领取（true=可一键领取；false=只能单独领取）
+	Items         []*MailAttachmentItem // 全服邮件附件物品条目列表（业务约定：只有一个附件，直接存 items）
+	SendTime      int64
+	ExpireTime    int64
+	Status        int32
+	CreatedBy     string
 }

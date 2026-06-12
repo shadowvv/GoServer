@@ -1,0 +1,23 @@
+syntax = "proto3";
+package pb;
+option go_package = "github.com/drop/GoServer/server/logic/pb;pb";
+
+// 账号绑定渠道请求（客户端主动上报绑定，无记录则插入 0 再 0→1）
+message AccountBindReq {
+  string channel = 1;
+}
+
+// 账号绑定渠道响应
+message AccountBindResp {
+  bool success = 1;
+}
+
+// 账号绑定领奖请求（绑定过该渠道且状态为已绑定才能领奖，具体奖励字段后续扩展）
+message AccountBindClaimReq {
+  string channel = 1;  // 渠道，与登录时绑定的一致
+}
+
+// 账号绑定领奖响应（具体奖励字段后续扩展）
+message AccountBindClaimResp {
+  bool success = 1;  // 是否领奖成功（仅当 1→2 成功为 true）
+}

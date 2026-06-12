@@ -1,0 +1,59 @@
+syntax = "proto3";
+option go_package = "../logic/pb;pb";
+
+package pb;       // 包名对应Go的生成路径
+import "heroMessage.proto";
+import "commonMessage.proto";
+import "taskMessage.proto";
+import "vipCard.proto";
+
+// 玩家登录请求
+message LoginReq {
+  string account = 1;//玩家账号
+  int32 serverId = 2;//服务器id
+  string token = 3; // 登录token
+}
+
+// 登录响应
+message LoginResp {
+  PlayerBasicInfo basicInfo = 1;//玩家基本信息
+  map<int64,HeroBagInfo> heroBagDetailsMap= 2; // 英雄背包信息列表
+  repeated HeroFormationDetails formations = 3; // 英雄阵容详情列表
+  InventoryData inventory = 4;//道具背包
+  int32 changeNicknameTimes = 5;//改变昵称次数
+  SceneBasicInfo sceneInfo = 6;//场景基本信息
+  repeated TaskInfoStruct TaskInfoList = 7;//任务系统
+  repeated FunctionOpenInfo openInfos = 8;//功能开启
+  repeated BountyInfo bountyinfoList=9; // 悬赏令信息
+  repeated VipCardInfo vipCards = 10; // 特权卡信息
+  repeated ActivityInfo activityInfos = 11;
+  repeated PassCardTask passCardTask=12;
+  repeated ClaimPrivilegeRewardInfo vipCardReward = 13;
+  map<int32, int32> storyMap = 14; // 剧情引导
+  SystemInfo systemInfo = 15; //系统数据
+  repeated string AccountBind = 16; // 账号绑定
+  bool isCreate = 17;
+  int32 maxStageId = 18;
+  bool isRecharged = 19;
+  repeated PetDetailInfo petBagDetails = 20; // 宠物背包信息列表
+  map<int32, int32> petStarBook = 21; // petId -> maxStar（历史最高星级）
+  PlayerAllianceInfo allianceInfo = 22; // 联盟信息
+  int32 buyDispatchFormationNum=23; // 已购买的委派阵容数量(上限最多为常量表中定义的数组长度)
+  int32 dailyTempBattleSpeedCount=24; // 加速符当天使用次数(-1是从没使用过)
+}
+
+//心跳请求
+message HeartReq{
+
+}
+
+//心跳响应
+message HeartResp{
+  int64 timestamp = 1;
+}
+
+//登录用系统数据
+message SystemInfo{
+  int64 timestamp = 1;
+  int64 serverOpenTime = 20;
+}

@@ -144,7 +144,9 @@ func OnReceiveBackwardRankBoardMessage(message *rpcPb.BackwardRankBoardMessage) 
 		return
 	}
 	if message.ErrorCode != int32(pb.ERROR_CODE_SUCCESS) {
-		messageSender.SendErrorMessage(pModel, pb.MESSAGE_ID(message.BackMessageId), pb.ERROR_CODE(message.ErrorCode))
+		if message.BackMessageId > 0 {
+			messageSender.SendErrorMessage(pModel, pb.MESSAGE_ID(message.BackMessageId), pb.ERROR_CODE(message.ErrorCode))
+		}
 		return
 	}
 	// ------------------ 路由 & 反序列化 ------------------
@@ -193,29 +195,37 @@ func OnReceiveBackwardSocialMessage(message *rpcPb.BackwardSocialMessage) {
 }
 
 func SendMessageToRankBoard(userId int64, rankId string, backMessageId int32, msgId rpcPb.RPC_MESSAGE_ID, req proto.Message) error {
-	return sendMessageToRankBoard(userId, rankId, backMessageId, msgId, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_ID_NONE, req)
+	return sendMessageToRankBoard(userId, []string{rankId}, backMessageId, msgId, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_ID_NONE, req)
+}
+
+func SendMessageToRankBoardBatch(userId int64, rankIds []string, backMessageId int32, msgId rpcPb.RPC_MESSAGE_ID, req proto.Message) error {
+	return sendMessageToRankBoard(userId, rankIds, backMessageId, msgId, rpcPb.RPC_MESSAGE_ID_RPC_MESSAGE_ID_NONE, req)
 }
 
 func SendMessageToRankBoardWithRespMsgId(userId int64, rankId string, backMessageId int32, msgId rpcPb.RPC_MESSAGE_ID, respMsgId rpcPb.RPC_MESSAGE_ID, req proto.Message) error {
-	return sendMessageToRankBoard(userId, rankId, backMessageId, msgId, respMsgId, req)
+	return sendMessageToRankBoard(userId, []string{rankId}, backMessageId, msgId, respMsgId, req)
 }
 
-func sendMessageToRankBoard(userId int64, rankId string, backMessageId int32, msgId rpcPb.RPC_MESSAGE_ID, respMsgId rpcPb.RPC_MESSAGE_ID, req proto.Message) error {
+func sendMessageToRankBoard(userId int64, rankIds []string, backMessageId int32, msgId rpcPb.RPC_MESSAGE_ID, respMsgId rpcPb.RPC_MESSAGE_ID, req proto.Message) error {
 	data, err := gameCodec.Marshal(int32(msgId), req)
 	if err != nil {
 		logger.ErrorBySprintf("[rpc] marshal rankBoard message error:%+v", err)
 		return err
 	}
+	routeRankId := ""
+	if len(rankIds) > 0 {
+		routeRankId = rankIds[0]
+	}
 	msg := &rpcPb.ForwardRankBoardMessage{
 		UserId:        userId,
 		MsgId:         msgId,
 		BackMessageId: backMessageId,
-		RankId:        rankId,
+		RankId:        append([]string(nil), rankIds...),
 		Payload:       data,
 		RespMsgId:     respMsgId,
 	}
 
-	id := tool.Hash(msg.RankId)
+	id := tool.Hash(routeRankId)
 	if rankBoardClient == nil {
 		logger.ErrorBySprintf("[rpc] unknown rankBoardClient")
 		return fmt.Errorf("[rpc] unknown rankBoardClient")
@@ -238,16 +248,7 @@ func sendMessageToRankBoard(userId int64, rankId string, backMessageId int32, ms
 	return nil
 }
 
-const BLOCK_SOCIAL = true
-
-func IsSocialRpcEnabled() bool {
-	return !BLOCK_SOCIAL
-}
-
 func SendMessageToSocial(userId int64, allianceId int64, backMessageId int32, msgId rpcPb.RPC_MESSAGE_ID, req proto.Message) error {
-	if BLOCK_SOCIAL {
-		return nil
-	}
 	data, err := gameCodec.Marshal(int32(msgId), req)
 	if err != nil {
 		logger.ErrorBySprintf("[rpc] marshal social message error:%+v", err)
@@ -338,6 +339,22 @@ func (g *GameRpcServer) NotifyServerOperationHandler(ctx context.Context, req *r
 		serverInfoService.ReloadAnnounce()
 	case rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_RELOAD_SERVER_INFO:
 		serverInfoService.ReloadServerInfo()
+	case rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_KICK_PLAYER_OUT:
+		gameSessionManager := sessionManager.(*logicSessionManager.GameSessionManager)
+		player := gameSessionManager.GetPlayerBasicInfoByUserId(req.OperationParam)
+		if player == nil {
+			logger.ErrorBySprintf("[platform] kick player is not in game,playerId:%d", req.OperationParam)
+			return &rpcPb.EmptyResp{}, nil
+		}
+		player.GetSession().Close()
+	case rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_KICK_SERVER_PLAYER_OFFLINE:
+		gameSessionManager := sessionManager.(*logicSessionManager.GameSessionManager)
+		count := gameSessionManager.KickOutServerPlayers(int32(req.OperationParam))
+		logger.InfoWithSprintf("[platform] kick server players offline,serverId:%d,count:%d", req.OperationParam, count)
+	case rpcPb.RPC_SERVER_OPERATION_RPC_OPERATION_KICK_ALL_PLAYER_OFFLINE:
+		gameSessionManager := sessionManager.(*logicSessionManager.GameSessionManager)
+		count := gameSessionManager.KickOutAllPlayers()
+		logger.InfoWithSprintf("[platform] kick all players offline,count:%d", count)
 	}
 
 	return &rpcPb.EmptyResp{}, nil

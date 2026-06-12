@@ -1,0 +1,69 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+
+import "commonMessage.proto";
+
+enum LotteryResult {
+  LOTTERY_RESULT_SUCCESS = 0;              // 成功
+  LOTTERY_RESULT_NOT_ENOUGH_CURRENCY = 1; // 抽卡货币不足
+  LOTTERY_RESULT_HERO_BAG_FULL = 2;        // 英雄背包已满
+}
+
+message GetLotteryHistoryDetailReq{
+  int32 lotteryId = 1; // 抽卡池ID
+}
+
+message LotteryHistoryDetail{
+  int32 id = 1; // 抽卡记录ID
+  int32  itemId= 2; // 道具id
+  int32 Count = 3; // 道具数量
+}
+
+message LotteryLuckyEvent{
+  int32 LuckyNum=1; // 就是折数
+  int64 CreateTime=2;
+}
+
+message GetLotteryHistoryDetailResp{
+  repeated LotteryHistoryDetail historyDetails = 1; // 抽卡记录详情列表
+}
+
+message GetLotteryInfoReq{
+  int32 lotteryId = 1; // 抽卡池ID
+}
+
+message LotteryInfo{
+  int32 lotteryCount = 1; // 抽卡总次数
+  int32 lastBasicGuaranteNum  = 2; // 上次基础保底计数
+  bool isDirty=3; // 上次是否歪了
+}
+
+message GetLotteryInfoResp{
+  LotteryInfo lotteryInfo = 1; // 抽卡信息
+  int32 firstDropFree =2 ;// 免费次数
+  LotteryLuckyEvent LotteryLuckyEvent = 3;
+  int32 NewLuckyCount = 4; // 新手抽取次数
+  bool NewIsReward = 5; // 新手是否奖励
+}
+
+message LotteryReq{
+    int32 lotteryType = 1; // 抽卡类型 1：单抽 2：十连抽
+  int32 lotteryId = 2; // 抽卡池ID
+}
+
+
+message LotteryResp{
+  LotteryResult result = 1; // 抽卡结果
+  repeated ItemBasicInfo infoList=2; // 抽奖结果 message ItemBasicInfo{int32 itemId = 1;int32 count = 2;}
+  LotteryInfo lotteryInfo = 3; // 抽卡信息
+  int32 firstDropFree =4 ;// 免费次数
+  LotteryLuckyEvent LotteryLuckyEvent = 5;
+}
+
+message NewLuckyRewardReq{
+  int32 itemId=1;
+}
+
+message NewLuckyRewardResp{
+}

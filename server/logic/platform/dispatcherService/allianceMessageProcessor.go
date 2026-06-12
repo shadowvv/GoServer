@@ -12,6 +12,7 @@ import (
 	"github.com/drop/GoServer/server/logic/socialService"
 	"github.com/drop/GoServer/server/service/logger"
 	"github.com/drop/GoServer/server/service/serviceInterface"
+	"github.com/drop/GoServer/server/tool"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -191,7 +192,7 @@ func (s *AllianceMessageProcessor) PushMessage(session serviceInterface.SessionI
 	}
 
 	alliance := socialService.GetService().GetAllianceById(allianceId)
-	index := int(allianceId % int64(s.processorNum))
+	index := tool.HashIndexByInt64(allianceId, s.processorNum)
 	if index < 0 || index >= s.processorNum {
 		logger.ErrorBySprintf("[allianceProcessor] index out of range userId:%d,msgId:%d allianceId:%d", socialSession.UserId, msgID, socialSession.AllianceId)
 		return
@@ -212,6 +213,8 @@ func extractAllianceID(msg proto.Message) int64 {
 	case *rpcPb.QuitAllianceReq:
 		return req.GetAllianceId()
 	case *rpcPb.ChangeMemberPositionReq:
+		return req.GetAllianceId()
+	case *rpcPb.AllianceItemsOperationReq:
 		return req.GetAllianceId()
 	default:
 		return 0

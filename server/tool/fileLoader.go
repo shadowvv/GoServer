@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"os"
+
+	"gopkg.in/yaml.v3"
 )
 
 // LoadJSON 从JSON文件加载数据
@@ -18,7 +19,12 @@ func LoadJSON(filePath string, v interface{}) error {
 	if err != nil {
 		return fmt.Errorf("[system] LoadJSON: open file %s: %w", filePath, err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err = file.Close()
+		if err != nil {
+
+		}
+	}(file)
 
 	dec := json.NewDecoder(file)
 	if err := dec.Decode(v); err != nil {

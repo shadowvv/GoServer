@@ -87,7 +87,7 @@ type BackwardClientMessage struct {
 	MsgId         int32                  `protobuf:"varint,2,opt,name=msgId,proto3" json:"msgId,omitempty"`                 // msgId
 	Payload       []byte                 `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`              // 原始pb二进制
 	BroadcastType int32                  `protobuf:"varint,4,opt,name=broadcastType,proto3" json:"broadcastType,omitempty"` // 广播类型
-	BroadcastId   int32                  `protobuf:"varint,5,opt,name=broadcastId,proto3" json:"broadcastId,omitempty"`     // 广播id
+	BroadcastId   int64                  `protobuf:"varint,5,opt,name=broadcastId,proto3" json:"broadcastId,omitempty"`     // 广播id
 	CloseSession  bool                   `protobuf:"varint,6,opt,name=closeSession,proto3" json:"closeSession,omitempty"`   // 关闭session
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -151,7 +151,7 @@ func (x *BackwardClientMessage) GetBroadcastType() int32 {
 	return 0
 }
 
-func (x *BackwardClientMessage) GetBroadcastId() int32 {
+func (x *BackwardClientMessage) GetBroadcastId() int64 {
 	if x != nil {
 		return x.BroadcastId
 	}
@@ -180,7 +180,7 @@ const file_game_proto_rawDesc = "" +
 	"\x05msgId\x18\x02 \x01(\x05R\x05msgId\x12\x18\n" +
 	"\apayload\x18\x03 \x01(\fR\apayload\x12$\n" +
 	"\rbroadcastType\x18\x04 \x01(\x05R\rbroadcastType\x12 \n" +
-	"\vbroadcastId\x18\x05 \x01(\x05R\vbroadcastId\x12\"\n" +
+	"\vbroadcastId\x18\x05 \x01(\x03R\vbroadcastId\x12\"\n" +
 	"\fcloseSession\x18\x06 \x01(\bR\fcloseSession2\xaf\x02\n" +
 	"\vGameService\x12-\n" +
 	"\bSayHello\x12\x0f.rpcPb.HelloReq\x1a\x10.rpcPb.HelloResp\x12X\n" +

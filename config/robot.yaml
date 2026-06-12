@@ -7,31 +7,39 @@ loggerConfig:
 
 main:
   login:
-    account: "60001"
-    serverID: 0
+    account: "70001"
+    serverID: 10
     loginURL: "http://127.0.0.1:8081/login"
     channel: 1
-    version: "1.0.2"
+    version: "1.0.7"
     language: 0
     deviceID: "robot_device"
     appID: "robot"
     sign: ""
   runConfig:
-    count: 1
+    # 运行数量
+    count: 100
+    # 运行模式，supported models: random, custom
     mode: "custom"
-    interval: 1000
-    duration: 60
+    # 启动时随机延迟，单位：毫秒
+    startupJitterMs: 60000
+    # 启动固定间隔，单位：毫秒  >0 时按间隔启动，否则按随机延迟启动
+    startupIntervalMs: 700
+    # 运行间隔，单位：毫秒
+    interval: 60000
+    # 运行时长，单位：秒
+    duration: 300
   modules:
     - "equipment"
-    - "mail"
+  #   - "mail"
 
 operations:
   equipment:
     - messageId: MESSAGE_ID_EQUIPMENT_LIST_REQ
-  mail:
-    - messageId: MESSAGE_ID_MAIL_LIST_REQ
-      params:
-        mail_type: 0
-        status: 0
-        page: 1
-        pageSize: 10
+#   mail:
+#     - messageId: MESSAGE_ID_MAIL_LIST_REQ
+#       params:
+#         mail_type: 0
+#         status: 0
+#         page: 1
+#         pageSize: 10

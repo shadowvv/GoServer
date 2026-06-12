@@ -2466,7 +2466,7 @@
       "instanceType": "1",
       "level": "12",
       "levelReward": "",
-      "mainStage": "233|308",
+      "mainStage": "233|1300",
       "monsterSpawn": "0001|0003|0006|0007;0001|0003|0006|0007;0001|0003|0006|0007",
       "type": "401"
     },
@@ -2586,7 +2586,7 @@
       "instanceType": "1",
       "level": "12",
       "levelReward": "",
-      "mainStage": "233|308",
+      "mainStage": "233|1300",
       "monsterSpawn": "0005;0005;0005;0005",
       "type": "402"
     },
@@ -2706,7 +2706,7 @@
       "instanceType": "1",
       "level": "12",
       "levelReward": "",
-      "mainStage": "233|308",
+      "mainStage": "233|1300",
       "monsterSpawn": "0005",
       "type": "403"
     },
@@ -2786,7 +2786,7 @@
       "instanceType": "1",
       "level": "8",
       "levelReward": "",
-      "mainStage": "233|308",
+      "mainStage": "233|1300",
       "monsterSpawn": "0004|0005|0006|0007|0008;0005",
       "type": "404"
     }
@@ -7011,7 +7011,7 @@
       "id": "10001",
       "level": "1",
       "levelReward": "10325",
-      "power": "10483",
+      "power": "1370",
       "stage": "1",
       "stageReward": "",
       "sweepReward": "11001"
@@ -7021,7 +7021,7 @@
       "id": "10002",
       "level": "2",
       "levelReward": "10326",
-      "power": "11863",
+      "power": "1923",
       "stage": "1",
       "stageReward": "",
       "sweepReward": "11002"
@@ -7031,7 +7031,7 @@
       "id": "10003",
       "level": "3",
       "levelReward": "10327",
-      "power": "13425",
+      "power": "2682",
       "stage": "1",
       "stageReward": "",
       "sweepReward": "11003"
@@ -7041,7 +7041,7 @@
       "id": "10004",
       "level": "4",
       "levelReward": "10328",
-      "power": "15198",
+      "power": "3770",
       "stage": "1",
       "stageReward": "",
       "sweepReward": "11004"
@@ -7051,7 +7051,7 @@
       "id": "10005",
       "level": "5",
       "levelReward": "10329",
-      "power": "17193",
+      "power": "5307",
       "stage": "1",
       "stageReward": "",
       "sweepReward": "11005"
@@ -7061,7 +7061,7 @@
       "id": "10006",
       "level": "6",
       "levelReward": "10330",
-      "power": "19463",
+      "power": "7457",
       "stage": "1",
       "stageReward": "",
       "sweepReward": "11006"
@@ -7071,7 +7071,7 @@
       "id": "10007",
       "level": "7",
       "levelReward": "10331",
-      "power": "22021",
+      "power": "10521",
       "stage": "1",
       "stageReward": "",
       "sweepReward": "11007"
@@ -7081,7 +7081,7 @@
       "id": "10008",
       "level": "8",
       "levelReward": "10332",
-      "power": "24934",
+      "power": "14840",
       "stage": "1",
       "stageReward": "",
       "sweepReward": "11008"
@@ -7091,7 +7091,7 @@
       "id": "10009",
       "level": "9",
       "levelReward": "10333",
-      "power": "28207",
+      "power": "20961",
       "stage": "1",
       "stageReward": "",
       "sweepReward": "11009"
@@ -7101,7 +7101,7 @@
       "id": "10010",
       "level": "10",
       "levelReward": "10334",
-      "power": "31934",
+      "power": "29537",
       "stage": "1",
       "stageReward": "10526",
       "sweepReward": "11010"
@@ -7111,7 +7111,7 @@
       "id": "10011",
       "level": "11",
       "levelReward": "10335",
-      "power": "36134",
+      "power": "20883",
       "stage": "2",
       "stageReward": "",
       "sweepReward": "11011"
@@ -7121,7 +7121,7 @@
       "id": "10012",
       "level": "12",
       "levelReward": "10336",
-      "power": "40907",
+      "power": "22411",
       "stage": "2",
       "stageReward": "",
       "sweepReward": "11012"
@@ -7131,7 +7131,7 @@
       "id": "10013",
       "level": "13",
       "levelReward": "10337",
-      "power": "46311",
+      "power": "23951",
       "stage": "2",
       "stageReward": "",
       "sweepReward": "11013"
@@ -7141,7 +7141,7 @@
       "id": "10014",
       "level": "14",
       "levelReward": "10338",
-      "power": "52428",
+      "power": "25502",
       "stage": "2",
       "stageReward": "",
       "sweepReward": "11014"
@@ -7151,7 +7151,7 @@
       "id": "10015",
       "level": "15",
       "levelReward": "10339",
-      "power": "59336",
+      "power": "27087",
       "stage": "2",
       "stageReward": "",
       "sweepReward": "11015"
@@ -7161,447 +7161,447 @@
       "id": "10016",
       "level": "16",
       "levelReward": "10340",
-      "power": "67235",
+      "power": "30122",
       "stage": "2",
       "stageReward": "",
       "sweepReward": "11016"
     },
     "10017": {
-      "Lineup": "170501|170502|170503|170504",
+      "Lineup": "170501|170502|170503",
       "id": "10017",
       "level": "17",
       "levelReward": "10341",
-      "power": "95712",
+      "power": "35115",
       "stage": "2",
       "stageReward": "",
       "sweepReward": "11017"
     },
     "10018": {
-      "Lineup": "180501|180502|180503|180504",
+      "Lineup": "180501|180502|180503",
       "id": "10018",
       "level": "18",
       "levelReward": "10342",
-      "power": "102198",
+      "power": "40939",
       "stage": "2",
       "stageReward": "",
       "sweepReward": "11018"
     },
     "10019": {
-      "Lineup": "190501|190502|190503|190504",
+      "Lineup": "190501|190502|190503",
       "id": "10019",
       "level": "19",
       "levelReward": "10343",
-      "power": "109141",
+      "power": "47739",
       "stage": "2",
       "stageReward": "",
       "sweepReward": "11019"
     },
     "10020": {
-      "Lineup": "200501|200502|200503|200504",
+      "Lineup": "200501|200502|200503",
       "id": "10020",
       "level": "20",
       "levelReward": "10344",
-      "power": "116566",
+      "power": "55634",
       "stage": "2",
       "stageReward": "10526",
       "sweepReward": "11020"
     },
     "10021": {
-      "Lineup": "210501|210502|210503|210504",
+      "Lineup": "210501|210502|210503",
       "id": "10021",
       "level": "21",
       "levelReward": "10345",
-      "power": "124512",
+      "power": "39710",
       "stage": "3",
       "stageReward": "",
       "sweepReward": "11021"
     },
     "10022": {
-      "Lineup": "220501|220502|220503|220504",
+      "Lineup": "220501|220502|220503",
       "id": "10022",
       "level": "22",
       "levelReward": "10346",
-      "power": "133002",
+      "power": "42673",
       "stage": "3",
       "stageReward": "",
       "sweepReward": "11022"
     },
     "10023": {
-      "Lineup": "230501|230502|230503|230504",
+      "Lineup": "230501|230502|230503",
       "id": "10023",
       "level": "23",
       "levelReward": "10347",
-      "power": "142078",
+      "power": "45671",
       "stage": "3",
       "stageReward": "",
       "sweepReward": "11023"
     },
     "10024": {
-      "Lineup": "240501|240502|240503|240504",
+      "Lineup": "240501|240502|240503",
       "id": "10024",
       "level": "24",
       "levelReward": "10348",
-      "power": "151794",
+      "power": "48701",
       "stage": "3",
       "stageReward": "",
       "sweepReward": "11024"
     },
     "10025": {
-      "Lineup": "250501|250502|250503|250504",
+      "Lineup": "250501|250502|250503",
       "id": "10025",
       "level": "25",
       "levelReward": "10349",
-      "power": "162207",
+      "power": "51777",
       "stage": "3",
       "stageReward": "",
       "sweepReward": "11025"
     },
     "10026": {
-      "Lineup": "260501|260502|260503|260504",
+      "Lineup": "260501|260502|260503",
       "id": "10026",
       "level": "26",
       "levelReward": "10350",
-      "power": "173329",
+      "power": "57603",
       "stage": "3",
       "stageReward": "",
       "sweepReward": "11026"
     },
     "10027": {
-      "Lineup": "270501|270502|270503|270504",
+      "Lineup": "270501|270502|270503",
       "id": "10027",
       "level": "27",
       "levelReward": "10351",
-      "power": "185263",
+      "power": "73477",
       "stage": "3",
       "stageReward": "",
       "sweepReward": "11027"
     },
     "10028": {
-      "Lineup": "280501|280502|280503|280504",
+      "Lineup": "280501|280502|280503",
       "id": "10028",
       "level": "28",
       "levelReward": "10352",
-      "power": "197964",
+      "power": "93810",
       "stage": "3",
       "stageReward": "",
       "sweepReward": "11028"
     },
     "10029": {
-      "Lineup": "290501|290502|290503|290504",
+      "Lineup": "290501|290502|290503",
       "id": "10029",
       "level": "29",
       "levelReward": "10353",
-      "power": "212221",
+      "power": "119856",
       "stage": "3",
       "stageReward": "",
       "sweepReward": "11029"
     },
     "10030": {
-      "Lineup": "300501|300502|300503|300504|300505",
+      "Lineup": "300501|300502|300503|300504",
       "id": "10030",
       "level": "30",
       "levelReward": "10354",
-      "power": "284373",
+      "power": "204327",
       "stage": "3",
       "stageReward": "10526",
       "sweepReward": "11030"
     },
     "10031": {
-      "Lineup": "310501|310502|310503|310504|310505",
+      "Lineup": "310501|310502|310503|310504",
       "id": "10031",
       "level": "31",
       "levelReward": "10355",
-      "power": "304849",
+      "power": "145539",
       "stage": "4",
       "stageReward": "",
       "sweepReward": "11031"
     },
     "10032": {
-      "Lineup": "320501|320502|320503|320504|320505",
+      "Lineup": "320501|320502|320503|320504",
       "id": "10032",
       "level": "32",
       "levelReward": "10356",
-      "power": "326791",
+      "power": "155402",
       "stage": "4",
       "stageReward": "",
       "sweepReward": "11032"
     },
     "10033": {
-      "Lineup": "330501|330502|330503|330504|330505",
+      "Lineup": "330501|330502|330503|330504",
       "id": "10033",
       "level": "33",
       "levelReward": "10357",
-      "power": "350306",
+      "power": "165265",
       "stage": "4",
       "stageReward": "",
       "sweepReward": "11033"
     },
     "10034": {
-      "Lineup": "340501|340502|340503|340504|340505",
+      "Lineup": "340501|340502|340503|340504",
       "id": "10034",
       "level": "34",
       "levelReward": "10358",
-      "power": "375504",
+      "power": "175158",
       "stage": "4",
       "stageReward": "",
       "sweepReward": "11034"
     },
     "10035": {
-      "Lineup": "350501|350502|350503|350504|350505",
+      "Lineup": "350501|350502|350503|350504",
       "id": "10035",
       "level": "35",
       "levelReward": "10359",
-      "power": "402518",
+      "power": "185021",
       "stage": "4",
       "stageReward": "",
       "sweepReward": "11035"
     },
     "10036": {
-      "Lineup": "360501|360502|360503|360504|360505",
+      "Lineup": "360501|360502|360503|360504",
       "id": "10036",
       "level": "36",
       "levelReward": "10360",
-      "power": "431462",
+      "power": "204687",
       "stage": "4",
       "stageReward": "",
       "sweepReward": "11036"
     },
     "10037": {
-      "Lineup": "370501|370502|370503|370504|370505",
+      "Lineup": "370501|370502|370503|370504",
       "id": "10037",
       "level": "37",
       "levelReward": "10361",
-      "power": "462511",
+      "power": "227697",
       "stage": "4",
       "stageReward": "",
       "sweepReward": "11037"
     },
     "10038": {
-      "Lineup": "380501|380502|380503|380504|380505",
+      "Lineup": "380501|380502|380503|380504",
       "id": "10038",
       "level": "38",
       "levelReward": "10362",
-      "power": "495710",
+      "power": "253404",
       "stage": "4",
       "stageReward": "",
       "sweepReward": "11038"
     },
     "10039": {
-      "Lineup": "390501|390502|390503|390504|390505",
+      "Lineup": "390501|390502|390503|390504",
       "id": "10039",
       "level": "39",
       "levelReward": "10363",
-      "power": "581541",
+      "power": "282092",
       "stage": "4",
       "stageReward": "",
       "sweepReward": "11039"
     },
     "10040": {
-      "Lineup": "400501|400502|400503|400504|400505",
+      "Lineup": "400501|400502|400503|400504",
       "id": "10040",
       "level": "40",
       "levelReward": "10364",
-      "power": "600850",
+      "power": "314075",
       "stage": "4",
       "stageReward": "10526",
       "sweepReward": "11040"
     },
     "10041": {
-      "Lineup": "410501|410502|410503|410504|410505",
+      "Lineup": "410501|410502|410503|410504",
       "id": "10041",
       "level": "41",
       "levelReward": "10365",
-      "power": "620788",
+      "power": "222477",
       "stage": "5",
       "stageReward": "",
       "sweepReward": "11041"
     },
     "10042": {
-      "Lineup": "420501|420502|420503|420504|420505",
+      "Lineup": "420501|420502|420503|420504",
       "id": "10042",
       "level": "42",
       "levelReward": "10366",
-      "power": "641404",
+      "power": "237776",
       "stage": "5",
       "stageReward": "",
       "sweepReward": "11042"
     },
     "10043": {
-      "Lineup": "430501|430502|430503|430504|430505",
+      "Lineup": "430501|430502|430503|430504",
       "id": "10043",
       "level": "43",
       "levelReward": "10367",
-      "power": "662706",
+      "power": "253045",
       "stage": "5",
       "stageReward": "",
       "sweepReward": "11043"
     },
     "10044": {
-      "Lineup": "440501|440502|440503|440504|440505",
+      "Lineup": "440501|440502|440503|440504",
       "id": "10044",
       "level": "44",
       "levelReward": "10368",
-      "power": "684723",
+      "power": "268344",
       "stage": "5",
       "stageReward": "",
       "sweepReward": "11044"
     },
     "10045": {
-      "Lineup": "450501|450502|450503|450504|450505",
+      "Lineup": "450501|450502|450503|450504",
       "id": "10045",
       "level": "45",
       "levelReward": "10369",
-      "power": "707482",
+      "power": "283612",
       "stage": "5",
       "stageReward": "",
       "sweepReward": "11045"
     },
     "10046": {
-      "Lineup": "460501|460502|460503|460504|460505",
+      "Lineup": "460501|460502|460503|460504",
       "id": "10046",
       "level": "46",
       "levelReward": "10370",
-      "power": "735757",
+      "power": "314165",
       "stage": "5",
       "stageReward": "",
       "sweepReward": "11046"
     },
     "10047": {
-      "Lineup": "470501|470502|470503|470504|470505",
+      "Lineup": "470501|470502|470503|470504",
       "id": "10047",
       "level": "47",
       "levelReward": "10371",
-      "power": "773689",
+      "power": "318412",
       "stage": "5",
       "stageReward": "",
       "sweepReward": "11047"
     },
     "10048": {
-      "Lineup": "480501|480502|480503|480504|480505",
+      "Lineup": "480501|480502|480503|480504",
       "id": "10048",
       "level": "48",
       "levelReward": "10372",
-      "power": "813600",
+      "power": "322708",
       "stage": "5",
       "stageReward": "",
       "sweepReward": "11048"
     },
     "10049": {
-      "Lineup": "490501|490502|490503|490504|490505",
+      "Lineup": "490501|490502|490503|490504",
       "id": "10049",
       "level": "49",
       "levelReward": "10373",
-      "power": "855589",
+      "power": "327085",
       "stage": "5",
       "stageReward": "",
       "sweepReward": "11049"
     },
     "10050": {
-      "Lineup": "500501|500502|500503|500504|500505",
+      "Lineup": "500501|500502|500503|500504",
       "id": "10050",
       "level": "50",
       "levelReward": "10374",
-      "power": "899777",
+      "power": "331556",
       "stage": "5",
       "stageReward": "10526",
       "sweepReward": "11050"
     },
     "10051": {
-      "Lineup": "510501|510502|510503|510504|510505",
+      "Lineup": "510501|510502|510503|510504",
       "id": "10051",
       "level": "51",
       "levelReward": "10375",
-      "power": "946243",
+      "power": "234809",
       "stage": "6",
       "stageReward": "",
       "sweepReward": "11051"
     },
     "10052": {
-      "Lineup": "520501|520502|520503|520504|520505",
+      "Lineup": "520501|520502|520503|520504",
       "id": "10052",
       "level": "52",
       "levelReward": "10376",
-      "power": "995111",
+      "power": "250996",
       "stage": "6",
       "stageReward": "",
       "sweepReward": "11052"
     },
     "10053": {
-      "Lineup": "530501|530502|530503|530504|530505",
+      "Lineup": "530501|530502|530503|530504",
       "id": "10053",
       "level": "53",
       "levelReward": "10377",
-      "power": "1046509",
+      "power": "267153",
       "stage": "6",
       "stageReward": "",
       "sweepReward": "11053"
     },
     "10054": {
-      "Lineup": "540501|540502|540503|540504|540505",
+      "Lineup": "540501|540502|540503|540504",
       "id": "10054",
       "level": "54",
       "levelReward": "10378",
-      "power": "1100588",
+      "power": "283340",
       "stage": "6",
       "stageReward": "",
       "sweepReward": "11054"
     },
     "10055": {
-      "Lineup": "550501|550502|550503|550504|550505",
+      "Lineup": "550501|550502|550503|550504",
       "id": "10055",
       "level": "55",
       "levelReward": "10379",
-      "power": "1124541",
+      "power": "299527",
       "stage": "6",
       "stageReward": "",
       "sweepReward": "11055"
     },
     "10056": {
-      "Lineup": "560501|560502|560503|560504|560505",
+      "Lineup": "560501|560502|560503|560504",
       "id": "10056",
       "level": "56",
       "levelReward": "10380",
-      "power": "1149028",
+      "power": "331826",
       "stage": "6",
       "stageReward": "",
       "sweepReward": "11056"
     },
     "10057": {
-      "Lineup": "570501|570502|570503|570504|570505",
+      "Lineup": "570501|570502|570503|570504",
       "id": "10057",
       "level": "57",
       "levelReward": "10381",
-      "power": "1174072",
+      "power": "339275",
       "stage": "6",
       "stageReward": "",
       "sweepReward": "11057"
     },
     "10058": {
-      "Lineup": "580501|580502|580503|580504|580505",
+      "Lineup": "580501|580502|580503|580504",
       "id": "10058",
       "level": "58",
       "levelReward": "10382",
-      "power": "1199676",
+      "power": "346872",
       "stage": "6",
       "stageReward": "",
       "sweepReward": "11058"
     },
     "10059": {
-      "Lineup": "590501|590502|590503|590504|590505",
+      "Lineup": "590501|590502|590503|590504",
       "id": "10059",
       "level": "59",
       "levelReward": "10383",
-      "power": "1225845",
+      "power": "354647",
       "stage": "6",
       "stageReward": "",
       "sweepReward": "11059"
     },
     "10060": {
-      "Lineup": "600501|600502|600503|600504|600505",
+      "Lineup": "600501|600502|600503|600504",
       "id": "10060",
       "level": "60",
       "levelReward": "10384",
-      "power": "1252537",
+      "power": "362662",
       "stage": "6",
       "stageReward": "10526",
       "sweepReward": "11060"
@@ -7611,7 +7611,7 @@
       "id": "10061",
       "level": "61",
       "levelReward": "10385",
-      "power": "1271435",
+      "power": "322423",
       "stage": "7",
       "stageReward": "",
       "sweepReward": "11061"
@@ -7621,7 +7621,7 @@
       "id": "10062",
       "level": "62",
       "levelReward": "10386",
-      "power": "1290621",
+      "power": "346281",
       "stage": "7",
       "stageReward": "",
       "sweepReward": "11062"
@@ -7631,7 +7631,7 @@
       "id": "10063",
       "level": "63",
       "levelReward": "10387",
-      "power": "1310141",
+      "power": "370326",
       "stage": "7",
       "stageReward": "",
       "sweepReward": "11063"
@@ -7641,7 +7641,7 @@
       "id": "10064",
       "level": "64",
       "levelReward": "10388",
-      "power": "1329972",
+      "power": "394672",
       "stage": "7",
       "stageReward": "",
       "sweepReward": "11064"
@@ -7651,7 +7651,7 @@
       "id": "10065",
       "level": "65",
       "levelReward": "10389",
-      "power": "1350138",
+      "power": "419280",
       "stage": "7",
       "stageReward": "",
       "sweepReward": "11065"
@@ -7661,7 +7661,7 @@
       "id": "10066",
       "level": "66",
       "levelReward": "10390",
-      "power": "1370618",
+      "power": "466321",
       "stage": "7",
       "stageReward": "",
       "sweepReward": "11066"
@@ -7671,7 +7671,7 @@
       "id": "10067",
       "level": "67",
       "levelReward": "10391",
-      "power": "1391414",
+      "power": "510331",
       "stage": "7",
       "stageReward": "",
       "sweepReward": "11067"
@@ -7681,7 +7681,7 @@
       "id": "10068",
       "level": "68",
       "levelReward": "10392",
-      "power": "1397833",
+      "power": "558500",
       "stage": "7",
       "stageReward": "",
       "sweepReward": "11068"
@@ -7691,7 +7691,7 @@
       "id": "10069",
       "level": "69",
       "levelReward": "10393",
-      "power": "1404261",
+      "power": "611263",
       "stage": "7",
       "stageReward": "",
       "sweepReward": "11069"
@@ -7701,7 +7701,7 @@
       "id": "10070",
       "level": "70",
       "levelReward": "10394",
-      "power": "1410739",
+      "power": "669120",
       "stage": "7",
       "stageReward": "10526",
       "sweepReward": "11070"
@@ -7711,7 +7711,7 @@
       "id": "10071",
       "level": "71",
       "levelReward": "10395",
-      "power": "1417226",
+      "power": "484312",
       "stage": "8",
       "stageReward": "",
       "sweepReward": "11071"
@@ -7721,7 +7721,7 @@
       "id": "10072",
       "level": "72",
       "levelReward": "10396",
-      "power": "1423785",
+      "power": "519779",
       "stage": "8",
       "stageReward": "",
       "sweepReward": "11072"
@@ -7731,7 +7731,7 @@
       "id": "10073",
       "level": "73",
       "levelReward": "10397",
-      "power": "1430353",
+      "power": "555565",
       "stage": "8",
       "stageReward": "",
       "sweepReward": "11073"
@@ -7741,7 +7741,7 @@
       "id": "10074",
       "level": "74",
       "levelReward": "10398",
-      "power": "1456199",
+      "power": "591782",
       "stage": "8",
       "stageReward": "",
       "sweepReward": "11074"
@@ -7751,7 +7751,7 @@
       "id": "10075",
       "level": "75",
       "levelReward": "10399",
-      "power": "1482586",
+      "power": "628393",
       "stage": "8",
       "stageReward": "",
       "sweepReward": "11075"
@@ -7761,7 +7761,7 @@
       "id": "10076",
       "level": "76",
       "levelReward": "10400",
-      "power": "1509514",
+      "power": "696926",
       "stage": "8",
       "stageReward": "",
       "sweepReward": "11076"
@@ -7771,7 +7771,7 @@
       "id": "10077",
       "level": "77",
       "levelReward": "10401",
-      "power": "1537028",
+      "power": "749772",
       "stage": "8",
       "stageReward": "",
       "sweepReward": "11077"
@@ -7781,7 +7781,7 @@
       "id": "10078",
       "level": "78",
       "levelReward": "10402",
-      "power": "1565109",
+      "power": "806617",
       "stage": "8",
       "stageReward": "",
       "sweepReward": "11078"
@@ -7791,7 +7791,7 @@
       "id": "10079",
       "level": "79",
       "levelReward": "10403",
-      "power": "1571378",
+      "power": "867789",
       "stage": "8",
       "stageReward": "",
       "sweepReward": "11079"
@@ -7801,7 +7801,7 @@
       "id": "10080",
       "level": "80",
       "levelReward": "10404",
-      "power": "1577674",
+      "power": "1067021",
       "stage": "8",
       "stageReward": "10526",
       "sweepReward": "11080"
@@ -7811,7 +7811,7 @@
       "id": "10081",
       "level": "81",
       "levelReward": "10405",
-      "power": "1583976",
+      "power": "783560",
       "stage": "9",
       "stageReward": "",
       "sweepReward": "11081"
@@ -7821,7 +7821,7 @@
       "id": "10082",
       "level": "82",
       "levelReward": "10406",
-      "power": "1590349",
+      "power": "834868",
       "stage": "9",
       "stageReward": "",
       "sweepReward": "11082"
@@ -7831,7 +7831,7 @@
       "id": "10083",
       "level": "83",
       "levelReward": "10407",
-      "power": "1596726",
+      "power": "886283",
       "stage": "9",
       "stageReward": "",
       "sweepReward": "11083"
@@ -7841,7 +7841,7 @@
       "id": "10084",
       "level": "84",
       "levelReward": "10408",
-      "power": "1603131",
+      "power": "937762",
       "stage": "9",
       "stageReward": "",
       "sweepReward": "11084"
@@ -7851,7 +7851,7 @@
       "id": "10085",
       "level": "85",
       "levelReward": "10409",
-      "power": "1845812",
+      "power": "989391",
       "stage": "9",
       "stageReward": "",
       "sweepReward": "11085"
@@ -7861,7 +7861,7 @@
       "id": "10086",
       "level": "86",
       "levelReward": "10410",
-      "power": "2127029",
+      "power": "1088964",
       "stage": "9",
       "stageReward": "",
       "sweepReward": "11086"
@@ -7871,7 +7871,7 @@
       "id": "10087",
       "level": "87",
       "levelReward": "10411",
-      "power": "2452986",
+      "power": "1164212",
       "stage": "9",
       "stageReward": "",
       "sweepReward": "11087"
@@ -7881,7 +7881,7 @@
       "id": "10088",
       "level": "88",
       "levelReward": "10412",
-      "power": "2830847",
+      "power": "1244911",
       "stage": "9",
       "stageReward": "",
       "sweepReward": "11088"
@@ -7891,7 +7891,7 @@
       "id": "10089",
       "level": "89",
       "levelReward": "10413",
-      "power": "2842348",
+      "power": "1331448",
       "stage": "9",
       "stageReward": "",
       "sweepReward": "11089"
@@ -7901,7 +7901,7 @@
       "id": "10090",
       "level": "90",
       "levelReward": "10414",
-      "power": "2853902",
+      "power": "1424201",
       "stage": "9",
       "stageReward": "10526",
       "sweepReward": "11090"
@@ -7911,7 +7911,7 @@
       "id": "10091",
       "level": "91",
       "levelReward": "10415",
-      "power": "2865531",
+      "power": "1047898",
       "stage": "10",
       "stageReward": "",
       "sweepReward": "11091"
@@ -7921,7 +7921,7 @@
       "id": "10092",
       "level": "92",
       "levelReward": "10416",
-      "power": "2877193",
+      "power": "1117876",
       "stage": "10",
       "stageReward": "",
       "sweepReward": "11092"
@@ -7931,7 +7931,7 @@
       "id": "10093",
       "level": "93",
       "levelReward": "10417",
-      "power": "2888887",
+      "power": "1188154",
       "stage": "10",
       "stageReward": "",
       "sweepReward": "11093"
@@ -7941,7 +7941,7 @@
       "id": "10094",
       "level": "94",
       "levelReward": "10418",
-      "power": "2939536",
+      "power": "1258646",
       "stage": "10",
       "stageReward": "",
       "sweepReward": "11094"
@@ -7951,7 +7951,7 @@
       "id": "10095",
       "level": "95",
       "levelReward": "10419",
-      "power": "2991079",
+      "power": "1329459",
       "stage": "10",
       "stageReward": "",
       "sweepReward": "11095"
@@ -7961,7 +7961,7 @@
       "id": "10096",
       "level": "96",
       "levelReward": "10420",
-      "power": "3043520",
+      "power": "1464251",
       "stage": "10",
       "stageReward": "",
       "sweepReward": "11096"
@@ -7971,7 +7971,7 @@
       "id": "10097",
       "level": "97",
       "levelReward": "10421",
-      "power": "3096865",
+      "power": "1585306",
       "stage": "10",
       "stageReward": "",
       "sweepReward": "11097"
@@ -7981,7 +7981,7 @@
       "id": "10098",
       "level": "98",
       "levelReward": "10422",
-      "power": "3149475",
+      "power": "1716755",
       "stage": "10",
       "stageReward": "",
       "sweepReward": "11098"
@@ -7991,7 +7991,7 @@
       "id": "10099",
       "level": "99",
       "levelReward": "10423",
-      "power": "3203388",
+      "power": "1859521",
       "stage": "10",
       "stageReward": "",
       "sweepReward": "11099"
@@ -8001,7 +8001,7 @@
       "id": "10100",
       "level": "100",
       "levelReward": "10424",
-      "power": "3258649",
+      "power": "2014529",
       "stage": "10",
       "stageReward": "10526",
       "sweepReward": "11100"
@@ -8011,7 +8011,7 @@
       "id": "10101",
       "level": "101",
       "levelReward": "10425",
-      "power": "3270650",
+      "power": "1481969",
       "stage": "11",
       "stageReward": "",
       "sweepReward": "11101"
@@ -8021,7 +8021,7 @@
       "id": "10102",
       "level": "102",
       "levelReward": "10426",
-      "power": "3282684",
+      "power": "1576779",
       "stage": "11",
       "stageReward": "",
       "sweepReward": "11102"
@@ -8031,7 +8031,7 @@
       "id": "10103",
       "level": "103",
       "levelReward": "10427",
-      "power": "3294771",
+      "power": "1671717",
       "stage": "11",
       "stageReward": "",
       "sweepReward": "11103"
@@ -8041,7 +8041,7 @@
       "id": "10104",
       "level": "104",
       "levelReward": "10428",
-      "power": "3306890",
+      "power": "1766784",
       "stage": "11",
       "stageReward": "",
       "sweepReward": "11104"
@@ -8051,7 +8051,7 @@
       "id": "10105",
       "level": "105",
       "levelReward": "10429",
-      "power": "3319084",
+      "power": "1862023",
       "stage": "11",
       "stageReward": "",
       "sweepReward": "11105"
@@ -8061,7 +8061,7 @@
       "id": "10106",
       "level": "106",
       "levelReward": "10430",
-      "power": "3331311",
+      "power": "2046950",
       "stage": "11",
       "stageReward": "",
       "sweepReward": "11106"
@@ -8071,7 +8071,7 @@
       "id": "10107",
       "level": "107",
       "levelReward": "10431",
-      "power": "3343570",
+      "power": "2181281",
       "stage": "11",
       "stageReward": "",
       "sweepReward": "11107"
@@ -8081,7 +8081,7 @@
       "id": "10108",
       "level": "108",
       "levelReward": "10432",
-      "power": "3431577",
+      "power": "2324939",
       "stage": "11",
       "stageReward": "",
       "sweepReward": "11108"
@@ -8091,7 +8091,7 @@
       "id": "10109",
       "level": "109",
       "levelReward": "10433",
-      "power": "3521961",
+      "power": "2478614",
       "stage": "11",
       "stageReward": "",
       "sweepReward": "11109"
@@ -8101,7 +8101,7 @@
       "id": "10110",
       "level": "110",
       "levelReward": "10434",
-      "power": "3614739",
+      "power": "2642971",
       "stage": "11",
       "stageReward": "10526",
       "sweepReward": "11110"
@@ -8111,7 +8111,7 @@
       "id": "10111",
       "level": "111",
       "levelReward": "10435",
-      "power": "3710015",
+      "power": "1938046",
       "stage": "12",
       "stageReward": "",
       "sweepReward": "11111"
@@ -8121,7 +8121,7 @@
       "id": "10112",
       "level": "112",
       "levelReward": "10436",
-      "power": "3757408",
+      "power": "2060684",
       "stage": "12",
       "stageReward": "",
       "sweepReward": "11112"
@@ -8131,7 +8131,7 @@
       "id": "10113",
       "level": "113",
       "levelReward": "10437",
-      "power": "3805400",
+      "power": "2183364",
       "stage": "12",
       "stageReward": "",
       "sweepReward": "11113"
@@ -8141,7 +8141,7 @@
       "id": "10114",
       "level": "114",
       "levelReward": "10438",
-      "power": "3853994",
+      "power": "2306109",
       "stage": "12",
       "stageReward": "",
       "sweepReward": "11114"
@@ -8151,7 +8151,7 @@
       "id": "10115",
       "level": "115",
       "levelReward": "10439",
-      "power": "3903192",
+      "power": "2428917",
       "stage": "12",
       "stageReward": "",
       "sweepReward": "11115"
@@ -8161,7 +8161,7 @@
       "id": "10116",
       "level": "116",
       "levelReward": "10440",
-      "power": "3943681",
+      "power": "2669992",
       "stage": "12",
       "stageReward": "",
       "sweepReward": "11116"
@@ -8171,7 +8171,7 @@
       "id": "10117",
       "level": "117",
       "levelReward": "10441",
-      "power": "3984715",
+      "power": "2843777",
       "stage": "12",
       "stageReward": "",
       "sweepReward": "11117"
@@ -8181,7 +8181,7 @@
       "id": "10118",
       "level": "118",
       "levelReward": "10442",
-      "power": "4026272",
+      "power": "3029709",
       "stage": "12",
       "stageReward": "",
       "sweepReward": "11118"
@@ -8191,7 +8191,7 @@
       "id": "10119",
       "level": "119",
       "levelReward": "10443",
-      "power": "4068375",
+      "power": "3228655",
       "stage": "12",
       "stageReward": "",
       "sweepReward": "11119"
@@ -8201,7 +8201,7 @@
       "id": "10120",
       "level": "120",
       "levelReward": "10444",
-      "power": "4202790",
+      "power": "3441566",
       "stage": "12",
       "stageReward": "10526",
       "sweepReward": "11120"
@@ -8211,7 +8211,7 @@
       "id": "10121",
       "level": "121",
       "levelReward": "10445",
-      "power": "4342032",
+      "power": "2507974",
       "stage": "13",
       "stageReward": "",
       "sweepReward": "11121"
@@ -8221,7 +8221,7 @@
       "id": "10122",
       "level": "122",
       "levelReward": "10446",
-      "power": "4486289",
+      "power": "2665062",
       "stage": "13",
       "stageReward": "",
       "sweepReward": "11122"
@@ -8231,7 +8231,7 @@
       "id": "10123",
       "level": "123",
       "levelReward": "10447",
-      "power": "4635749",
+      "power": "2822150",
       "stage": "13",
       "stageReward": "",
       "sweepReward": "11123"
@@ -8241,7 +8241,7 @@
       "id": "10124",
       "level": "124",
       "levelReward": "10448",
-      "power": "4790689",
+      "power": "2979239",
       "stage": "13",
       "stageReward": "",
       "sweepReward": "11124"
@@ -8251,7 +8251,7 @@
       "id": "10125",
       "level": "125",
       "levelReward": "10449",
-      "power": "4896862",
+      "power": "3136369",
       "stage": "13",
       "stageReward": "",
       "sweepReward": "11125"
@@ -8261,7 +8261,7 @@
       "id": "10126",
       "level": "126",
       "levelReward": "10450",
-      "power": "5005839",
+      "power": "3449281",
       "stage": "13",
       "stageReward": "",
       "sweepReward": "11126"
@@ -8271,7 +8271,7 @@
       "id": "10127",
       "level": "127",
       "levelReward": "10451",
-      "power": "5030234",
+      "power": "3467803",
       "stage": "13",
       "stageReward": "",
       "sweepReward": "11127"
@@ -8281,7 +8281,7 @@
       "id": "10128",
       "level": "128",
       "levelReward": "10452",
-      "power": "5054715",
+      "power": "3486442",
       "stage": "13",
       "stageReward": "",
       "sweepReward": "11128"
@@ -8291,7 +8291,7 @@
       "id": "10129",
       "level": "129",
       "levelReward": "10453",
-      "power": "5358042",
+      "power": "3505156",
       "stage": "13",
       "stageReward": "",
       "sweepReward": "11129"
@@ -8301,7 +8301,7 @@
       "id": "10130",
       "level": "130",
       "levelReward": "10454",
-      "power": "5679938",
+      "power": "3523987",
       "stage": "13",
       "stageReward": "10526",
       "sweepReward": "11130"
@@ -8311,7 +8311,7 @@
       "id": "10131",
       "level": "131",
       "levelReward": "10455",
-      "power": "6021571",
+      "power": "2574206",
       "stage": "14",
       "stageReward": "",
       "sweepReward": "11131"
@@ -8321,7 +8321,7 @@
       "id": "10132",
       "level": "132",
       "levelReward": "10456",
-      "power": "6384179",
+      "power": "2739542",
       "stage": "14",
       "stageReward": "",
       "sweepReward": "11132"
@@ -8331,7 +8331,7 @@
       "id": "10133",
       "level": "133",
       "levelReward": "10457",
-      "power": "6400375",
+      "power": "2904943",
       "stage": "14",
       "stageReward": "",
       "sweepReward": "11133"
@@ -8341,7 +8341,7 @@
       "id": "10134",
       "level": "134",
       "levelReward": "10458",
-      "power": "6416628",
+      "power": "3070450",
       "stage": "14",
       "stageReward": "",
       "sweepReward": "11134"
@@ -8351,7 +8351,7 @@
       "id": "10135",
       "level": "135",
       "levelReward": "10459",
-      "power": "6432959",
+      "power": "3236065",
       "stage": "14",
       "stageReward": "",
       "sweepReward": "11135"
@@ -8361,7 +8361,7 @@
       "id": "10136",
       "level": "136",
       "levelReward": "10460",
-      "power": "6449305",
+      "power": "3561123",
       "stage": "14",
       "stageReward": "",
       "sweepReward": "11136"
@@ -8371,7 +8371,7 @@
       "id": "10137",
       "level": "137",
       "levelReward": "10461",
-      "power": "6502110",
+      "power": "3777813",
       "stage": "14",
       "stageReward": "",
       "sweepReward": "11137"
@@ -8381,7 +8381,7 @@
       "id": "10138",
       "level": "138",
       "levelReward": "10462",
-      "power": "6555329",
+      "power": "4008485",
       "stage": "14",
       "stageReward": "",
       "sweepReward": "11138"
@@ -8391,7 +8391,7 @@
       "id": "10139",
       "level": "139",
       "levelReward": "10463",
-      "power": "6624693",
+      "power": "4254065",
       "stage": "14",
       "stageReward": "",
       "sweepReward": "11139"
@@ -8401,7 +8401,7 @@
       "id": "10140",
       "level": "140",
       "levelReward": "10464",
-      "power": "6694990",
+      "power": "4515478",
       "stage": "14",
       "stageReward": "10526",
       "sweepReward": "11140"
@@ -8411,7 +8411,7 @@
       "id": "10141",
       "level": "141",
       "levelReward": "10465",
-      "power": "6766244",
+      "power": "3286806",
       "stage": "15",
       "stageReward": "",
       "sweepReward": "11141"
@@ -8421,7 +8421,7 @@
       "id": "10142",
       "level": "142",
       "levelReward": "10466",
-      "power": "6838478",
+      "power": "3497764",
       "stage": "15",
       "stageReward": "",
       "sweepReward": "11142"
@@ -8431,7 +8431,7 @@
       "id": "10143",
       "level": "143",
       "levelReward": "10467",
-      "power": "7452418",
+      "power": "3708742",
       "stage": "15",
       "stageReward": "",
       "sweepReward": "11143"
@@ -8441,7 +8441,7 @@
       "id": "10144",
       "level": "144",
       "levelReward": "10468",
-      "power": "8125667",
+      "power": "3919828",
       "stage": "15",
       "stageReward": "",
       "sweepReward": "11144"
@@ -8451,7 +8451,7 @@
       "id": "10145",
       "level": "145",
       "levelReward": "10469",
-      "power": "8248155",
+      "power": "4130978",
       "stage": "15",
       "stageReward": "",
       "sweepReward": "11145"
@@ -8461,7 +8461,7 @@
       "id": "10146",
       "level": "146",
       "levelReward": "10470",
-      "power": "8372573",
+      "power": "4547835",
       "stage": "15",
       "stageReward": "",
       "sweepReward": "11146"
@@ -8471,7 +8471,7 @@
       "id": "10147",
       "level": "147",
       "levelReward": "10471",
-      "power": "8498996",
+      "power": "4795363",
       "stage": "15",
       "stageReward": "",
       "sweepReward": "11147"
@@ -8481,7 +8481,7 @@
       "id": "10148",
       "level": "148",
       "levelReward": "10472",
-      "power": "8627412",
+      "power": "5057234",
       "stage": "15",
       "stageReward": "",
       "sweepReward": "11148"
@@ -8491,7 +8491,7 @@
       "id": "10149",
       "level": "149",
       "levelReward": "10473",
-      "power": "8804557",
+      "power": "5334219",
       "stage": "15",
       "stageReward": "",
       "sweepReward": "11149"
@@ -8501,7 +8501,7 @@
       "id": "10150",
       "level": "150",
       "levelReward": "10474",
-      "power": "8986433",
+      "power": "5627214",
       "stage": "15",
       "stageReward": "10526",
       "sweepReward": "11150"
@@ -8511,7 +8511,7 @@
       "id": "10151",
       "level": "151",
       "levelReward": "10475",
-      "power": "9649498",
+      "power": "4077628",
       "stage": "16",
       "stageReward": "",
       "sweepReward": "11151"
@@ -8521,7 +8521,7 @@
       "id": "10152",
       "level": "152",
       "levelReward": "10476",
-      "power": "10364884",
+      "power": "4337324",
       "stage": "16",
       "stageReward": "",
       "sweepReward": "11152"
@@ -8531,7 +8531,7 @@
       "id": "10153",
       "level": "153",
       "levelReward": "10477",
-      "power": "11136708",
+      "power": "4597021",
       "stage": "16",
       "stageReward": "",
       "sweepReward": "11153"
@@ -8541,7 +8541,7 @@
       "id": "10154",
       "level": "154",
       "levelReward": "10478",
-      "power": "11969384",
+      "power": "4856760",
       "stage": "16",
       "stageReward": "",
       "sweepReward": "11154"
@@ -8551,7 +8551,7 @@
       "id": "10155",
       "level": "155",
       "levelReward": "10479",
-      "power": "11996695",
+      "power": "5116456",
       "stage": "16",
       "stageReward": "",
       "sweepReward": "11155"
@@ -8561,7 +8561,7 @@
       "id": "10156",
       "level": "156",
       "levelReward": "10480",
-      "power": "12024024",
+      "power": "5634649",
       "stage": "16",
       "stageReward": "",
       "sweepReward": "11156"
@@ -8571,7 +8571,7 @@
       "id": "10157",
       "level": "157",
       "levelReward": "10481",
-      "power": "12844816",
+      "power": "5647514",
       "stage": "16",
       "stageReward": "",
       "sweepReward": "11157"
@@ -8581,7 +8581,7 @@
       "id": "10158",
       "level": "158",
       "levelReward": "10482",
-      "power": "13724436",
+      "power": "5660429",
       "stage": "16",
       "stageReward": "",
       "sweepReward": "11158"
@@ -8591,7 +8591,7 @@
       "id": "10159",
       "level": "159",
       "levelReward": "10483",
-      "power": "14667141",
+      "power": "5673376",
       "stage": "16",
       "stageReward": "",
       "sweepReward": "11159"
@@ -8601,7 +8601,7 @@
       "id": "10160",
       "level": "160",
       "levelReward": "10484",
-      "power": "15677461",
+      "power": "5686331",
       "stage": "16",
       "stageReward": "10526",
       "sweepReward": "11160"
@@ -8611,7 +8611,7 @@
       "id": "10161",
       "level": "161",
       "levelReward": "10485",
-      "power": "15808606",
+      "power": "4122899",
       "stage": "17",
       "stageReward": "",
       "sweepReward": "11161"
@@ -8621,7 +8621,7 @@
       "id": "10162",
       "level": "162",
       "levelReward": "10486",
-      "power": "15943856",
+      "power": "4385043",
       "stage": "17",
       "stageReward": "",
       "sweepReward": "11162"
@@ -8631,7 +8631,7 @@
       "id": "10163",
       "level": "163",
       "levelReward": "10487",
-      "power": "16366663",
+      "power": "4647229",
       "stage": "17",
       "stageReward": "",
       "sweepReward": "11163"
@@ -8641,7 +8641,7 @@
       "id": "10164",
       "level": "164",
       "levelReward": "10488",
-      "power": "16801107",
+      "power": "4909415",
       "stage": "17",
       "stageReward": "",
       "sweepReward": "11164"
@@ -8651,7 +8651,7 @@
       "id": "10165",
       "level": "165",
       "levelReward": "10489",
-      "power": "17247468",
+      "power": "5171601",
       "stage": "17",
       "stageReward": "",
       "sweepReward": "11165"
@@ -8661,7 +8661,7 @@
       "id": "10166",
       "level": "166",
       "levelReward": "10490",
-      "power": "17706134",
+      "power": "5694581",
       "stage": "17",
       "stageReward": "",
       "sweepReward": "11166"
@@ -8671,7 +8671,7 @@
       "id": "10167",
       "level": "167",
       "levelReward": "10491",
-      "power": "17838534",
+      "power": "5981664",
       "stage": "17",
       "stageReward": "",
       "sweepReward": "11167"
@@ -8681,7 +8681,7 @@
       "id": "10168",
       "level": "168",
       "levelReward": "10492",
-      "power": "17972598",
+      "power": "6284421",
       "stage": "17",
       "stageReward": "",
       "sweepReward": "11168"
@@ -8691,7 +8691,7 @@
       "id": "10169",
       "level": "169",
       "levelReward": "10493",
-      "power": "18108349",
+      "power": "6603698",
       "stage": "17",
       "stageReward": "",
       "sweepReward": "11169"
@@ -8701,7 +8701,7 @@
       "id": "10170",
       "level": "170",
       "levelReward": "10494",
-      "power": "18245895",
+      "power": "6940352",
       "stage": "17",
       "stageReward": "10526",
       "sweepReward": "11170"
@@ -8711,7 +8711,7 @@
       "id": "10171",
       "level": "171",
       "levelReward": "10495",
-      "power": "18268959",
+      "power": "5009236",
       "stage": "18",
       "stageReward": "",
       "sweepReward": "11171"
@@ -8721,7 +8721,7 @@
       "id": "10172",
       "level": "172",
       "levelReward": "10496",
-      "power": "18292032",
+      "power": "5337886",
       "stage": "18",
       "stageReward": "",
       "sweepReward": "11172"
@@ -8731,7 +8731,7 @@
       "id": "10173",
       "level": "173",
       "levelReward": "10497",
-      "power": "18315135",
+      "power": "5666641",
       "stage": "18",
       "stageReward": "",
       "sweepReward": "11173"
@@ -8741,7 +8741,7 @@
       "id": "10174",
       "level": "174",
       "levelReward": "10498",
-      "power": "18338289",
+      "power": "5995419",
       "stage": "18",
       "stageReward": "",
       "sweepReward": "11174"
@@ -8751,7 +8751,7 @@
       "id": "10175",
       "level": "175",
       "levelReward": "10499",
-      "power": "18361452",
+      "power": "6324283",
       "stage": "18",
       "stageReward": "",
       "sweepReward": "11175"
@@ -8761,7 +8761,7 @@
       "id": "10176",
       "level": "176",
       "levelReward": "10500",
-      "power": "18384644",
+      "power": "6976052",
       "stage": "18",
       "stageReward": "",
       "sweepReward": "11176"
@@ -8771,7 +8771,7 @@
       "id": "10177",
       "level": "177",
       "levelReward": "10501",
-      "power": "18492596",
+      "power": "7029143",
       "stage": "18",
       "stageReward": "",
       "sweepReward": "11177"
@@ -8781,7 +8781,7 @@
       "id": "10178",
       "level": "178",
       "levelReward": "10502",
-      "power": "18601429",
+      "power": "7082647",
       "stage": "18",
       "stageReward": "",
       "sweepReward": "11178"
@@ -8791,7 +8791,7 @@
       "id": "10179",
       "level": "179",
       "levelReward": "10503",
-      "power": "18711163",
+      "power": "7136544",
       "stage": "18",
       "stageReward": "",
       "sweepReward": "11179"
@@ -8801,7 +8801,7 @@
       "id": "10180",
       "level": "180",
       "levelReward": "10504",
-      "power": "18821821",
+      "power": "7190898",
       "stage": "18",
       "stageReward": "10526",
       "sweepReward": "11180"
@@ -8811,7 +8811,7 @@
       "id": "10181",
       "level": "181",
       "levelReward": "10505",
-      "power": "18933426",
+      "power": "5198307",
       "stage": "19",
       "stageReward": "",
       "sweepReward": "11181"
@@ -8821,7 +8821,7 @@
       "id": "10182",
       "level": "182",
       "levelReward": "10506",
-      "power": "19046042",
+      "power": "5531763",
       "stage": "19",
       "stageReward": "",
       "sweepReward": "11182"
@@ -8831,7 +8831,7 @@
       "id": "10183",
       "level": "183",
       "levelReward": "10507",
-      "power": "19226196",
+      "power": "5865176",
       "stage": "19",
       "stageReward": "",
       "sweepReward": "11183"
@@ -8841,7 +8841,7 @@
       "id": "10184",
       "level": "184",
       "levelReward": "10508",
-      "power": "19408099",
+      "power": "6198631",
       "stage": "19",
       "stageReward": "",
       "sweepReward": "11184"
@@ -8851,7 +8851,7 @@
       "id": "10185",
       "level": "185",
       "levelReward": "10509",
-      "power": "19591759",
+      "power": "6532086",
       "stage": "19",
       "stageReward": "",
       "sweepReward": "11185"
@@ -8861,7 +8861,7 @@
       "id": "10186",
       "level": "186",
       "levelReward": "10510",
-      "power": "19777179",
+      "power": "7197841",
       "stage": "19",
       "stageReward": "",
       "sweepReward": "11186"
@@ -8871,7 +8871,7 @@
       "id": "10187",
       "level": "187",
       "levelReward": "10511",
-      "power": "19964323",
+      "power": "7479079",
       "stage": "19",
       "stageReward": "",
       "sweepReward": "11187"
@@ -8881,7 +8881,7 @@
       "id": "10188",
       "level": "188",
       "levelReward": "10512",
-      "power": "20258731",
+      "power": "7772137",
       "stage": "19",
       "stageReward": "",
       "sweepReward": "11188"
@@ -8891,7 +8891,7 @@
       "id": "10189",
       "level": "189",
       "levelReward": "10513",
-      "power": "20559369",
+      "power": "8077483",
       "stage": "19",
       "stageReward": "",
       "sweepReward": "11189"
@@ -8901,7 +8901,7 @@
       "id": "10190",
       "level": "190",
       "levelReward": "10514",
-      "power": "20866486",
+      "power": "8395652",
       "stage": "19",
       "stageReward": "10526",
       "sweepReward": "11190"
@@ -8911,7 +8911,7 @@
       "id": "10191",
       "level": "191",
       "levelReward": "10515",
-      "power": "21180331",
+      "power": "6049904",
       "stage": "20",
       "stageReward": "",
       "sweepReward": "11191"
@@ -8921,7 +8921,7 @@
       "id": "10192",
       "level": "192",
       "levelReward": "10516",
-      "power": "21501107",
+      "power": "6447901",
       "stage": "20",
       "stageReward": "",
       "sweepReward": "11192"
@@ -8931,7 +8931,7 @@
       "id": "10193",
       "level": "193",
       "levelReward": "10517",
-      "power": "22346354",
+      "power": "6845963",
       "stage": "20",
       "stageReward": "",
       "sweepReward": "11193"
@@ -8941,7 +8941,7 @@
       "id": "10194",
       "level": "194",
       "levelReward": "10518",
-      "power": "23233135",
+      "power": "7244089",
       "stage": "20",
       "stageReward": "",
       "sweepReward": "11194"
@@ -8951,7 +8951,7 @@
       "id": "10195",
       "level": "195",
       "levelReward": "10519",
-      "power": "24029038",
+      "power": "7642279",
       "stage": "20",
       "stageReward": "",
       "sweepReward": "11195"
@@ -8961,7 +8961,7 @@
       "id": "10196",
       "level": "196",
       "levelReward": "10520",
-      "power": "24856320",
+      "power": "8432509",
       "stage": "20",
       "stageReward": "",
       "sweepReward": "11196"
@@ -8971,7 +8971,7 @@
       "id": "10197",
       "level": "197",
       "levelReward": "10521",
-      "power": "26297529",
+      "power": "8533315",
       "stage": "20",
       "stageReward": "",
       "sweepReward": "11197"
@@ -8981,7 +8981,7 @@
       "id": "10198",
       "level": "198",
       "levelReward": "10522",
-      "power": "27838957",
+      "power": "8635336",
       "stage": "20",
       "stageReward": "",
       "sweepReward": "11198"
@@ -8991,7 +8991,7 @@
       "id": "10199",
       "level": "199",
       "levelReward": "10523",
-      "power": "28847887",
+      "power": "8738576",
       "stage": "20",
       "stageReward": "",
       "sweepReward": "11199"
@@ -9001,8 +9001,908 @@
       "id": "10200",
       "level": "200",
       "levelReward": "10524",
-      "power": "29896134",
+      "power": "8843060",
       "stage": "20",
+      "stageReward": "10526",
+      "sweepReward": "11200"
+    },
+    "10201": {
+      "Lineup": "2010501|2010502|2010503|2010504|2010505",
+      "id": "10201",
+      "level": "201",
+      "levelReward": "10515",
+      "power": "6382841",
+      "stage": "21",
+      "stageReward": "",
+      "sweepReward": "11191"
+    },
+    "10202": {
+      "Lineup": "2020501|2020502|2020503|2020504|2020505",
+      "id": "10202",
+      "level": "202",
+      "levelReward": "10516",
+      "power": "6800981",
+      "stage": "21",
+      "stageReward": "",
+      "sweepReward": "11192"
+    },
+    "10203": {
+      "Lineup": "2030501|2030502|2030503|2030504|2030505",
+      "id": "10203",
+      "level": "203",
+      "levelReward": "10517",
+      "power": "7219185",
+      "stage": "21",
+      "stageReward": "",
+      "sweepReward": "11193"
+    },
+    "10204": {
+      "Lineup": "2040501|2040502|2040503|2040504|2040505",
+      "id": "10204",
+      "level": "204",
+      "levelReward": "10518",
+      "power": "7637518",
+      "stage": "21",
+      "stageReward": "",
+      "sweepReward": "11194"
+    },
+    "10205": {
+      "Lineup": "2050501|2050502|2050503|2050504|2050505",
+      "id": "10205",
+      "level": "205",
+      "levelReward": "10519",
+      "power": "8055873",
+      "stage": "21",
+      "stageReward": "",
+      "sweepReward": "11195"
+    },
+    "10206": {
+      "Lineup": "2060501|2060502|2060503|2060504|2060505",
+      "id": "10206",
+      "level": "206",
+      "levelReward": "10520",
+      "power": "8885489",
+      "stage": "21",
+      "stageReward": "",
+      "sweepReward": "11196"
+    },
+    "10207": {
+      "Lineup": "2070501|2070502|2070503|2070504|2070505",
+      "id": "10207",
+      "level": "207",
+      "levelReward": "10521",
+      "power": "9371273",
+      "stage": "21",
+      "stageReward": "",
+      "sweepReward": "11197"
+    },
+    "10208": {
+      "Lineup": "2080501|2080502|2080503|2080504|2080505",
+      "id": "10208",
+      "level": "208",
+      "levelReward": "10522",
+      "power": "9884973",
+      "stage": "21",
+      "stageReward": "",
+      "sweepReward": "11198"
+    },
+    "10209": {
+      "Lineup": "2090501|2090502|2090503|2090504|2090505",
+      "id": "10209",
+      "level": "209",
+      "levelReward": "10523",
+      "power": "10428199",
+      "stage": "21",
+      "stageReward": "",
+      "sweepReward": "11199"
+    },
+    "10210": {
+      "Lineup": "2100501|2100502|2100503|2100504|2100505",
+      "id": "10210",
+      "level": "210",
+      "levelReward": "10524",
+      "power": "11002614",
+      "stage": "21",
+      "stageReward": "10526",
+      "sweepReward": "11200"
+    },
+    "10211": {
+      "Lineup": "2110501|2110502|2110503|2110504|2110505",
+      "id": "10211",
+      "level": "211",
+      "levelReward": "10515",
+      "power": "7916889",
+      "stage": "22",
+      "stageReward": "",
+      "sweepReward": "11191"
+    },
+    "10212": {
+      "Lineup": "2120501|2120502|2120503|2120504|2120505",
+      "id": "10212",
+      "level": "212",
+      "levelReward": "10516",
+      "power": "8440024",
+      "stage": "22",
+      "stageReward": "",
+      "sweepReward": "11192"
+    },
+    "10213": {
+      "Lineup": "2130501|2130502|2130503|2130504|2130505",
+      "id": "10213",
+      "level": "213",
+      "levelReward": "10517",
+      "power": "8963200",
+      "stage": "22",
+      "stageReward": "",
+      "sweepReward": "11193"
+    },
+    "10214": {
+      "Lineup": "2140501|2140502|2140503|2140504|2140505",
+      "id": "10214",
+      "level": "214",
+      "levelReward": "10518",
+      "power": "9486506",
+      "stage": "22",
+      "stageReward": "",
+      "sweepReward": "11194"
+    },
+    "10215": {
+      "Lineup": "2150501|2150502|2150503|2150504|2150505",
+      "id": "10215",
+      "level": "215",
+      "levelReward": "10519",
+      "power": "10009896",
+      "stage": "22",
+      "stageReward": "",
+      "sweepReward": "11195"
+    },
+    "10216": {
+      "Lineup": "2160501|2160502|2160503|2160504|2160505",
+      "id": "10216",
+      "level": "216",
+      "levelReward": "10520",
+      "power": "11048921",
+      "stage": "22",
+      "stageReward": "",
+      "sweepReward": "11196"
+    },
+    "10217": {
+      "Lineup": "2170501|2170502|2170503|2170504|2170505",
+      "id": "10217",
+      "level": "217",
+      "levelReward": "10521",
+      "power": "11539455",
+      "stage": "22",
+      "stageReward": "",
+      "sweepReward": "11197"
+    },
+    "10218": {
+      "Lineup": "2180501|2180502|2180503|2180504|2180505",
+      "id": "10218",
+      "level": "218",
+      "levelReward": "10522",
+      "power": "12052676",
+      "stage": "22",
+      "stageReward": "",
+      "sweepReward": "11198"
+    },
+    "10219": {
+      "Lineup": "2190501|2190502|2190503|2190504|2190505",
+      "id": "10219",
+      "level": "219",
+      "levelReward": "10523",
+      "power": "12589624",
+      "stage": "22",
+      "stageReward": "",
+      "sweepReward": "11199"
+    },
+    "10220": {
+      "Lineup": "2200501|2200502|2200503|2200504|2200505",
+      "id": "10220",
+      "level": "220",
+      "levelReward": "10524",
+      "power": "13151393",
+      "stage": "22",
+      "stageReward": "10526",
+      "sweepReward": "11200"
+    },
+    "10221": {
+      "Lineup": "2210501|2210502|2210503|2210504|2210505",
+      "id": "10221",
+      "level": "221",
+      "levelReward": "10515",
+      "power": "9445251",
+      "stage": "23",
+      "stageReward": "",
+      "sweepReward": "11191"
+    },
+    "10222": {
+      "Lineup": "2220501|2220502|2220503|2220504|2220505",
+      "id": "10222",
+      "level": "222",
+      "levelReward": "10516",
+      "power": "10072474",
+      "stage": "23",
+      "stageReward": "",
+      "sweepReward": "11192"
+    },
+    "10223": {
+      "Lineup": "2230501|2230502|2230503|2230504|2230505",
+      "id": "10223",
+      "level": "223",
+      "levelReward": "10517",
+      "power": "10699739",
+      "stage": "23",
+      "stageReward": "",
+      "sweepReward": "11193"
+    },
+    "10224": {
+      "Lineup": "2240501|2240502|2240503|2240504|2240505",
+      "id": "10224",
+      "level": "224",
+      "levelReward": "10518",
+      "power": "11327133",
+      "stage": "23",
+      "stageReward": "",
+      "sweepReward": "11194"
+    },
+    "10225": {
+      "Lineup": "2250501|2250502|2250503|2250504|2250505",
+      "id": "10225",
+      "level": "225",
+      "levelReward": "10519",
+      "power": "11954569",
+      "stage": "23",
+      "stageReward": "",
+      "sweepReward": "11195"
+    },
+    "10226": {
+      "Lineup": "2260501|2260502|2260503|2260504|2260505",
+      "id": "10226",
+      "level": "226",
+      "levelReward": "10520",
+      "power": "13201150",
+      "stage": "23",
+      "stageReward": "",
+      "sweepReward": "11196"
+    },
+    "10227": {
+      "Lineup": "2270501|2270502|2270503|2270504|2270505",
+      "id": "10227",
+      "level": "227",
+      "levelReward": "10521",
+      "power": "13751232",
+      "stage": "23",
+      "stageReward": "",
+      "sweepReward": "11197"
+    },
+    "10228": {
+      "Lineup": "2280501|2280502|2280503|2280504|2280505",
+      "id": "10228",
+      "level": "228",
+      "levelReward": "10522",
+      "power": "14325097",
+      "stage": "23",
+      "stageReward": "",
+      "sweepReward": "11198"
+    },
+    "10229": {
+      "Lineup": "2290501|2290502|2290503|2290504|2290505",
+      "id": "10229",
+      "level": "229",
+      "levelReward": "10523",
+      "power": "14923797",
+      "stage": "23",
+      "stageReward": "",
+      "sweepReward": "11199"
+    },
+    "10230": {
+      "Lineup": "2300501|2300502|2300503|2300504|2300505",
+      "id": "10230",
+      "level": "230",
+      "levelReward": "10524",
+      "power": "15548399",
+      "stage": "23",
+      "stageReward": "10526",
+      "sweepReward": "11200"
+    },
+    "10231": {
+      "Lineup": "2310501|2310502|2310503|2310504|2310505",
+      "id": "10231",
+      "level": "231",
+      "levelReward": "10515",
+      "power": "11141986",
+      "stage": "24",
+      "stageReward": "",
+      "sweepReward": "11191"
+    },
+    "10232": {
+      "Lineup": "2320501|2320502|2320503|2320504|2320505",
+      "id": "10232",
+      "level": "232",
+      "levelReward": "10516",
+      "power": "11878146",
+      "stage": "24",
+      "stageReward": "",
+      "sweepReward": "11192"
+    },
+    "10233": {
+      "Lineup": "2330501|2330502|2330503|2330504|2330505",
+      "id": "10233",
+      "level": "233",
+      "levelReward": "10517",
+      "power": "12614304",
+      "stage": "24",
+      "stageReward": "",
+      "sweepReward": "11193"
+    },
+    "10234": {
+      "Lineup": "2340501|2340502|2340503|2340504|2340505",
+      "id": "10234",
+      "level": "234",
+      "levelReward": "10518",
+      "power": "13350421",
+      "stage": "24",
+      "stageReward": "",
+      "sweepReward": "11194"
+    },
+    "10235": {
+      "Lineup": "2350501|2350502|2350503|2350504|2350505",
+      "id": "10235",
+      "level": "235",
+      "levelReward": "10519",
+      "power": "14086580",
+      "stage": "24",
+      "stageReward": "",
+      "sweepReward": "11195"
+    },
+    "10236": {
+      "Lineup": "2360501|2360502|2360503|2360504|2360505",
+      "id": "10236",
+      "level": "236",
+      "levelReward": "10520",
+      "power": "15557399",
+      "stage": "24",
+      "stageReward": "",
+      "sweepReward": "11196"
+    },
+    "10237": {
+      "Lineup": "2370501|2370502|2370503|2370504|2370505",
+      "id": "10237",
+      "level": "237",
+      "levelReward": "10521",
+      "power": "15673845",
+      "stage": "24",
+      "stageReward": "",
+      "sweepReward": "11197"
+    },
+    "10238": {
+      "Lineup": "2380501|2380502|2380503|2380504|2380505",
+      "id": "10238",
+      "level": "238",
+      "levelReward": "10522",
+      "power": "15791211",
+      "stage": "24",
+      "stageReward": "",
+      "sweepReward": "11198"
+    },
+    "10239": {
+      "Lineup": "2390501|2390502|2390503|2390504|2390505",
+      "id": "10239",
+      "level": "239",
+      "levelReward": "10523",
+      "power": "15909477",
+      "stage": "24",
+      "stageReward": "",
+      "sweepReward": "11199"
+    },
+    "10240": {
+      "Lineup": "2400501|2400502|2400503|2400504|2400505",
+      "id": "10240",
+      "level": "240",
+      "levelReward": "10524",
+      "power": "16028625",
+      "stage": "24",
+      "stageReward": "10526",
+      "sweepReward": "11200"
+    },
+    "10241": {
+      "Lineup": "2410501|2410502|2410503|2410504|2410505",
+      "id": "10241",
+      "level": "241",
+      "levelReward": "10515",
+      "power": "11489811",
+      "stage": "25",
+      "stageReward": "",
+      "sweepReward": "11191"
+    },
+    "10242": {
+      "Lineup": "2420501|2420502|2420503|2420504|2420505",
+      "id": "10242",
+      "level": "242",
+      "levelReward": "10516",
+      "power": "12256433",
+      "stage": "25",
+      "stageReward": "",
+      "sweepReward": "11192"
+    },
+    "10243": {
+      "Lineup": "2430501|2430502|2430503|2430504|2430505",
+      "id": "10243",
+      "level": "243",
+      "levelReward": "10517",
+      "power": "13023141",
+      "stage": "25",
+      "stageReward": "",
+      "sweepReward": "11193"
+    },
+    "10244": {
+      "Lineup": "2440501|2440502|2440503|2440504|2440505",
+      "id": "10244",
+      "level": "244",
+      "levelReward": "10518",
+      "power": "13789957",
+      "stage": "25",
+      "stageReward": "",
+      "sweepReward": "11194"
+    },
+    "10245": {
+      "Lineup": "2450501|2450502|2450503|2450504|2450505",
+      "id": "10245",
+      "level": "245",
+      "levelReward": "10519",
+      "power": "14556901",
+      "stage": "25",
+      "stageReward": "",
+      "sweepReward": "11195"
+    },
+    "10246": {
+      "Lineup": "2460501|2460502|2460503|2460504|2460505",
+      "id": "10246",
+      "level": "246",
+      "levelReward": "10520",
+      "power": "16081789",
+      "stage": "25",
+      "stageReward": "",
+      "sweepReward": "11196"
+    },
+    "10247": {
+      "Lineup": "2470501|2470502|2470503|2470504|2470505",
+      "id": "10247",
+      "level": "247",
+      "levelReward": "10521",
+      "power": "16678542",
+      "stage": "25",
+      "stageReward": "",
+      "sweepReward": "11197"
+    },
+    "10248": {
+      "Lineup": "2480501|2480502|2480503|2480504|2480505",
+      "id": "10248",
+      "level": "248",
+      "levelReward": "10522",
+      "power": "17298143",
+      "stage": "25",
+      "stageReward": "",
+      "sweepReward": "11198"
+    },
+    "10249": {
+      "Lineup": "2490501|2490502|2490503|2490504|2490505",
+      "id": "10249",
+      "level": "249",
+      "levelReward": "10523",
+      "power": "17941507",
+      "stage": "25",
+      "stageReward": "",
+      "sweepReward": "11199"
+    },
+    "10250": {
+      "Lineup": "2500501|2500502|2500503|2500504|2500505",
+      "id": "10250",
+      "level": "250",
+      "levelReward": "10524",
+      "power": "18609561",
+      "stage": "25",
+      "stageReward": "10526",
+      "sweepReward": "11200"
+    },
+    "10251": {
+      "Lineup": "2510501|2510502|2510503|2510504|2510505",
+      "id": "10251",
+      "level": "251",
+      "levelReward": "10515",
+      "power": "13326896",
+      "stage": "26",
+      "stageReward": "",
+      "sweepReward": "11191"
+    },
+    "10252": {
+      "Lineup": "2520501|2520502|2520503|2520504|2520505",
+      "id": "10252",
+      "level": "252",
+      "levelReward": "10516",
+      "power": "14221455",
+      "stage": "26",
+      "stageReward": "",
+      "sweepReward": "11192"
+    },
+    "10253": {
+      "Lineup": "2530501|2530502|2530503|2530504|2530505",
+      "id": "10253",
+      "level": "253",
+      "levelReward": "10517",
+      "power": "15116121",
+      "stage": "26",
+      "stageReward": "",
+      "sweepReward": "11193"
+    },
+    "10254": {
+      "Lineup": "2540501|2540502|2540503|2540504|2540505",
+      "id": "10254",
+      "level": "254",
+      "levelReward": "10518",
+      "power": "16010979",
+      "stage": "26",
+      "stageReward": "",
+      "sweepReward": "11194"
+    },
+    "10255": {
+      "Lineup": "2550501|2550502|2550503|2550504|2550505",
+      "id": "10255",
+      "level": "255",
+      "levelReward": "10519",
+      "power": "16905987",
+      "stage": "26",
+      "stageReward": "",
+      "sweepReward": "11195"
+    },
+    "10256": {
+      "Lineup": "2560501|2560502|2560503|2560504|2560505",
+      "id": "10256",
+      "level": "256",
+      "levelReward": "10520",
+      "power": "18683576",
+      "stage": "26",
+      "stageReward": "",
+      "sweepReward": "11196"
+    },
+    "10257": {
+      "Lineup": "2570501|2570502|2570503|2570504|2570505",
+      "id": "10257",
+      "level": "257",
+      "levelReward": "10521",
+      "power": "19496321",
+      "stage": "26",
+      "stageReward": "",
+      "sweepReward": "11197"
+    },
+    "10258": {
+      "Lineup": "2580501|2580502|2580503|2580504|2580505",
+      "id": "10258",
+      "level": "258",
+      "levelReward": "10522",
+      "power": "20345477",
+      "stage": "26",
+      "stageReward": "",
+      "sweepReward": "11198"
+    },
+    "10259": {
+      "Lineup": "2590501|2590502|2590503|2590504|2590505",
+      "id": "10259",
+      "level": "259",
+      "levelReward": "10523",
+      "power": "21232685",
+      "stage": "26",
+      "stageReward": "",
+      "sweepReward": "11199"
+    },
+    "10260": {
+      "Lineup": "2600501|2600502|2600503|2600504|2600505",
+      "id": "10260",
+      "level": "260",
+      "levelReward": "10524",
+      "power": "22159736",
+      "stage": "26",
+      "stageReward": "10526",
+      "sweepReward": "11200"
+    },
+    "10261": {
+      "Lineup": "2610501|2610502|2610503|2610504|2610505",
+      "id": "10261",
+      "level": "261",
+      "levelReward": "10515",
+      "power": "15875306",
+      "stage": "27",
+      "stageReward": "",
+      "sweepReward": "11191"
+    },
+    "10262": {
+      "Lineup": "2620501|2620502|2620503|2620504|2620505",
+      "id": "10262",
+      "level": "262",
+      "levelReward": "10516",
+      "power": "16967529",
+      "stage": "27",
+      "stageReward": "",
+      "sweepReward": "11192"
+    },
+    "10263": {
+      "Lineup": "2630501|2630502|2630503|2630504|2630505",
+      "id": "10263",
+      "level": "263",
+      "levelReward": "10517",
+      "power": "18061081",
+      "stage": "27",
+      "stageReward": "",
+      "sweepReward": "11193"
+    },
+    "10264": {
+      "Lineup": "2640501|2640502|2640503|2640504|2640505",
+      "id": "10264",
+      "level": "264",
+      "levelReward": "10518",
+      "power": "19156004",
+      "stage": "27",
+      "stageReward": "",
+      "sweepReward": "11194"
+    },
+    "10265": {
+      "Lineup": "2650501|2650502|2650503|2650504|2650505",
+      "id": "10265",
+      "level": "265",
+      "levelReward": "10519",
+      "power": "20252298",
+      "stage": "27",
+      "stageReward": "",
+      "sweepReward": "11195"
+    },
+    "10266": {
+      "Lineup": "2660501|2660502|2660503|2660504|2660505",
+      "id": "10266",
+      "level": "266",
+      "levelReward": "10520",
+      "power": "22403744",
+      "stage": "27",
+      "stageReward": "",
+      "sweepReward": "11196"
+    },
+    "10267": {
+      "Lineup": "2670501|2670502|2670503|2670504|2670505",
+      "id": "10267",
+      "level": "267",
+      "levelReward": "10521",
+      "power": "24575559",
+      "stage": "27",
+      "stageReward": "",
+      "sweepReward": "11197"
+    },
+    "10268": {
+      "Lineup": "2680501|2680502|2680503|2680504|2680505",
+      "id": "10268",
+      "level": "268",
+      "levelReward": "10522",
+      "power": "26963471",
+      "stage": "27",
+      "stageReward": "",
+      "sweepReward": "11198"
+    },
+    "10269": {
+      "Lineup": "2690501|2690502|2690503|2690504|2690505",
+      "id": "10269",
+      "level": "269",
+      "levelReward": "10523",
+      "power": "29589154",
+      "stage": "27",
+      "stageReward": "",
+      "sweepReward": "11199"
+    },
+    "10270": {
+      "Lineup": "2700501|2700502|2700503|2700504|2700505",
+      "id": "10270",
+      "level": "270",
+      "levelReward": "10524",
+      "power": "32476577",
+      "stage": "27",
+      "stageReward": "10526",
+      "sweepReward": "11200"
+    },
+    "10271": {
+      "Lineup": "2710501|2710502|2710503|2710504|2710505",
+      "id": "10271",
+      "level": "271",
+      "levelReward": "10515",
+      "power": "23289018",
+      "stage": "28",
+      "stageReward": "",
+      "sweepReward": "11191"
+    },
+    "10272": {
+      "Lineup": "2720501|2720502|2720503|2720504|2720505",
+      "id": "10272",
+      "level": "272",
+      "levelReward": "10516",
+      "power": "24941335",
+      "stage": "28",
+      "stageReward": "",
+      "sweepReward": "11192"
+    },
+    "10273": {
+      "Lineup": "2730501|2730502|2730503|2730504|2730505",
+      "id": "10273",
+      "level": "273",
+      "levelReward": "10517",
+      "power": "26600401",
+      "stage": "28",
+      "stageReward": "",
+      "sweepReward": "11193"
+    },
+    "10274": {
+      "Lineup": "2740501|2740502|2740503|2740504|2740505",
+      "id": "10274",
+      "level": "274",
+      "levelReward": "10518",
+      "power": "28266604",
+      "stage": "28",
+      "stageReward": "",
+      "sweepReward": "11194"
+    },
+    "10275": {
+      "Lineup": "2750501|2750502|2750503|2750504|2750505",
+      "id": "10275",
+      "level": "275",
+      "levelReward": "10519",
+      "power": "29940500",
+      "stage": "28",
+      "stageReward": "",
+      "sweepReward": "11195"
+    },
+    "10276": {
+      "Lineup": "2760501|2760502|2760503|2760504|2760505",
+      "id": "10276",
+      "level": "276",
+      "levelReward": "10520",
+      "power": "33170156",
+      "stage": "28",
+      "stageReward": "",
+      "sweepReward": "11196"
+    },
+    "10277": {
+      "Lineup": "2770501|2770502|2770503|2770504|2770505",
+      "id": "10277",
+      "level": "277",
+      "levelReward": "10521",
+      "power": "35533444",
+      "stage": "28",
+      "stageReward": "",
+      "sweepReward": "11197"
+    },
+    "10278": {
+      "Lineup": "2780501|2780502|2780503|2780504|2780505",
+      "id": "10278",
+      "level": "278",
+      "levelReward": "10522",
+      "power": "38065206",
+      "stage": "28",
+      "stageReward": "",
+      "sweepReward": "11198"
+    },
+    "10279": {
+      "Lineup": "2790501|2790502|2790503|2790504|2790505",
+      "id": "10279",
+      "level": "279",
+      "levelReward": "10523",
+      "power": "40777491",
+      "stage": "28",
+      "stageReward": "",
+      "sweepReward": "11199"
+    },
+    "10280": {
+      "Lineup": "2800501|2800502|2800503|2800504|2800505",
+      "id": "10280",
+      "level": "280",
+      "levelReward": "10524",
+      "power": "43683133",
+      "stage": "28",
+      "stageReward": "10526",
+      "sweepReward": "11200"
+    },
+    "10281": {
+      "Lineup": "2810501|2810502|2810503|2810504|2810505",
+      "id": "10281",
+      "level": "281",
+      "levelReward": "10515",
+      "power": "31513931",
+      "stage": "29",
+      "stageReward": "",
+      "sweepReward": "11191"
+    },
+    "10282": {
+      "Lineup": "2820501|2820502|2820503|2820504|2820505",
+      "id": "10282",
+      "level": "282",
+      "levelReward": "10516",
+      "power": "33639625",
+      "stage": "29",
+      "stageReward": "",
+      "sweepReward": "11192"
+    },
+    "10283": {
+      "Lineup": "2830501|2830502|2830503|2830504|2830505",
+      "id": "10283",
+      "level": "283",
+      "levelReward": "10517",
+      "power": "35767718",
+      "stage": "29",
+      "stageReward": "",
+      "sweepReward": "11193"
+    },
+    "10284": {
+      "Lineup": "2840501|2840502|2840503|2840504|2840505",
+      "id": "10284",
+      "level": "284",
+      "levelReward": "10518",
+      "power": "37898232",
+      "stage": "29",
+      "stageReward": "",
+      "sweepReward": "11194"
+    },
+    "10285": {
+      "Lineup": "2850501|2850502|2850503|2850504|2850505",
+      "id": "10285",
+      "level": "285",
+      "levelReward": "10519",
+      "power": "40031339",
+      "stage": "29",
+      "stageReward": "",
+      "sweepReward": "11195"
+    },
+    "10286": {
+      "Lineup": "2860501|2860502|2860503|2860504|2860505",
+      "id": "10286",
+      "level": "286",
+      "levelReward": "10520",
+      "power": "44208861",
+      "stage": "29",
+      "stageReward": "",
+      "sweepReward": "11196"
+    },
+    "10287": {
+      "Lineup": "2870501|2870502|2870503|2870504|2870505",
+      "id": "10287",
+      "level": "287",
+      "levelReward": "10521",
+      "power": "46126221",
+      "stage": "29",
+      "stageReward": "",
+      "sweepReward": "11197"
+    },
+    "10288": {
+      "Lineup": "2880501|2880502|2880503|2880504|2880505",
+      "id": "10288",
+      "level": "288",
+      "levelReward": "10522",
+      "power": "48127551",
+      "stage": "29",
+      "stageReward": "",
+      "sweepReward": "11198"
+    },
+    "10289": {
+      "Lineup": "2890501|2890502|2890503|2890504|2890505",
+      "id": "10289",
+      "level": "289",
+      "levelReward": "10523",
+      "power": "50216531",
+      "stage": "29",
+      "stageReward": "",
+      "sweepReward": "11199"
+    },
+    "10290": {
+      "Lineup": "2900501|2900502|2900503|2900504|2900505",
+      "id": "10290",
+      "level": "290",
+      "levelReward": "10524",
+      "power": "52397003",
+      "stage": "29",
       "stageReward": "10526",
       "sweepReward": "11200"
     }

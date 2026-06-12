@@ -11,6 +11,7 @@ import (
 	"github.com/drop/GoServer/server/logic/platform/nodeConfig"
 	"github.com/drop/GoServer/server/service/logger"
 	"github.com/drop/GoServer/server/service/serviceInterface"
+	"github.com/drop/GoServer/server/tool"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -173,9 +174,18 @@ func (l *LoginMessageProcessor) PushMessage(session serviceInterface.SessionInte
 		logger.ErrorBySprintf("[loginProcessor] PushMessage nil session")
 		return
 	}
-	index := int(session.GetID() % int64(l.processorNum))
+	gameSession, ok := session.(*logicSessionManager.GameSession)
+	if !ok || gameSession == nil {
+		logger.ErrorBySprintf("[loginProcessor] PushMessage invalid game session msgId:%d", msgID)
+		return
+	}
+	if gameSession.UserId <= 0 {
+		logger.ErrorBySprintf("[loginProcessor] PushMessage invalid userId:%d msgId:%d", gameSession.UserId, msgID)
+		return
+	}
+	index := tool.HashIndexByInt64(gameSession.UserId, l.processorNum)
 	if index < 0 || index >= l.processorNum {
-		logger.ErrorBySprintf("[loginProcessor] login index out of range sessionId:%d,msgId:%d", session.GetID(), msgID)
+		logger.ErrorBySprintf("[loginProcessor] login index out of range userId:%d,msgId:%d", gameSession.UserId, msgID)
 		return
 	}
 	handler := l.messageHandlerMap[msgID]

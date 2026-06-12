@@ -29,7 +29,7 @@ func RegisterSocialRpcServer(s *grpc.Server) {
 	rpcPb.RegisterSocialServiceServer(s, &SocialRpcServer{})
 }
 
-func NotifyAllianceOperationToGateway(playerId int64, allianceId int64, oper pb.ALLIANCE_CHANGE_OPER) {
+func NotifyAllianceOperationToGateway(playerId int64, allianceId int64, oper pb.ALLIANCE_CHANGE_OPER, items []*rpcPb.ItemInfo) {
 	client, err := ServerNodeService.GetGatewayClient()
 	if err != nil {
 		logger.ErrorBySprintf("[grpc] get gateway client error: %v,playerId:%d,allianceId:%d,oper:%d", err, playerId, allianceId, oper)
@@ -38,11 +38,15 @@ func NotifyAllianceOperationToGateway(playerId int64, allianceId int64, oper pb.
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 		defer cancel()
-		_, err := client.NotifyAllianceChange(ctx, &rpcPb.NotifyAllianceChangeReq{
+		req := &rpcPb.NotifyAllianceChangeReq{
 			UserId:     playerId,
 			AllianceId: allianceId,
 			ChangeOper: int32(oper),
-		})
+		}
+		if oper == pb.ALLIANCE_CHANGE_OPER_ITEM_CHANGE {
+			req.Items = items
+		}
+		_, err := client.NotifyAllianceChange(ctx, req)
 		if err != nil {
 			logger.ErrorBySprintf("BroadcastOperationToGameNode error: %v", err)
 			return

@@ -8,6 +8,7 @@ package idle
 import (
 	"encoding/json"
 	"errors"
+
 	"github.com/drop/GoServer/server/logic/logicCommon"
 
 	"github.com/drop/GoServer/server/enum"
@@ -133,21 +134,24 @@ func (s *IdleServer) QuickClaim(player *model.PlayerModel, idleType int32) ([]*p
 
 	// 今日最大可领取次数（考虑解锁），所有类型共享总次数上限
 	maxCount := s.getMaxQuickClaimCount(player)
-
+	nextClaimId := int32(0)
+	var quickClaimCfg *gameConfig.IdleQuickClaimCfg
 	// 当前领取序号：统计今日已快速领取总次数（普通+广告）
-	nextClaimId := entity.QuickClaimCount + 1
-	if maxCount > 0 && nextClaimId > maxCount {
-		return nil, nil, errors.New("quick claim config not found")
-	}
-	quickClaimCfg := gameConfig.GetIdleQuickClaimCfg(nextClaimId)
-	if quickClaimCfg == nil {
-		return nil, nil, errors.New("quick claim config not found")
-	}
+	if idleType == idleTypeNormal {
+		nextClaimId = entity.QuickClaimCount + 1
+		if maxCount > 0 && nextClaimId > maxCount {
+			return nil, nil, errors.New("quick claim config not found")
+		}
+		quickClaimCfg = gameConfig.GetIdleQuickClaimCfg(nextClaimId)
+		if quickClaimCfg == nil {
+			return nil, nil, errors.New("quick claim config not found")
+		}
 
-	// 检查解锁条件
-	if quickClaimCfg.UnlockId > 0 {
-		if !s.unlockService.CheckUnlock(quickClaimCfg.UnlockId, player) {
-			return nil, nil, errors.New("quick claim not unlocked")
+		// 检查解锁条件
+		if quickClaimCfg.UnlockId > 0 {
+			if !s.unlockService.CheckUnlock(quickClaimCfg.UnlockId, player) {
+				return nil, nil, errors.New("quick claim not unlocked")
+			}
 		}
 	}
 

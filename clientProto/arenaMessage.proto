@@ -1,0 +1,63 @@
+syntax = "proto3";
+package pb;       // 包名对应Go的生成路径
+option go_package = "../logic/pb;pb";
+import "commonMessage.proto";
+
+// 获取对战日志
+message GetArenaLogReq {
+
+}
+
+// 获取对战日志
+message GetArenaLogResp {
+    repeated ArenaLog areaLogs = 1;
+}
+
+message ArenaLog {
+  OpponentBasicInfo opponent = 1;
+  int32 changeScore = 2;
+  int64 battleTime = 3;
+}
+
+message GetChallengeListReq {
+
+}
+
+message GetChallengeListResp {
+  repeated OpponentBasicInfo opponents = 1;
+}
+
+message OpponentBasicInfo {
+  PlayerBasicInfo opponent = 1;
+  int64 opponentBattlePower = 2;
+  int32 opponentScore = 3;
+  repeated HeroShowInfo heroes = 4;
+  int32 isRobot = 5;
+}
+
+message StartArenaBattleReq {
+  int64 opponentId = 1;
+  int32 IsRevenge = 2;
+}
+
+message StartArenaBattleResp {
+  SceneBasicInfo data = 1;
+}
+
+message RefreshChallengeListReq {
+
+}
+
+message RefreshChallengeListResp {
+  repeated OpponentBasicInfo opponents = 1;
+}
+
+message GetArenaInfoReq{
+
+}
+
+message GetArenaInfoResp{
+  int32 score = 1;
+  int32 refreshTime = 2;
+  int32 freeChallengeTime = 3;
+}

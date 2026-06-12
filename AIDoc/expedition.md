@@ -33,10 +33,11 @@
   - `last_recovery_stamina_time`
   - `daily_free_stamina_times`
   - `last_daily_free_stamina_time`
-  - `monster_refresh_count`（json，`monsterId -> 当日已刷新次数`）
+  - `monster_refresh_count`（json，`monsterId -> 当日已战斗完成次数`）
 - `player_expedition_battlefield_data`（`ExpeditionBattlefieldEntity`）
   - `battlefield_id`
   - `battlefield_level`
+  - `battlefield_max_level`
   - `battle_point_infos`（json，`pointId -> PointInfo`）
 - `player_expedition_slot_data`（`ExpeditionSlotEntity`）
   - `slot_id`
@@ -64,6 +65,10 @@
 1. 计算可用槽位数：`默认1 + 已购买派遣编队 + VIP特权(最多再+2)`。
 2. `CheckExpeditionUnlock(slotNum)`：
    - 初始化已解锁战场数据（按 `cityDispatch(level=1)` 的 unlock 条件）
+   - 计算战场当前已解锁最大等级 `BattlefieldMaxLevel`
+   - 新战场按当前已解锁最大等级初始化 `BattlefieldLevel/BattlefieldMaxLevel` 与点位
+   - 已有战场解锁更高等级时，更新 `battlefield_max_level`，并同步 `battlefield_level` 到新最大等级
+   - 最大等级提升时，移除当前 `Idle` 点位，保留 `Busy/Reward` 点位，按新等级配置刷新空点位
    - 确保 `1..slotNum` 的槽位行存在
 3. 返回：
    - 战场列表（含点位 monsterId/nextRefreshTime/isReward）
@@ -129,7 +134,8 @@
 
 1. 校验目标 `battlefieldId+level` 配置存在且解锁条件满足
 2. 更新 `battlefield_level`
-3. 不立即重置现有点位，后续刷怪周期按新等级配置生效
+3. 手动切换等级不立即重置现有点位，后续普通刷怪周期按新等级配置生效
+4. 最高等级自动解锁不由本协议触发，而是在进入出征信息时的 `CheckExpeditionUnlock` 中处理
 
 ### 3.8 免费体力 `ExpeditionClaimFreeStaminaReq`
 
@@ -145,7 +151,7 @@
 
 - `daily_free_stamina_times = 0`
 - `last_daily_free_stamina_time = 0`
-- `monster_refresh_count = {}`（清当日怪物刷新计数）
+- `monster_refresh_count = {}`（清当日怪物战斗完成计数）
 
 ### 4.2 体力自然恢复
 
@@ -162,7 +168,7 @@
 - 点位刷新：
   - `Idle` 且过期（`now > nextRefreshTime`）的点位被移除
   - 根据配置补足 `AllMonsterNum`，新怪物写入空点位
-  - 怪物选择受 `monster_refresh_count` 与怪物 `Max` 限制
+  - 怪物选择受“当日已战斗完成次数 + 当前已刷出但未完成的 `Idle/Busy` 数量 + 本轮新刷出数量”与怪物 `Max` 限制
   - 推送 `ExpeditionChangePush` 点位变化
 
 ## 5. 怪物刷新与掉落规则
@@ -175,11 +181,21 @@
   - 候选怪物 `CityMonsterID` 及权重 `Probability`
   - 点位生命周期CD `Cd`
 - 每次补点时，`randomMonster`：
-  - 过滤掉当日达到 `cityMonster.Max` 的怪物
+  - 使用临时限制计数过滤达到 `cityMonster.Max` 的怪物
+  - 临时限制计数 = `monster_refresh_count` 中的当日已战斗完成次数 + 当前 `Idle/Busy` 点位中的同怪数量 + 本轮已抽中的同怪数量
+  - `randomMonster` 只更新本轮临时计数，不直接写 `monster_refresh_count`
   - 按权重抽取怪物
   - `nextRefreshTime = now + Cd*1000`
 
-### 5.2 掉落
+### 5.2 怪物次数计数
+
+- 玩家与怪物战斗完成后，`completeSlot` 将点位置为 `Reward`，并递增 `monster_refresh_count[monsterId]`
+- 自动完成和立刻完成都会占用一次怪物 `Max` 次数
+- 取消出征不会占用怪物 `Max` 次数
+- `Reward` 点位不再作为“当前已刷出但未完成”计数，因为它已经在完成时计入 `monster_refresh_count`
+- 例：`cityMonster.Max = 3`，当天已战斗完成 1 次，则同一时刻最多还能刷出 2 只该怪物
+
+### 5.3 掉落
 
 - `Drop(dropId)` = 固定掉落 + 每组权重掉落各抽1个
 - 出征奖励：
@@ -188,8 +204,6 @@
 
 ## 6. 当前实现中的注意点（按代码现状）
 
-1. `StartExpeditionHandler` 前置有 `if req.SlotId > 1 return`，会把多槽位能力（购买/VIP）直接挡掉，后面的 `slotNum` 判定基本失效。
-2. `ClaimPointReward` 仅从内存 map 删除点位，未立即写 `battle_point_infos` 变更；通常依赖后续心跳刷新触发落库。
-3. `CheckExpeditionUnlock` 中 `emptyPoint := make([]int32, 0); copy(emptyPoint, cfg.MonsterPoint)` 不会复制任何元素，导致战场初始化当下可能无点位，需等心跳补点。
-4. 免费体力CD失败时发送错误消息ID使用了 `CHANGE_LEVEL_RESP`，与接口不一致（应为 `CLAIM_FREE_STAMINA_RESP`）。
+1. `ClaimPointReward` 仅从内存 map 删除点位，未立即写 `battle_point_infos` 变更；通常依赖后续心跳刷新触发落库。
+2. 免费体力CD失败时发送错误消息ID使用了 `CHANGE_LEVEL_RESP`，与接口不一致（应为 `CLAIM_FREE_STAMINA_RESP`）。
 
