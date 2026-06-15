@@ -54,7 +54,11 @@ func (i *ItemService) AddItem(player logicCommon.PlayerInterface, item *gameConf
 		Count:  item.Num,
 	})
 	if itemCfg.IsAutoUse == 1 {
-		return i.autoUseItem(player, item.ID, item.Num)
+		err := i.autoUseItem(player, item.ID, item.Num)
+		if err != nil {
+			platformLogger.ErrorWithUser("autoUseItem failed", player, err)
+			return err
+		}
 	} else if itemCfg.ShowGroup == int32(enum.ITEM_TYPE_EQUIP) {
 		equipLevel := itemCfg.Level
 		if itemCfg.Level == 0 {

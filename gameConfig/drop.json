@@ -19806,6 +19806,12 @@
    "probabilityItem": "",
    "probabilityItemWeight": ""
   },
+  "19058": {
+   "fixedItem": "1130001~1|1130015~1|1130016~1|1130017~1|1130018~1",
+   "id": "19058",
+   "probabilityItem": "",
+   "probabilityItemWeight": ""
+  },
   "19999": {
    "fixedItem": "",
    "id": "19999",

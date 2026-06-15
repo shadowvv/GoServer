@@ -169,6 +169,7 @@ const (
 	ITEM_CHANGE_REASON_GLORY_ARENA_REFRESH_LIST                             // 荣耀擂台刷新挑战列表
 	ITEM_CHANGE_REASON_ALLIANCE_SIGN_IN                                     // 联盟签到
 	ITEM_CHANGE_REASON_ALLIANCE_DAILY_TASK                                  // 联盟日常任务
+	ITEM_CHANGE_REASON_NEW_LUCKY_REWARD                                     // 新幸运奖励
 )
 
 type ItemRefreshType int32

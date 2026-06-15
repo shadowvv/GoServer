@@ -100,40 +100,59 @@ func GetLotteryInfoHandle(message proto.Message, player *model.PlayerModel) {
 			LotteryInfo: &pb.LotteryInfo{
 				LotteryCount:         0,
 				LastBasicGuaranteNum: 0,
+				IsDirty:              false,
 			},
 			FirstDropFree: 0,
 		})
 		return
 	}
 	lotteryEntity := player.LotteryModel.GetLotteryEntityById(req.LotteryId)
-	if lotteryEntity == nil {
+	// 确定共享保底数据的实体（如果ActModID存在，多个卡池共用一份保底数据）
+	dataLotteryId := player.LotteryModel.GetSharedLotteryEntityId(lotteryId)
+	dataEntity := player.LotteryModel.GetLotteryEntityById(dataLotteryId)
+	if dataEntity == nil && lotteryEntity == nil {
+		// 共享实体和自身实体都不存在，返回全0
 		messageSender.SendMessage(player, pb.MESSAGE_ID_GET_LOTTERY_INFO_RESP, &pb.GetLotteryInfoResp{
 			LotteryInfo: &pb.LotteryInfo{
 				LotteryCount:         0,
 				LastBasicGuaranteNum: 0,
+				IsDirty:              false,
 			},
 			FirstDropFree: 0,
 		})
 		return
 	}
-	if lotteryEntity.FirstDropFree > 0 {
-		if !tool.IsSameDayByMilli(lotteryEntity.LastFirstDropFreeTime, tool.UnixNowMilli()) {
-			lotteryEntity.FirstDropFree--
-			player.LotteryModel.UpdateFirstDropFree(lotteryId, lotteryEntity.FirstDropFree)
+	if dataEntity == nil {
+		dataEntity = lotteryEntity
+	}
+	firstDropFree := int32(0)
+	if lotteryEntity != nil {
+		if lotteryEntity.FirstDropFree > 0 {
+			if !tool.IsSameDayByMilli(lotteryEntity.LastFirstDropFreeTime, tool.UnixNowMilli()) {
+				lotteryEntity.FirstDropFree--
+				player.LotteryModel.UpdateFirstDropFree(lotteryId, lotteryEntity.FirstDropFree)
+			}
 		}
+		firstDropFree = lotteryEntity.FirstDropFree
 	}
 	lotteryLuckyEvent := player.LotteryModel.GetLotteryLuckyEvent()
 	resp := &pb.GetLotteryInfoResp{
 		LotteryInfo: &pb.LotteryInfo{
-			LotteryCount:         lotteryEntity.AllCount,
-			LastBasicGuaranteNum: lotteryEntity.LastBasicGuaranteeNum,
+			LotteryCount:         dataEntity.AllCount,
+			LastBasicGuaranteNum: dataEntity.LastBasicGuaranteeNum,
+			IsDirty:              dataEntity.IsDirty,
 		},
-		FirstDropFree: player.LotteryModel.LotteryEntities[req.LotteryId].FirstDropFree,
-		LotteryLuckyEvent: &pb.LotteryLuckyEvent{
-			LuckyNum:   lotteryLuckyEvent.LuckyNum,
-			CreateTime: lotteryLuckyEvent.CreateTime,
-		},
-		//NewLuckyCount:
+		FirstDropFree: firstDropFree,
+	}
+	if lotteryLuckyEvent != nil {
+		if cfg.ActModID != 0 {
+			resp.LotteryLuckyEvent = &pb.LotteryLuckyEvent{
+				LuckyNum:   lotteryLuckyEvent.LuckyNum,
+				CreateTime: lotteryLuckyEvent.CreateTime,
+			}
+		}
+		resp.NewLuckyCount = lotteryLuckyEvent.NewLuckyCount
+		resp.NewIsReward = lotteryLuckyEvent.IsNewLuckyReward
 	}
 	messageSender.SendMessage(player, pb.MESSAGE_ID_GET_LOTTERY_INFO_RESP, resp)
 }
@@ -250,6 +269,34 @@ func LotteryHandle(message proto.Message, player *model.PlayerModel) {
 		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_LOTTERY_RESP, pb.ERROR_CODE_UNLOCK_NOT_OPEN)
 		return
 	}
+
+	// 确定共享保底数据的实体ID（如果ActModID存在，多个卡池共用同一份保底数据）
+	dataLotteryId := player.LotteryModel.GetSharedLotteryEntityId(lotteryId)
+	dataDetail := player.LotteryModel.GetLotteryEntityById(dataLotteryId)
+	if dataDetail == nil && dataLotteryId != lotteryId {
+		// 共享实体不存在，需要创建
+		sharedEntity := &model.LotteryEntity{
+			UserId:                  player.GetUserId(),
+			Id:                      dataLotteryId,
+			AllCount:                0,
+			LastBasicGuaranteeNum:   0,
+			LastSpecialGuaranteeNum: 0,
+			SpecialGuaranteeCount:   0,
+			LastOnceEffectiveNum:    0,
+			OnceEffectiveCount:      0,
+			LastChangeTime:          tool.UnixNowMilli(),
+			FirstDropFree:           0,
+		}
+		if err := player.LotteryModel.AddLotteryEntity(sharedEntity); err != nil {
+			platformLogger.ErrorWithUser("add shared lottery entity error", player, err)
+			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_LOTTERY_RESP, pb.ERROR_CODE_LOTTERY_LOAD_INFO_ERROR)
+			return
+		}
+		dataDetail = sharedEntity
+	} else if dataDetail == nil {
+		dataDetail = lotteryDetail
+	}
+
 	vipCards, err := vipCard.Service.GetAllFunctionValues(player)
 	if err != nil {
 		platformLogger.ErrorWithUser("GetVipCardInfoList failed", player, err)
@@ -262,95 +309,115 @@ func LotteryHandle(message proto.Message, player *model.PlayerModel) {
 	}
 
 	for i := int32(0); i < lotteryNum; i++ {
-		// 抽奖逻辑
-		player.LotteryModel.UpdateAllCount(req.LotteryId, lotteryDetail.AllCount+1)
-		// 单次保底全部触发 或 未配置
-		if lotteryDetail.OnceEffectiveCount >= int32(len(cfg.Guarantees1)) {
-			//循环保底
-			if len(cfg.Guarantees2) > 0 {
-				if lotteryDetail.AllCount-lotteryDetail.LastSpecialGuaranteeNum >= cfg.Guarantees2[lotteryDetail.SpecialGuaranteeCount].Num {
+		// 抽奖逻辑 - 使用共享实体进行保底计数
+		player.LotteryModel.UpdateAllCount(dataLotteryId, dataDetail.AllCount+1)
 
-					dropGroupId := gameConfig.WeightedRandomChoice(cfg.Guarantees2[lotteryDetail.SpecialGuaranteeCount].DropGroupIdList, cfg.Guarantees2Weight[lotteryDetail.SpecialGuaranteeCount])
+		if len(cfg.LuckyGuarantees) > 0 {
+			// 奖励式保底机制（与单次保底、循环保底不共存）
+			luckyGuaranteesCfg := cfg.LuckyGuarantees[0]
+			if luckyGuaranteesCfg == nil {
+				platformLogger.ErrorWithUser("luckyGuaranteesCfg is nil", player, nil)
+				continue
+			}
+			if dataDetail.IsDirty && luckyGuaranteesCfg.Num != 0 && dataDetail.AllCount-dataDetail.LastBasicGuaranteeNum >= luckyGuaranteesCfg.Num {
+				// 已歪且达到保底阈值，强制从奖励式保底池抽取
+				player.LotteryModel.LuckyGuaranteeLottery(cfg, &res, dataLotteryId)
+			} else if cfg.Guarantees != nil && dataDetail.AllCount-dataDetail.LastBasicGuaranteeNum >= cfg.Guarantees.Num-int32(lossValue) {
+				player.LotteryModel.BasicLotteryGuarantee(cfg, &res, false, false, dataLotteryId)
+			} else {
+				// 普通抽取，抽取次数决定卡池
+				player.LotteryModel.BasicLottery(cfg, &res, false, false, dataLotteryId)
+			}
+		} else {
+			// 原有逻辑：单次保底/循环保底
+			// 单次保底全部触发 或 未配置
+			if dataDetail.OnceEffectiveCount >= int32(len(cfg.Guarantees1)) {
+				//循环保底
+				if len(cfg.Guarantees2) > 0 {
+					if dataDetail.AllCount-dataDetail.LastSpecialGuaranteeNum >= cfg.Guarantees2[dataDetail.SpecialGuaranteeCount].Num {
+
+						dropGroupId := gameConfig.WeightedRandomChoice(cfg.Guarantees2[dataDetail.SpecialGuaranteeCount].DropGroupIdList, cfg.Guarantees2Weight[dataDetail.SpecialGuaranteeCount])
+						itemIdList := gameConfig.DropGroupItems(dropGroupId, nil)
+
+						player.LotteryModel.UpdateLastBasicGuaranteeNum(dataLotteryId, dataDetail.AllCount)
+						for _, v := range itemIdList {
+							itemCfg := gameConfig.GetItemCfg(v.ID)
+							if itemCfg != nil {
+								if itemCfg.ShowGroup == int32(enum.ITEM_TYPE_HERO) {
+									player.LotteryModel.AddLotteryLog(&model.LotteryLog{UserId: dataDetail.UserId, Id: dataLotteryId, ItemId: v.ID, Count: dataDetail.AllCount, AddTime: tool.UnixNowMilli()})
+								}
+							}
+						}
+						player.LotteryModel.UpdateLastSpecialGuaranteeNum(dataLotteryId, dataDetail.AllCount)
+						player.LotteryModel.CheckAndUpSpecialGuaranteeNum(cfg, dataLotteryId)
+						player.LotteryModel.UpdateLastChengeTime(dataLotteryId, tool.UnixNowMilli())
+
+						for _, itemInfo := range itemIdList {
+							res = append(res, &pb.ItemBasicInfo{
+								ItemId: itemInfo.ID,
+								Count:  itemInfo.Num,
+							})
+						}
+
+					} else {
+						// 普通保底
+						if cfg.Guarantees != nil && dataDetail.AllCount-dataDetail.LastBasicGuaranteeNum >= cfg.Guarantees.Num-int32(lossValue) {
+							player.LotteryModel.BasicLotteryGuarantee(cfg, &res, false, true, dataLotteryId)
+						} else {
+							// 普通抽取，抽取次数决定卡池
+							player.LotteryModel.BasicLottery(cfg, &res, false, true, dataLotteryId)
+						}
+					}
+				} else {
+					if cfg.Guarantees != nil && dataDetail.AllCount-dataDetail.LastBasicGuaranteeNum >= cfg.Guarantees.Num-int32(lossValue) {
+						player.LotteryModel.BasicLotteryGuarantee(cfg, &res, false, false, dataLotteryId)
+					} else {
+						// 普通抽取，抽取次数决定卡池
+						player.LotteryModel.BasicLottery(cfg, &res, false, false, dataLotteryId)
+					}
+				}
+			} else {
+				// 单次保底未触发
+				if dataDetail.AllCount-dataDetail.LastOnceEffectiveNum >= cfg.Guarantees1[dataDetail.OnceEffectiveCount].Num {
+					// 触发单次保底
+					dropGroupId := gameConfig.WeightedRandomChoice(cfg.Guarantees1[dataDetail.OnceEffectiveCount].DropGroupIdList, cfg.Guarantees1Weight[dataDetail.OnceEffectiveCount])
 					itemIdList := gameConfig.DropGroupItems(dropGroupId, nil)
-
-					player.LotteryModel.UpdateLastBasicGuaranteeNum(req.LotteryId, lotteryDetail.AllCount)
+					player.LotteryModel.UpdateLastBasicGuaranteeNum(dataLotteryId, dataDetail.AllCount)
 					for _, v := range itemIdList {
 						itemCfg := gameConfig.GetItemCfg(v.ID)
 						if itemCfg != nil {
 							if itemCfg.ShowGroup == int32(enum.ITEM_TYPE_HERO) {
-								player.LotteryModel.AddLotteryLog(&model.LotteryLog{UserId: lotteryDetail.UserId, Id: req.LotteryId, ItemId: v.ID, Count: lotteryDetail.AllCount, AddTime: tool.UnixNowMilli()})
+								player.LotteryModel.AddLotteryLog(&model.LotteryLog{UserId: dataDetail.UserId, Id: dataLotteryId, ItemId: v.ID, Count: dataDetail.AllCount, AddTime: tool.UnixNowMilli()})
 							}
 						}
 					}
-					player.LotteryModel.UpdateLastSpecialGuaranteeNum(req.LotteryId, lotteryDetail.AllCount)
-					player.LotteryModel.CheckAndUpSpecialGuaranteeNum(cfg, lotteryId)
-					player.LotteryModel.UpdateLastChengeTime(req.LotteryId, tool.UnixNowMilli())
-
+					player.LotteryModel.UpdateLastSpecialGuaranteeNum(dataLotteryId, dataDetail.AllCount)
+					player.LotteryModel.UpdateLastOnceEffectiveNum(dataLotteryId, dataDetail.AllCount)
+					player.LotteryModel.UpdateOnceEffectiveCount(dataLotteryId, dataDetail.OnceEffectiveCount+1)
+					player.LotteryModel.UpdateLastChengeTime(dataLotteryId, tool.UnixNowMilli())
 					for _, itemInfo := range itemIdList {
 						res = append(res, &pb.ItemBasicInfo{
 							ItemId: itemInfo.ID,
 							Count:  itemInfo.Num,
 						})
 					}
-
 				} else {
 					// 普通保底
-					if cfg.Guarantees != nil && lotteryDetail.AllCount-lotteryDetail.LastBasicGuaranteeNum >= cfg.Guarantees.Num-int32(lossValue) {
-						player.LotteryModel.BasicLotteryGuarantee(cfg, &res, false, true, lotteryId)
+					if cfg.Guarantees != nil && dataDetail.AllCount-dataDetail.LastBasicGuaranteeNum >= cfg.Guarantees.Num-int32(lossValue) {
+						player.LotteryModel.BasicLotteryGuarantee(cfg, &res, true, false, dataLotteryId)
 					} else {
-						// 普通抽取，抽取次数决定卡池
-						player.LotteryModel.BasicLottery(cfg, &res, false, true, lotteryId)
+						player.LotteryModel.BasicLottery(cfg, &res, true, false, dataLotteryId)
 					}
-				}
-			} else {
-				if cfg.Guarantees != nil && lotteryDetail.AllCount-lotteryDetail.LastBasicGuaranteeNum >= cfg.Guarantees.Num-int32(lossValue) {
-					player.LotteryModel.BasicLotteryGuarantee(cfg, &res, false, false, lotteryId)
-				} else {
-					// 普通抽取，抽取次数决定卡池
-					player.LotteryModel.BasicLottery(cfg, &res, false, false, lotteryId)
-				}
-			}
-		} else {
-			// 单次保底未触发
-			if lotteryDetail.AllCount-lotteryDetail.LastOnceEffectiveNum >= cfg.Guarantees1[lotteryDetail.OnceEffectiveCount].Num {
-				// 触发单次保底
-				dropGroupId := gameConfig.WeightedRandomChoice(cfg.Guarantees1[lotteryDetail.OnceEffectiveCount].DropGroupIdList, cfg.Guarantees1Weight[lotteryDetail.OnceEffectiveCount])
-				itemIdList := gameConfig.DropGroupItems(dropGroupId, nil)
-				player.LotteryModel.UpdateLastBasicGuaranteeNum(req.LotteryId, lotteryDetail.AllCount)
-				for _, v := range itemIdList {
-					itemCfg := gameConfig.GetItemCfg(v.ID)
-					if itemCfg != nil {
-						if itemCfg.ShowGroup == int32(enum.ITEM_TYPE_HERO) {
-							player.LotteryModel.AddLotteryLog(&model.LotteryLog{UserId: lotteryDetail.UserId, Id: req.LotteryId, ItemId: v.ID, Count: lotteryDetail.AllCount, AddTime: tool.UnixNowMilli()})
-						}
-					}
-				}
-				player.LotteryModel.UpdateLastSpecialGuaranteeNum(req.LotteryId, lotteryDetail.AllCount)
-				player.LotteryModel.UpdateLastOnceEffectiveNum(req.LotteryId, lotteryDetail.AllCount)
-				player.LotteryModel.UpdateOnceEffectiveCount(req.LotteryId, lotteryDetail.OnceEffectiveCount+1)
-				player.LotteryModel.UpdateLastChengeTime(req.LotteryId, tool.UnixNowMilli())
-				for _, itemInfo := range itemIdList {
-					res = append(res, &pb.ItemBasicInfo{
-						ItemId: itemInfo.ID,
-						Count:  itemInfo.Num,
-					})
-				}
-			} else {
-				// 普通保底
-				if cfg.Guarantees != nil && lotteryDetail.AllCount-lotteryDetail.LastBasicGuaranteeNum >= cfg.Guarantees.Num-int32(lossValue) {
-					player.LotteryModel.BasicLotteryGuarantee(cfg, &res, true, false, lotteryId)
-				} else {
-					player.LotteryModel.BasicLottery(cfg, &res, true, false, lotteryId)
 				}
 			}
 		}
 	}
+	lotteryLuckyEvent := player.LotteryModel.GetLotteryLuckyEvent()
 	if lotteryNum == 1 && lotteryDetail.FirstDropFree < cfg.FirstDropFree {
 		player.LotteryModel.UpdateFirstDropFree(lotteryId, lotteryDetail.FirstDropFree+1)
 		player.LotteryModel.UpdateLastFirstDropFreeTime(lotteryId, tool.UnixNowMilli())
 	} else {
 		removeItems := &gameConfig.ItemConfig{ID: gameConfig.GetSummonPoolCfg(req.LotteryId).DropToken, Num: int64(lotteryNum)}
-		lotteryLuckyEvent := player.LotteryModel.GetLotteryLuckyEvent()
 		// 抽奖类型：英雄卡池          数量：十抽          卡池类型：限定卡池
 		if cfg.Gashatype == 1 && lotteryNum == 10 && cfg.ActModID != 0 {
 			luckyEventCfgTime := gameConfig.GetConstantCfg(gameConfig.CONSTANT_limitedGachaLuckyEventTime)
@@ -365,15 +432,16 @@ func LotteryHandle(message proto.Message, player *model.PlayerModel) {
 				return
 			}
 		}
-		if cfg.Gashatype == 1 && !lotteryLuckyEvent.IsNewLuckyReward {
-			player.LotteryModel.UpdateNewLuckyCount(lotteryLuckyEvent.NewLuckyCount + lotteryNum)
-		}
+
 		err := itemService.RemoveItem(player, removeItems, enum.ITEM_CHANGE_REASON_DRAW_LOTTERY)
 		if err != nil {
 			platformLogger.InfoWithUser("扣除材料失败", player)
 			messageSender.SendErrorMessage(player, pb.MESSAGE_ID_LOTTERY_RESP, pb.ERROR_CODE_REMOVE_ITEM_ERROR)
 			return
 		}
+	}
+	if cfg.Gashatype == 1 && !lotteryLuckyEvent.IsNewLuckyReward {
+		player.LotteryModel.UpdateNewLuckyCount(lotteryLuckyEvent.NewLuckyCount + lotteryNum)
 	}
 	items := make([]*gameConfig.ItemConfig, 0)
 	for _, v := range res {
@@ -387,20 +455,22 @@ func LotteryHandle(message proto.Message, player *model.PlayerModel) {
 		platformLogger.ErrorWithUser("add item error", player, err)
 		return
 	}
-	lotteryLuckyEvent := player.LotteryModel.GetLotteryLuckyEvent()
 	resp := &pb.LotteryResp{
 		Result:   pb.LotteryResult_LOTTERY_RESULT_SUCCESS,
 		InfoList: res,
 		LotteryInfo: &pb.LotteryInfo{
-			LotteryCount:         lotteryDetail.AllCount,
-			LastBasicGuaranteNum: lotteryDetail.LastBasicGuaranteeNum,
+			LotteryCount:         dataDetail.AllCount,
+			LastBasicGuaranteNum: dataDetail.LastBasicGuaranteeNum,
+			IsDirty:              dataDetail.IsDirty,
 		},
 		FirstDropFree: player.LotteryModel.LotteryEntities[req.LotteryId].FirstDropFree,
-		LotteryLuckyEvent: &pb.LotteryLuckyEvent{
+		NewLuckyCount: lotteryLuckyEvent.NewLuckyCount,
+	}
+	if cfg.ActModID != 0 {
+		resp.LotteryLuckyEvent = &pb.LotteryLuckyEvent{
 			CreateTime: lotteryLuckyEvent.CreateTime,
 			LuckyNum:   lotteryLuckyEvent.LuckyNum,
-		},
-		NewLuckyCount: lotteryLuckyEvent.NewLuckyCount,
+		}
 	}
 	messageSender.SendMessage(player, pb.MESSAGE_ID_LOTTERY_RESP, resp)
 
@@ -442,5 +512,6 @@ func NewLuckyRewardHandle(message proto.Message, player *model.PlayerModel) {
 		messageSender.SendErrorMessage(player, pb.MESSAGE_ID_NEW_LUCKY_REWARD_RESP, pb.ERROR_CODE_NEW_LUCKY_REWARD_ERROR)
 		return
 	}
+	itemService.AddItem(player, &gameConfig.ItemConfig{ID: req.ItemId, Num: 1}, enum.ITEM_CHANGE_REASON_NEW_LUCKY_REWARD)
 	messageSender.SendMessage(player, pb.MESSAGE_ID_NEW_LUCKY_REWARD_RESP, &pb.NewLuckyRewardResp{})
 }

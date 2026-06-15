@@ -92,7 +92,7 @@ func (s *LotteryCfgLoader) loadData() error {
 		v.ActModID = ParseInt(row["actModID"])
 		v.UnlockID = ParseInt(row["unlockID"])
 		v.LuckyGuarantees = ParseLotteryCfgArray(row["luckGuarantees"])
-		v.LuckyGuaranteesWeight = ParseIntMatrix(row["luckGuaranteesWeight"])
+		v.LuckyWeight = ParseIntMatrix(row["luckWeight"])
 		if v.Id <= 0 {
 			continue
 		}
@@ -110,7 +110,7 @@ func (s *LotteryCfgLoader) checkData() error {
 		if len(v.DropGroupId1) != len(v.Weight1) || len(v.DropGroupId2) != len(v.Weight2) {
 			return errors.New(fmt.Sprintf("[gameConfig] load summonPool error invalid DropGroupId or Weight ID:%d", id))
 		}
-		if len(v.LuckyGuaranteesWeight) != len(v.LuckyGuarantees) {
+		if len(v.LuckyWeight) != len(v.LuckyGuarantees) {
 			return errors.New(fmt.Sprintf("[gameConfig] load summonPool error invalid LuckyGuaranteesWeight ID:%d", id))
 		}
 		// 如果有奖励式保底，则不能有单次保底和循环保底
@@ -153,7 +153,7 @@ type SummonPoolCfg struct {
 	// 奖励式保底
 	LuckyGuarantees []*LotteryCfg `json:"luckGuarantees"`
 	// 奖励式保底权重
-	LuckyGuaranteesWeight [][]int32 `json:"luckGuaranteesWeight"`
+	LuckyWeight [][]int32 `json:"luckWeight"`
 	// 单次保底抽数1
 	Guarantees1 []*LotteryCfg `json:"guarantees1"`
 	// 单次保底卡池权重
@@ -176,6 +176,24 @@ func GetSummonPoolCfg(id int32) *SummonPoolCfg {
 		return nil
 	}
 	return cfgMap.(map[int32]*SummonPoolCfg)[id]
+}
+
+// GetActModSharedLotteryId 获取共享保底的基准卡池ID
+// 只要ActModID存在（不为0），不论值是否一样，所有这些卡池共用一个进度（取最小卡池ID作为共享key）
+func GetActModSharedLotteryId() int32 {
+	cfgMap := summonPool.Load()
+	if cfgMap == nil {
+		return 0
+	}
+	minId := int32(0)
+	for id, cfg := range cfgMap.(map[int32]*SummonPoolCfg) {
+		if cfg.ActModID != 0 {
+			if minId == 0 || id < minId {
+				minId = id
+			}
+		}
+	}
+	return minId
 }
 
 func WeightedRandomChoice(nums []int32, weights []int32) int32 {

@@ -25,6 +25,7 @@ type LotteryEntity struct {
 	OnceEffectiveCount      int32 `gorm:"column:once_effective_count"`       // 单次保底生效档位
 	FirstDropFree           int32 `gorm:"column:first_drop_free"`            // 首次免费次数
 	LastFirstDropFreeTime   int64 `gorm:"column:last_once_effective_time"`   // 上次免费次数更新时间
+	IsDirty                 bool  `gorm:"column:is_dirty"`                   // 是否歪了
 
 	ActVersion string `gorm:"column:act_version"` // 活动版本号
 }
@@ -73,12 +74,12 @@ func (l *LotteryModel) GetLotterySystemId(lotterType int32) enum.FunctionIdEnum 
 
 func (l *LotteryModel) SaveModelToDB() {
 	if l.Changed == nil || len(l.Changed) == 0 {
-		return
+	} else {
+		for id, changes := range l.Changed {
+			easyDB.UpdatePlayerEntity[LotteryEntity](l.LotteryEntities[id], changes, l.UserId)
+		}
+		l.Changed = make(map[int32]map[string]interface{})
 	}
-	for id, changes := range l.Changed {
-		easyDB.UpdatePlayerEntity[LotteryEntity](l.LotteryEntities[id], changes, l.UserId)
-	}
-	l.Changed = make(map[int32]map[string]interface{})
 
 	if l.LotteryLuckyEventEntity != nil && (l.LuckyEventChanged == nil || len(l.LuckyEventChanged) == 0) {
 		return
@@ -183,6 +184,21 @@ func (l *LotteryModel) GetLotteryEntityById(lotteryId int32) *LotteryEntity {
 	return l.LotteryEntities[lotteryId]
 }
 
+// GetSharedLotteryEntityId 获取共享保底数据的实体ID
+// 如果 ActModID 存在（不为0），则所有有 ActModID 的卡池共用一个保底数据（取最小卡池ID作为共享key）
+// 如果 ActModID 不存在，则使用自身卡池ID
+func (l *LotteryModel) GetSharedLotteryEntityId(lotteryId int32) int32 {
+	cfg := gameConfig.GetSummonPoolCfg(lotteryId)
+	if cfg == nil || cfg.ActModID == 0 {
+		return lotteryId
+	}
+	sharedId := gameConfig.GetActModSharedLotteryId()
+	if sharedId == 0 {
+		return lotteryId
+	}
+	return sharedId
+}
+
 func (l *LotteryModel) AddLotteryEntity(entity *LotteryEntity) error {
 	l.LotteryEntities[entity.Id] = entity
 	if err := easyDB.CreatePlayerEntity[LotteryEntity](entity); err != nil {
@@ -222,6 +238,17 @@ func (l *LotteryModel) AddLotteryLog(entity *LotteryLog) {
 	}
 }
 
+func CreateLotteryLuckyEvent(userId int64) (error, *LotteryLuckyEventEntity) {
+	entity := &LotteryLuckyEventEntity{
+		UserId:           userId,
+		LuckyNum:         0,
+		CreateTime:       0,
+		NewLuckyCount:    0,
+		IsNewLuckyReward: false,
+	}
+	return easyDB.CreatePlayerEntity[LotteryLuckyEventEntity](entity), entity
+}
+
 func LoadLotteryModel(userId int64) (*LotteryModel, error) {
 	LotteryEntities := make(map[int32]*LotteryEntity)
 	lotteryHistoryDetail := make(map[int32][]*LotteryLog)
@@ -240,6 +267,14 @@ func LoadLotteryModel(userId int64) (*LotteryModel, error) {
 	row2, err2 := easyDB.GetPlayerEntityByWhere[LotteryLuckyEventEntity](map[string]interface{}{"user_id": userId})
 	if err2 != nil {
 		if !errors.Is(err2, gorm.ErrRecordNotFound) {
+			return NewLotteryModel(userId, LotteryEntities, lotteryLuckyEventEntity, lotteryHistoryDetail, set, qualitySet), err2
+		} else {
+			err, entity := CreateLotteryLuckyEvent(userId)
+			if err != nil {
+				logger.ErrorWithZapFields("CreateLotteryLuckyEvent error")
+			} else {
+				lotteryLuckyEventEntity = entity
+			}
 			return NewLotteryModel(userId, LotteryEntities, lotteryLuckyEventEntity, lotteryHistoryDetail, set, qualitySet), err2
 		}
 	}
@@ -282,7 +317,7 @@ func (l *LotteryModel) BasicLottery(cfg *gameConfig.SummonPoolCfg, res *[]*pb.It
 			Count:  itemInfo.Num,
 		})
 	}
-	// 判断抽取到的是否为特殊物品
+	// 原有逻辑：判断抽取到的是否为特殊物品
 	flag := gameConfig.CheckLotterIdIsGuarantess(LotteryId, dropGroupId, onceFlag, specialFlag)
 	if flag == 1 {
 		l.UpdateOnceEffectiveCount(LotteryId, lotterDetail.OnceEffectiveCount+1)
@@ -311,6 +346,19 @@ func (l *LotteryModel) BasicLottery(cfg *gameConfig.SummonPoolCfg, res *[]*pb.It
 		}
 	} else if flag == 3 {
 		l.UpdateLastBasicGuaranteeNum(LotteryId, lotterDetail.AllCount)
+		// 判断是否歪了（抽到的是否在LuckyGuarantees奖池里）
+		isDirty := true
+		for _, v := range itemIdList {
+			if !l.IsLotteryDirty(cfg, v.ID) {
+				isDirty = false
+				break
+			}
+		}
+		if isDirty {
+			l.UpdateIsDirty(LotteryId, true)
+		} else {
+			l.UpdateIsDirty(LotteryId, false)
+		}
 		for _, v := range itemIdList {
 			itemCfg := gameConfig.GetItemCfg(v.ID)
 			if itemCfg != nil {
@@ -344,6 +392,21 @@ func (l *LotteryModel) BasicLotteryGuarantee(cfg *gameConfig.SummonPoolCfg, res 
 			Count:  itemInfo.Num,
 		})
 	}
+	// 奖励式保底机制：判断保底结果是否歪了
+	if cfg.LuckyGuarantees != nil && len(cfg.LuckyGuarantees) > 0 {
+		isDirty := true
+		for _, v := range itemIdList {
+			if !l.IsLotteryDirty(cfg, v.ID) {
+				isDirty = false
+				break
+			}
+		}
+		if isDirty {
+			l.UpdateIsDirty(LotteryId, true)
+		} else {
+			l.UpdateIsDirty(LotteryId, false)
+		}
+	}
 	flag := gameConfig.CheckLotterIdIsGuarantess(LotteryId, dropGroupId, onceFlag, specialFlag)
 	if flag == 1 {
 		l.UpdateOnceEffectiveCount(LotteryId, lotterDetail.OnceEffectiveCount+1)
@@ -357,7 +420,7 @@ func (l *LotteryModel) BasicLotteryGuarantee(cfg *gameConfig.SummonPoolCfg, res 
 
 func (l *LotteryModel) CheckAndUpSpecialGuaranteeNum(cfg *gameConfig.SummonPoolCfg, LotteryId int32) {
 	lotterDetail := l.LotteryEntities[LotteryId]
-	if gameConfig.GetSummonPoolCfg(LotteryId).Guarantees2Type == 1 {
+	if cfg.Guarantees2Type == 1 {
 		l.UpdateSpecialGuaranteeCount(LotteryId, min(lotterDetail.SpecialGuaranteeCount+1, int32(len(cfg.Guarantees2)-1)))
 	} else {
 		if lotterDetail.SpecialGuaranteeCount+1 >= int32(len(cfg.Guarantees2)) {
@@ -376,6 +439,14 @@ func (l *LotteryModel) UpdateNewLuckyCount(num int32) {
 func (l *LotteryModel) UpdateIsNewLuckyReward() {
 	l.LotteryLuckyEventEntity.IsNewLuckyReward = true
 	l.LuckyEventChanged["is_new_lucky_reward"] = true
+}
+
+func (l *LotteryModel) UpdateIsDirty(lotteryId int32, isDirty bool) {
+	l.LotteryEntities[lotteryId].IsDirty = isDirty
+	if l.Changed[lotteryId] == nil {
+		l.Changed[lotteryId] = make(map[string]interface{})
+	}
+	l.Changed[lotteryId]["is_dirty"] = isDirty
 }
 
 func (l *LotteryModel) RewardNewLucky(itemId int32) bool {
@@ -412,29 +483,23 @@ func (l *LotteryModel) CreateLotteryLuckyEvent() error {
 	if len(cfgWeight.Value) != len(cfgValue.Value) {
 		return errors.New("constant cfg error")
 	}
-	luckyEventNum := gameConfig.WeightedRandomChoice(cfgWeight.Value, cfgWeight.Value)
+	luckyEventNum := gameConfig.WeightedRandomChoice(cfgValue.Value, cfgWeight.Value)
 	entity.LuckyNum = luckyEventNum
 	entity.CreateTime = tool.UnixNowMilli()
-	if l.LotteryLuckyEventEntity.LuckyNum == 0 && l.LotteryLuckyEventEntity.CreateTime == 0 {
-		l.LotteryLuckyEventEntity = entity
-		return easyDB.CreatePlayerEntity(entity)
-	} else {
-		l.LotteryLuckyEventEntity = entity
-		l.LuckyEventChanged["LuckyNum"] = entity.LuckyNum
-		l.LuckyEventChanged["CreateTime"] = entity.CreateTime
-	}
+	l.LotteryLuckyEventEntity = entity
+	l.LuckyEventChanged["LuckyNum"] = entity.LuckyNum
+	l.LuckyEventChanged["CreateTime"] = entity.CreateTime
 	return nil
 }
 
-func (l *LotteryModel) IsLotteryDirty(lotteryId int32, itemId int32) bool {
-	cfg := gameConfig.GetSummonPoolCfg(lotteryId)
+func (l *LotteryModel) IsLotteryDirty(cfg *gameConfig.SummonPoolCfg, itemId int32) bool {
 	if cfg == nil {
 		return true
 	}
 	dropIdCfgs := cfg.LuckyGuarantees
 	for _, v := range dropIdCfgs {
 		for _, value := range v.DropGroupIdList {
-			items := gameConfig.Drop(value)
+			items := gameConfig.DropGroupItems(value, nil)
 			for _, item := range items {
 				if item.ID == itemId {
 					return false
@@ -443,4 +508,33 @@ func (l *LotteryModel) IsLotteryDirty(lotteryId int32, itemId int32) bool {
 		}
 	}
 	return true
+}
+
+// 奖励式保底抽取（强制从奖励式保底池中抽取）
+func (l *LotteryModel) LuckyGuaranteeLottery(cfg *gameConfig.SummonPoolCfg, res *[]*pb.ItemBasicInfo, LotteryId int32) {
+	lotterDetail := l.LotteryEntities[LotteryId]
+	// 从奖励式保底池中随机抽取
+	dropGroupId := gameConfig.WeightedRandomChoice(cfg.LuckyGuarantees[0].DropGroupIdList, cfg.LuckyWeight[0])
+	itemIdList := gameConfig.DropGroupItems(dropGroupId, nil)
+
+	for _, v := range itemIdList {
+		itemCfg := gameConfig.GetItemCfg(v.ID)
+		if itemCfg != nil {
+			if gameConfig.CheckItemIsGuarantess(itemCfg.ShowGroup) {
+				l.AddLotteryLog(&LotteryLog{UserId: lotterDetail.UserId, Id: LotteryId, ItemId: v.ID, Count: lotterDetail.AllCount, AddTime: tool.UnixNowMilli()})
+			}
+		}
+	}
+
+	for _, itemInfo := range itemIdList {
+		*res = append(*res, &pb.ItemBasicInfo{
+			ItemId: itemInfo.ID,
+			Count:  itemInfo.Num,
+		})
+	}
+
+	// 强制保底成功，重置保底计数，标记未歪
+	l.UpdateLastBasicGuaranteeNum(LotteryId, lotterDetail.AllCount)
+	l.UpdateIsDirty(LotteryId, false)
+	l.UpdateLastChengeTime(LotteryId, tool.UnixNowMilli())
 }
